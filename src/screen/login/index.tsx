@@ -28,7 +28,7 @@ export default function Login() {
         alt="logo"
         mt="20%"
       />
-      <Center mt={30}>
+      <Center mt={30} mx={20}>
         <VStack space="md">
           <Text fontWeight={"$extrabold"} fontSize={"$xl"}>
             Selamat datang

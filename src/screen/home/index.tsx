@@ -295,10 +295,10 @@ const Home = () => {
             </ActionsheetDragIndicatorWrapper>
 
             <ActionsheetItem>
-              <Text fontWeight={"$bold"}>All Menu</Text>
+              <Text fontWeight={"$extrabold"}>All Menu</Text>
             </ActionsheetItem>
             <ActionsheetItem>
-              <Text fontWeight={"$bold"} mx={10}>
+              <Text fontWeight={"$extrabold"} mx={10}>
                 Keuangan
               </Text>
             </ActionsheetItem>
@@ -323,7 +323,7 @@ const Home = () => {
             </ActionsheetItem>
 
             <ActionsheetItem>
-              <Text fontWeight={"$bold"} mx={10}>
+              <Text fontWeight={"$extrabold"} mx={10}>
                 Akademik
               </Text>
             </ActionsheetItem>
@@ -342,7 +342,7 @@ const Home = () => {
             </ActionsheetItem>
 
             <ActionsheetItem onPress={handleClose}>
-              <Text fontWeight={"$bold"} mx={10}>
+              <Text fontWeight={"$extrabold"} mx={10}>
                 Pengasuhan
               </Text>
             </ActionsheetItem>
