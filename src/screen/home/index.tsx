@@ -55,10 +55,11 @@ const Home = () => {
             borderColor="transparent"
           >
             <ImageBackground
-              source={require("@/assets/images/One.png")} // Ganti dengan path gambar Anda
+              source={require("@/assets/images/One.png")}
               style={{
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
+                width: "auto",
               }}
               imageStyle={{
                 borderTopLeftRadius: 16,
@@ -92,7 +93,7 @@ const Home = () => {
             borderWidth={1}
             backgroundColor="#506A7A"
             height={50}
-            mt={-10}
+            mt={20}
             borderColor="transparent"
           >
             <HStack justifyContent="space-between" mx={20} my={3} mt={10}>
@@ -196,7 +197,7 @@ const Home = () => {
               <MaterialCommunityIcons name="close" size={30} />
             </HStack>
 
-            <HStack justifyContent="space-between">
+            <HStack justifyContent="space-between" width={"auto"}>
               <VStack width={"70%"}>
                 <Text fontWeight={"$bold"} fontSize={15}>
                   Ganti Kata Sandi Anda!
@@ -206,13 +207,15 @@ const Home = () => {
                   sandi secara berkala, minimal 4 bulan sekali.
                 </Text>
               </VStack>
-              <Image
-                size="xl"
-                source={require("@/assets/images/lock.png")}
-                alt="artikel"
-                borderRadius={10}
-                mt={"-10%"}
-              />
+              <Box>
+                <Image
+                  size="xl"
+                  source={require("@/assets/images/lock.png")}
+                  alt="artikel"
+                  borderRadius={10}
+                  mt={"-10%"}
+                />
+              </Box>
             </HStack>
           </VStack>
         </Box>
@@ -239,7 +242,7 @@ const Home = () => {
                   source={require("@/assets/images/artikel1.jpg")}
                   alt="artikel"
                   borderRadius={10}
-                  width={screenWidth}
+                  width={cardWidth}
                 />
                 <VStack space="md" m={10}>
                   <Text fontWeight={"$bold"} fontSize={14}>
@@ -267,7 +270,7 @@ const Home = () => {
                   source={require("@/assets/images/artikel1.jpg")}
                   alt="artikel"
                   borderRadius={10}
-                  width={screenWidth}
+                  width={cardWidth}
                 />
                 <VStack space="md" m={10}>
                   <Text fontWeight={"$bold"} fontSize={14}>
@@ -289,73 +292,75 @@ const Home = () => {
           zIndex={999}
         >
           <ActionsheetBackdrop />
-          <ActionsheetContent h="$72" zIndex={999}>
-            <ActionsheetDragIndicatorWrapper>
-              <ActionsheetDragIndicator />
-            </ActionsheetDragIndicatorWrapper>
+          <ScrollView>
+            <ActionsheetContent maxHeight={"100%"} zIndex={999}>
+              <ActionsheetDragIndicatorWrapper>
+                <ActionsheetDragIndicator />
+              </ActionsheetDragIndicatorWrapper>
 
-            <ActionsheetItem>
-              <Text fontWeight={"$extrabold"}>All Menu</Text>
-            </ActionsheetItem>
-            <ActionsheetItem>
-              <Text fontWeight={"$extrabold"} mx={10}>
-                Keuangan
-              </Text>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Tagihan</ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>
-                Pembayaran Tagihan
-              </ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Invoice</ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>
-                Pembayaran Mesin
-              </ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Saldo</ActionsheetItemText>
-            </ActionsheetItem>
+              <ActionsheetItem>
+                <Text fontWeight={"$extrabold"}>All Menu</Text>
+              </ActionsheetItem>
+              <ActionsheetItem>
+                <Text fontWeight={"$extrabold"} mx={10}>
+                  Keuangan
+                </Text>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Tagihan</ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>
+                  Pembayaran Tagihan
+                </ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Invoice</ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>
+                  Pembayaran Mesin
+                </ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Saldo</ActionsheetItemText>
+              </ActionsheetItem>
 
-            <ActionsheetItem>
-              <Text fontWeight={"$extrabold"} mx={10}>
-                Akademik
-              </Text>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>
-                Jadwal Pelajaran
-              </ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Rangking</ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>
-                Hafalan Al-Qur'an
-              </ActionsheetItemText>
-            </ActionsheetItem>
+              <ActionsheetItem>
+                <Text fontWeight={"$extrabold"} mx={10}>
+                  Akademik
+                </Text>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>
+                  Jadwal Pelajaran
+                </ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Rangking</ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>
+                  Hafalan Al-Qur'an
+                </ActionsheetItemText>
+              </ActionsheetItem>
 
-            <ActionsheetItem onPress={handleClose}>
-              <Text fontWeight={"$extrabold"} mx={10}>
-                Pengasuhan
-              </Text>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Absensi Biasa</ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Absensi HP</ActionsheetItemText>
-            </ActionsheetItem>
-            <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText mx={20}>Pelanggaran</ActionsheetItemText>
-            </ActionsheetItem>
-          </ActionsheetContent>
+              <ActionsheetItem onPress={handleClose}>
+                <Text fontWeight={"$extrabold"} mx={10}>
+                  Pengasuhan
+                </Text>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Absensi Biasa</ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Absensi HP</ActionsheetItemText>
+              </ActionsheetItem>
+              <ActionsheetItem onPress={handleClose}>
+                <ActionsheetItemText mx={20}>Pelanggaran</ActionsheetItemText>
+              </ActionsheetItem>
+            </ActionsheetContent>
+          </ScrollView>
         </Actionsheet>
       </ScrollView>
     </>
