@@ -274,7 +274,7 @@ const Home = () => {
                 />
                 <VStack space="md" m={10}>
                   <Text fontWeight={"$bold"} fontSize={14}>
-                    Tesla Launching AI Robot
+                    Tesla Launching AI Robots
                   </Text>
                   <Text fontSize={12}>
                     Untuk keamanan akun anda, kami sarankan untuk mengganti kata
