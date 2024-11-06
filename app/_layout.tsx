@@ -45,6 +45,14 @@ export default function RootLayout() {
             name="confirmPassword"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="informasiDiri" options={{ headerShown: false }} />
+          <Stack.Screen name="informasiWali" options={{ headerShown: false }} />
+
+          <Stack.Screen name="keamananAkun" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="pengaturanAkun"
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>

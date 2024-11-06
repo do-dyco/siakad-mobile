@@ -93,13 +93,16 @@ export default function Login() {
             isFocusVisible={false}
             bgColor={colors.primary}
             mt={20}
+            borderRadius={10}
             onPress={() => router.push("/(tabs)")}
           >
             <Text color="#ffffff">Masuk</Text>
           </Button>
 
           <Center mt={20}>
-            <TouchableOpacity onPress={() => router.push("forgetPassword")}>
+            <TouchableOpacity
+              onPress={() => router.push("forgetPassword" as never)}
+            >
               <Text>Lupa Kata Sandi ?</Text>
             </TouchableOpacity>
           </Center>
