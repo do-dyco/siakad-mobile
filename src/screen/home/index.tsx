@@ -24,6 +24,7 @@ import {
 } from "@gluestack-ui/themed";
 import { Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -107,13 +108,15 @@ const Home = () => {
           <VStack space="xl">
             <HStack justifyContent="space-between" m={20}>
               <VStack alignItems="center">
-                <Box backgroundColor="#F5F5F5" p={3} borderRadius={8}>
-                  <MaterialCommunityIcons
-                    name="clipboard-check-outline"
-                    size={25}
-                  />
-                </Box>
-                <Text fontSize={10}>Absensi</Text>
+                <TouchableOpacity onPress={() => router.push("/absensi")}>
+                  <Box backgroundColor="#F5F5F5" p={3} borderRadius={8}>
+                    <MaterialCommunityIcons
+                      name="clipboard-check-outline"
+                      size={25}
+                    />
+                  </Box>
+                  <Text fontSize={10}>Absensi</Text>
+                </TouchableOpacity>
               </VStack>
               <VStack alignItems="center">
                 <Box backgroundColor="#F5F5F5" p={3} borderRadius={8}>
