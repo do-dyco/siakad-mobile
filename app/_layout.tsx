@@ -54,6 +54,13 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
 
+          {/* keuangan */}
+          <Stack.Screen name="saldo" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="detailTransaksi"
+            options={{ headerShown: false }}
+          />
+
           {/* pengasuhan */}
           <Stack.Screen name="absensi" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />

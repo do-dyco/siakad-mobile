@@ -325,7 +325,12 @@ const Home = () => {
                   Pembayaran Mesin
                 </ActionsheetItemText>
               </ActionsheetItem>
-              <ActionsheetItem onPress={handleClose}>
+              <ActionsheetItem
+                onPress={() => {
+                  router.push("/saldo");
+                  handleClose();
+                }}
+              >
                 <ActionsheetItemText mx={20}>Saldo</ActionsheetItemText>
               </ActionsheetItem>
 
