@@ -34,7 +34,11 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider config={config}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
@@ -58,6 +62,13 @@ export default function RootLayout() {
           <Stack.Screen name="saldo" options={{ headerShown: false }} />
           <Stack.Screen
             name="detailTransaksi"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="topUp" options={{ headerShown: false }} />
+          <Stack.Screen name="metodeBayar" options={{ headerShown: false }} />
+          <Stack.Screen name="transferNow" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="statusTransfer"
             options={{ headerShown: false }}
           />
 

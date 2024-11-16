@@ -8,22 +8,22 @@ import {
   Divider,
   HStack,
   Heading,
+  StatusBar,
   Text,
 } from "@gluestack-ui/themed";
 import React from "react";
-import { ImageBackground, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
 import { useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 function Header({ data }: any) {
-  const navigation = useNavigation<any>();
   const theme = useColorScheme();
 
   return (
     <>
+      <StatusBar />
       <Box backgroundColor={theme === "dark" ? "black" : "white"}>
         <TouchableOpacity onPress={() => router.back()}>
           <HStack m={5}>

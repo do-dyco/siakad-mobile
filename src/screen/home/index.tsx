@@ -83,7 +83,9 @@ const Home = () => {
                     <Text fontWeight={"$bold"} color="white">
                       |
                     </Text>
-                    <MaterialIcons name="add-box" size={25} color={"white"} />
+                    <TouchableOpacity onPress={() => router.push("/topUp")}>
+                      <MaterialIcons name="add-box" size={25} color={"white"} />
+                    </TouchableOpacity>
                   </HStack>
                 </HStack>
               </VStack>
