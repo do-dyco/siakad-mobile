@@ -69,11 +69,14 @@ const TransferNow = () => {
                     size="md"
                     variant="solid"
                     borderRadius={12}
-                    action="error"
+                    backgroundColor="#450A0A"
                     width={"30%"}
+                    alignContent="center"
                   >
                     <Center>
-                      <BadgeText>05:59:49</BadgeText>
+                      <Text color="#FCA5A5" size="md" ml={"35%"}>
+                        05:59:49
+                      </Text>
                     </Center>
                   </Badge>
                 </HStack>

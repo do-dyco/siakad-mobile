@@ -14,7 +14,7 @@ import {
   Input,
   InputField,
   Badge,
-  BadgeText,
+  Image,
   Divider,
   Button,
 } from "@gluestack-ui/themed";
@@ -104,30 +104,75 @@ const topUp = () => {
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>50k</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto100k.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    50k
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
 
             <Badge
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>100k</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto100k.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    100k
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
 
             <Badge
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>200k</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto100k.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    200k
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
           </HStack>
 
@@ -136,30 +181,75 @@ const topUp = () => {
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>300k</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto300k.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    300k
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
 
             <Badge
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>500k</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto500k.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    500k
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
 
             <Badge
               size="md"
               variant="solid"
               borderRadius={12}
-              action="success"
+              backgroundColor={colors.box}
               width={"30%"}
             >
-              <BadgeText>1jt</BadgeText>
+              <Center>
+                <HStack space="md" alignItems="center">
+                  <Image
+                    source={require("@/assets/images/money/upto1mil.png")}
+                    alt="artikel"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text color="white" size="md">
+                    1jt
+                  </Text>
+                </HStack>
+              </Center>
             </Badge>
           </HStack>
         </VStack>

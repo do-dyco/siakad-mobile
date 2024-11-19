@@ -68,7 +68,7 @@ export default function RootLayout() {
           <Stack.Screen name="metodeBayar" options={{ headerShown: false }} />
           <Stack.Screen name="transferNow" options={{ headerShown: false }} />
           <Stack.Screen
-            name="statusTransfer"
+            name="statusTransaksi"
             options={{ headerShown: false }}
           />
 
