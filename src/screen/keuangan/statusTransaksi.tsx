@@ -5,6 +5,7 @@ import {
   EvilIcons,
   Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import {
   SafeAreaView,
@@ -20,14 +21,23 @@ import {
   Divider,
   Button,
   Avatar,
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetItem,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetDragIndicator,
+  ActionsheetItemText,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React from "react";
-import { Dimensions, useColorScheme } from "react-native";
+import React, { useState } from "react";
+import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 
 const StatusTransaksi = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const [showActionsheet, setShowActionsheet] = useState(false);
+  const handleClose = () => setShowActionsheet(!showActionsheet);
 
   return (
     <SafeAreaView flex={1}>
@@ -137,30 +147,32 @@ const StatusTransaksi = () => {
             </VStack>
           </Box>
 
-          <Box
-            borderRadius={10}
-            borderWidth={1}
-            borderColor="transparent"
-            bgColor="#13161B"
-          >
-            <HStack justifyContent="space-between" m={10}>
-              <HStack space="md">
+          <TouchableOpacity onPress={handleClose}>
+            <Box
+              borderRadius={10}
+              borderWidth={1}
+              borderColor="transparent"
+              bgColor="#13161B"
+            >
+              <HStack justifyContent="space-between" m={10}>
+                <HStack space="md">
+                  <MaterialCommunityIcons
+                    name="text-box-outline"
+                    size={20}
+                    color={mode === "dark" ? "white" : "black"}
+                  />
+                  <Text color={mode === "dark" ? "white" : "black"}>
+                    Detail Transaksi
+                  </Text>
+                </HStack>
                 <MaterialCommunityIcons
-                  name="text-box-outline"
+                  name="chevron-right"
                   size={20}
                   color={mode === "dark" ? "white" : "black"}
                 />
-                <Text color={mode === "dark" ? "white" : "black"}>
-                  Detail Transaksi
-                </Text>
               </HStack>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={mode === "dark" ? "white" : "black"}
-              />
-            </HStack>
-          </Box>
+            </Box>
+          </TouchableOpacity>
 
           <Box
             borderRadius={10}
@@ -191,6 +203,107 @@ const StatusTransaksi = () => {
           </Center>
         </VStack>
       </ScrollView>
+
+      <Actionsheet
+        isOpen={showActionsheet}
+        onClose={handleClose}
+        zIndex={999}
+        trapFocus={false}
+      >
+        <ActionsheetBackdrop />
+        <ActionsheetContent
+          h="50%"
+          zIndex={999}
+          backgroundColor={mode === "dark" ? "black" : "white"}
+        >
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <HStack justifyContent="space-between" mt={10} width={"100%"}>
+            <Text
+              color={mode === "dark" ? "white" : "black"}
+              fontWeight={"$bold"}
+              size="lg"
+              mt={2}
+            >
+              Detail Transaksi
+            </Text>
+            <Badge
+              size="md"
+              variant="solid"
+              borderRadius={12}
+              bgColor="#22262F"
+              width={"30%"}
+            >
+              <HStack space="xs">
+                <Text color="white" size="xs">
+                  TF25592952
+                </Text>
+
+                <Ionicons name="copy-outline" size={20} color={"#373A41"} />
+              </HStack>
+            </Badge>
+          </HStack>
+          <Divider mt={10} bgColor={colors.border} />
+          <Box
+            borderRadius={10}
+            borderWidth={1}
+            borderColor="transparent"
+            backgroundColor={colors.box}
+            m={10}
+            w={"100%"}
+          >
+            <HStack space="md" m={5}>
+              <Box backgroundColor={colors.primary} borderRadius={8} mt={10}>
+                <MaterialIcons
+                  name="person-outline"
+                  size={20}
+                  color="white"
+                  style={{ margin: 5 }}
+                />
+              </Box>
+              <Text mt={10} color={mode === "dark" ? "white" : "black"}>
+                Muhammad Robby
+              </Text>
+            </HStack>
+            <Divider bgColor={colors.border} mt={5} />
+            <HStack justifyContent="space-between" m={10}>
+              <Text>Jumlah isi ulang saldo</Text>
+              <Text color={mode === "dark" ? "white" : "black"}>
+                Rp.100.000
+              </Text>
+            </HStack>
+          </Box>
+          <Divider bgColor={colors.border} mt={10} />
+
+          <HStack justifyContent="space-between" m={10} w={"100%"}>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Bank Mandiri
+            </Text>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Transfer Bank Mandiri
+            </Text>
+          </HStack>
+
+          <HStack justifyContent="space-between" m={10} w={"100%"}>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Kode Unik
+            </Text>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Rp.122
+            </Text>
+          </HStack>
+
+          <HStack justifyContent="space-between" m={10} w={"100%"}>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Total Transfer
+            </Text>
+            <Text color={mode === "dark" ? "white" : "black"} size="xs">
+              Rp.100.122
+            </Text>
+          </HStack>
+        </ActionsheetContent>
+      </Actionsheet>
     </SafeAreaView>
   );
 };
