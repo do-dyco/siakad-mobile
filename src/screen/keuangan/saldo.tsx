@@ -151,7 +151,12 @@ const Saldo = () => {
                   </Center>
 
                   <HStack mt={15} space="md">
-                    <Input variant="rounded" width={"85%"}>
+                    <Input
+                      variant="rounded"
+                      width={"85%"}
+                      borderColor={"transparent"}
+                      backgroundColor={mode === "dark" ? "#13161B" : "white"}
+                    >
                       <InputField placeholder="Cari transaksi disini" />
                     </Input>
 

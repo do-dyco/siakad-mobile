@@ -7,6 +7,7 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetItem,
   ActionsheetItemText,
+  Badge,
   Box,
   Center,
   Divider,
@@ -34,14 +35,15 @@ import {
 import SkeletonList from "@/components/SkeletonList";
 import { router } from "expo-router";
 import NoData from "@/components/NoData";
+import colors from "@/src/config/colors";
 
-const absensi = () => {
+const AbsensiHp = () => {
   const mode = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
   const [showActionsheet, setShowActionsheet] = useState(false);
   const handleClose = () => setShowActionsheet(!showActionsheet);
-  const [data, setData] = useState("");
+  const [data, setData] = useState("1");
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
@@ -66,7 +68,7 @@ const absensi = () => {
                   size="sm"
                   mr={20}
                 >
-                  Absensi
+                  Absensi Hp
                 </Text>
               </Center>
             </HStack>
@@ -104,7 +106,7 @@ const absensi = () => {
         {loading ? <SkeletonList /> : null}
         {!data && !loading ? (
           <NoData
-            title="Belum ada data absensi"
+            title="Belum ada data absensi hp"
             desc="Jika Anda sudah absen, absen tersebut akan muncul di sini."
           />
         ) : (
@@ -140,24 +142,51 @@ const absensi = () => {
                 </VStack>
 
                 <VStack>
-                  <Text color="#94979C">Berangkat Sekolah</Text>
-                  <Text color="#94979C">Pulang Sekolah</Text>
-                  <Text color="#94979C">Sholat Berjamaah</Text>
+                  <Text color="#94979C">Merk Hp</Text>
+                  <Text color="#94979C">Waktu Menyerahkan</Text>
+                  <Text color="#94979C">Status</Text>
+                  <Text color="#94979C">Waktu Pengambilan</Text>
                 </VStack>
               </HStack>
 
               <VStack>
-                <Text color={mode === "dark" ? "white" : "black"}>
-                  06:40:22
+                <Text
+                  color={mode === "dark" ? "white" : "black"}
+                  textAlign="right"
+                >
+                  Iphone 11, Ungu
                 </Text>
-                <Text color={mode === "dark" ? "white" : "black"}>
+                <Text
+                  color={mode === "dark" ? "white" : "black"}
+                  textAlign="right"
+                >
                   12:24:33
                 </Text>
-                <Text color={mode === "dark" ? "white" : "black"}>
-                  11:47:22
+                <Badge
+                  size="md"
+                  variant="solid"
+                  borderRadius={12}
+                  backgroundColor="#450A0A"
+                  width={"80%"}
+                  alignContent="center"
+                >
+                  <Center>
+                    <Text color="#FCA5A5" size="md" ml={"35%"}>
+                      05:59:49
+                    </Text>
+                  </Center>
+                </Badge>
+                <Text
+                  color={mode === "dark" ? "white" : "black"}
+                  textAlign="right"
+                >
+                  {" "}
+                  -{" "}
                 </Text>
               </VStack>
             </HStack>
+
+            <Divider bgColor={colors.border} />
 
             <Actionsheet
               isOpen={showActionsheet}
@@ -191,4 +220,4 @@ const absensi = () => {
   );
 };
 
-export default absensi;
+export default AbsensiHp;

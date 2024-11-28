@@ -8,6 +8,8 @@ import {
   Image,
   HStack,
   InputSlot,
+  ScrollView,
+  SafeAreaView,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
@@ -16,98 +18,111 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 
 export default function Login() {
   const router = useRouter();
+  const mode = useColorScheme();
+  const screenHeight = Dimensions.get("window").height;
   return (
     <>
-      <Image
-        style={{ width: 70, height: 70, margin: 20 }}
-        source={require("@/assets/images/LOGO.png")}
-        alt="logo"
-        mt="20%"
-      />
-      <Center mt={30} mx={20}>
-        <VStack space="md">
-          <Text fontWeight={"$extrabold"} fontSize={"$xl"}>
-            Selamat datang
-          </Text>
-          <Text>
-            Masukkan email, kode instansi dan kata sandi Anda untuk masuk ke
-            dalam aplikasi.
-          </Text>
+      <ScrollView>
+        <SafeAreaView
+          backgroundColor={mode === "dark" ? "black" : "white"}
+          height={screenHeight}
+        >
+          <Image
+            style={{ width: 70, height: 70, margin: 20 }}
+            source={require("@/assets/images/LOGO.png")}
+            alt="logo"
+            mt="20%"
+          />
+          <Center mt={30} mx={20}>
+            <VStack space="md">
+              <Text
+                fontWeight={"$extrabold"}
+                fontSize={"$xl"}
+                color={mode === "dark" ? "white" : "black"}
+              >
+                Selamat datang
+              </Text>
+              <Text color={mode === "dark" ? "white" : "black"}>
+                Masukkan email, kode instansi dan kata sandi Anda untuk masuk ke
+                dalam aplikasi.
+              </Text>
 
-          <Input
-            variant="outline"
-            size="md"
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            borderRadius={8}
-          >
-            <InputSlot mx={10}>
-              <MaterialCommunityIcons
-                name="email-outline"
-                size={25}
-                color={"#535862"}
-              />
-            </InputSlot>
-            <InputField placeholder="Masukkan username / email Anda" />
-          </Input>
+              <Input
+                variant="outline"
+                size="md"
+                isDisabled={false}
+                isInvalid={false}
+                isReadOnly={false}
+                borderRadius={8}
+              >
+                <InputSlot mx={10}>
+                  <MaterialCommunityIcons
+                    name="email-outline"
+                    size={25}
+                    color={"#535862"}
+                  />
+                </InputSlot>
+                <InputField placeholder="Masukkan username / email Anda" />
+              </Input>
 
-          <Input
-            variant="outline"
-            size="md"
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            borderRadius={8}
-          >
-            <InputSlot mx={10}>
-              <FontAwesome name="id-card-o" size={20} color={"#535862"} />
-            </InputSlot>
-            <InputField placeholder="Masukkan kode instansi" />
-          </Input>
+              <Input
+                variant="outline"
+                size="md"
+                isDisabled={false}
+                isInvalid={false}
+                isReadOnly={false}
+                borderRadius={8}
+              >
+                <InputSlot mx={10}>
+                  <FontAwesome name="id-card-o" size={20} color={"#535862"} />
+                </InputSlot>
+                <InputField placeholder="Masukkan kode instansi" />
+              </Input>
 
-          <Input
-            variant="outline"
-            size="md"
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            borderRadius={8}
-          >
-            <InputField placeholder="Kata sandi" />
+              <Input
+                variant="outline"
+                size="md"
+                isDisabled={false}
+                isInvalid={false}
+                isReadOnly={false}
+                borderRadius={8}
+              >
+                <InputField placeholder="Kata sandi" />
 
-            <InputSlot mx={10}>
-              <Entypo name="eye-with-line" size={25} color={"#535862"} />
-            </InputSlot>
-          </Input>
+                <InputSlot mx={10}>
+                  <Entypo name="eye-with-line" size={25} color={"#535862"} />
+                </InputSlot>
+              </Input>
 
-          <Button
-            size="md"
-            variant="solid"
-            action="primary"
-            isDisabled={false}
-            isFocusVisible={false}
-            bgColor={colors.primary}
-            mt={20}
-            borderRadius={10}
-            onPress={() => router.push("/(tabs)")}
-          >
-            <Text color="#ffffff">Masuk</Text>
-          </Button>
+              <Button
+                size="md"
+                variant="solid"
+                action="primary"
+                isDisabled={false}
+                isFocusVisible={false}
+                bgColor={colors.primary}
+                mt={20}
+                borderRadius={10}
+                onPress={() => router.push("/(tabs)")}
+              >
+                <Text color="#ffffff">Masuk</Text>
+              </Button>
 
-          <Center mt={20}>
-            <TouchableOpacity
-              onPress={() => router.push("forgetPassword" as never)}
-            >
-              <Text>Lupa Kata Sandi ?</Text>
-            </TouchableOpacity>
+              <Center mt={20}>
+                <TouchableOpacity
+                  onPress={() => router.push("forgetPassword" as never)}
+                >
+                  <Text>Lupa Kata Sandi ?</Text>
+                </TouchableOpacity>
+              </Center>
+            </VStack>
           </Center>
-        </VStack>
-      </Center>
+        </SafeAreaView>
+      </ScrollView>
     </>
   );
 }

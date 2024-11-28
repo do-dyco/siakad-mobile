@@ -39,41 +39,33 @@ export default function RootLayout() {
             headerShown: false,
           }}
         >
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="forgetPassword"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="confirmPassword"
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="forgetPassword" />
+          <Stack.Screen name="confirmPassword" />
           {/* account */}
-          <Stack.Screen name="informasiDiri" options={{ headerShown: false }} />
-          <Stack.Screen name="informasiWali" options={{ headerShown: false }} />
-          <Stack.Screen name="keamananAkun" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="pengaturanAkun"
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="informasiDiri" />
+          <Stack.Screen name="informasiWali" />
+          <Stack.Screen name="keamananAkun" />
+          <Stack.Screen name="pengaturanAkun" />
 
           {/* keuangan */}
-          <Stack.Screen name="saldo" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="detailTransaksi"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="topUp" options={{ headerShown: false }} />
-          <Stack.Screen name="metodeBayar" options={{ headerShown: false }} />
-          <Stack.Screen name="transferNow" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="statusTransaksi"
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="saldo" />
+          <Stack.Screen name="detailTransaksi" />
+          <Stack.Screen name="topUp" />
+          <Stack.Screen name="metodeBayar" />
+          <Stack.Screen name="transferNow" />
+          <Stack.Screen name="statusTransaksi" />
+          <Stack.Screen name="tagihan" />
 
           {/* pengasuhan */}
-          <Stack.Screen name="absensi" options={{ headerShown: false }} />
+          <Stack.Screen name="absensi" />
+          <Stack.Screen name="absensiHp" />
+          <Stack.Screen name="pelanggaran" />
+
+          {/* akademik */}
+          <Stack.Screen name="rangking" />
+
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>

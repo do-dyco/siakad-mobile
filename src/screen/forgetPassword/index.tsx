@@ -9,6 +9,8 @@ import {
   HStack,
   InputSlot,
   Divider,
+  SafeAreaView,
+  ScrollView,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
@@ -17,61 +19,83 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 
 export default function ForgetPassword() {
   const router = useRouter();
+  const mode = useColorScheme();
+  const screenHeight = Dimensions.get("window").height;
   return (
     <>
-      <VStack mt={"20%"} mx={10}>
-        <Entypo name="chevron-left" size={30} />
-        <Divider mt={20} />
-        <Center mt={30}>
-          <VStack space="md">
-            <Text fontWeight={"$extrabold"} fontSize={"$xl"}>
-              Setel ulang kata sandi
-            </Text>
-            <Text fontSize={"$lg"}>
-              Masukkan alamat email yang terkait dengan akun Anda, dan kami akan
-              mengirimkan tautan untuk mengatur ulang kata sandi Anda melalui
-              email.
-            </Text>
+      <ScrollView>
+        <SafeAreaView
+          backgroundColor={mode === "dark" ? "black" : "white"}
+          height={screenHeight}
+        >
+          <VStack mt={"20%"} mx={10}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Entypo
+                name="chevron-left"
+                size={30}
+                color={mode === "dark" ? "white" : "black"}
+              />
+            </TouchableOpacity>
+            <Divider mt={20} />
+            <Center mt={30}>
+              <VStack space="md">
+                <Text
+                  fontWeight={"$bold"}
+                  fontSize={"$xl"}
+                  color={mode === "dark" ? "white" : "black"}
+                >
+                  Setel ulang kata sandi
+                </Text>
+                <Text
+                  fontSize={"$lg"}
+                  color={mode === "dark" ? "white" : "black"}
+                >
+                  Masukkan alamat email yang terkait dengan akun Anda, dan kami
+                  akan mengirimkan tautan untuk mengatur ulang kata sandi Anda
+                  melalui email.
+                </Text>
 
-            <Input
-              variant="outline"
-              size="md"
-              isDisabled={false}
-              isInvalid={false}
-              isReadOnly={false}
-              borderRadius={8}
-            >
-              <InputSlot mx={10}>
-                <MaterialCommunityIcons
-                  name="email-outline"
-                  size={25}
-                  color={"#535862"}
-                />
-              </InputSlot>
-              <InputField placeholder="Masukkan email Anda" />
-            </Input>
+                <Input
+                  variant="outline"
+                  size="md"
+                  isDisabled={false}
+                  isInvalid={false}
+                  isReadOnly={false}
+                  borderRadius={8}
+                >
+                  <InputSlot mx={10}>
+                    <MaterialCommunityIcons
+                      name="email-outline"
+                      size={25}
+                      color={"#535862"}
+                    />
+                  </InputSlot>
+                  <InputField placeholder="Masukkan email Anda" />
+                </Input>
 
-            <Button
-              size="md"
-              variant="solid"
-              action="primary"
-              isDisabled={false}
-              isFocusVisible={false}
-              bgColor={colors.primary}
-              borderRadius={10}
-              height={"15%"}
-              mt={20}
-              onPress={() => router.push("/confirmPassword")}
-            >
-              <Text color="#ffffff">Kirim Tautan</Text>
-            </Button>
+                <Button
+                  size="md"
+                  variant="solid"
+                  action="primary"
+                  isDisabled={false}
+                  isFocusVisible={false}
+                  bgColor={colors.primary}
+                  borderRadius={10}
+                  height={"15%"}
+                  mt={20}
+                  onPress={() => router.push("/confirmPassword")}
+                >
+                  <Text color="#ffffff">Kirim Tautan</Text>
+                </Button>
+              </VStack>
+            </Center>
           </VStack>
-        </Center>
-      </VStack>
+        </SafeAreaView>
+      </ScrollView>
     </>
   );
 }
