@@ -1,6 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
+  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -10,6 +11,7 @@ import React, { useEffect } from "react";
 import "react-native-reanimated";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
+import "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -57,6 +59,8 @@ export default function RootLayout() {
           <Stack.Screen name="transferNow" />
           <Stack.Screen name="statusTransaksi" />
           <Stack.Screen name="tagihan" />
+          <Stack.Screen name="invoice" />
+          <Stack.Screen name="bayarInvoice" />
 
           {/* pengasuhan */}
           <Stack.Screen name="absensi" />

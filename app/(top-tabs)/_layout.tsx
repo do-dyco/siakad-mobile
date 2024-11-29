@@ -1,31 +1,19 @@
-import {
-  MaterialTopTabNavigationEventMap,
-  MaterialTopTabNavigationOptions,
-  createMaterialTopTabNavigator,
-} from "@react-navigation/material-top-tabs";
-import { withLayoutContext } from "expo-router";
-import { ParamListBase, TabNavigationState } from "@react-navigation/native";
+// import React from 'react';
+// import { Tabs } from 'expo-router';
+// import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-const { Navigator } = createMaterialTopTabNavigator();
+// const TopTab = createMaterialTopTabNavigator();
 
-export const MaterialTopTabs = withLayoutContext<
-  MaterialTopTabNavigationOptions,
-  typeof Navigator,
-  TabNavigationState<ParamListBase>,
-  MaterialTopTabNavigationEventMap
->(Navigator);
-
-export default function TopTabLayout() {
-  return (
-    <MaterialTopTabs>
-      <MaterialTopTabs.Screen
-        name="berlangsung"
-        options={{ title: "Sedang Berlangsung" }}
-      />
-      <MaterialTopTabs.Screen
-        name="proses"
-        options={{ title: "Dalam Proses" }}
-      />
-    </MaterialTopTabs>
-  );
-}
+// export default function TopTabsLayout() {
+//   return (
+//     <Tabs
+//       screenOptions={{
+//         tabBarStyle: { backgroundColor: '#6200ee' },
+//         tabBarLabelStyle: { color: '#fff' },
+//       }}
+//     >
+//       <Tabs.Screen name="berlangsung" options={{ title: 'Sedang Berlangsung' }} />
+//       <Tabs.Screen name="proses" options={{ title: 'Dalam Proses' }} />
+//     </Tabs>
+//   );
+// }

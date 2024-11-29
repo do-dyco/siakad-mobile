@@ -17,9 +17,9 @@ import {
   SafeAreaView,
   Text,
   VStack,
+  ScrollView,
 } from "@gluestack-ui/themed";
 import { router, Stack } from "expo-router";
-import { ScrollView } from "moti";
 import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 import { Tabs } from "react-native-collapsible-tab-view";
@@ -93,9 +93,9 @@ const Tagihan = () => {
             />
           ) : (
             <>
-              <Stack>
+              {/* <Stack>
                 <Stack.Screen name="(top-tabs)" />
-              </Stack>
+              </Stack> */}
             </>
           )}
         </VStack>

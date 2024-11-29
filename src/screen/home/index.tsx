@@ -180,23 +180,25 @@ const Home = () => {
                   </TouchableOpacity>
                 </VStack>
                 <VStack alignItems="center">
-                  <Box
-                    backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                    p={3}
-                    borderRadius={8}
-                  >
-                    <MaterialCommunityIcons
-                      name="script-text-outline"
-                      size={25}
+                  <TouchableOpacity onPress={() => router.push("/invoice")}>
+                    <Box
+                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
+                      p={3}
+                      borderRadius={8}
+                    >
+                      <MaterialCommunityIcons
+                        name="script-text-outline"
+                        size={25}
+                        color={mode === "dark" ? "white" : "black"}
+                      />
+                    </Box>
+                    <Text
+                      fontSize={10}
                       color={mode === "dark" ? "white" : "black"}
-                    />
-                  </Box>
-                  <Text
-                    fontSize={10}
-                    color={mode === "dark" ? "white" : "black"}
-                  >
-                    Invoice
-                  </Text>
+                    >
+                      Invoice
+                    </Text>
+                  </TouchableOpacity>
                 </VStack>
                 <VStack alignItems="center">
                   <Box
@@ -520,7 +522,12 @@ const Home = () => {
                           Pembayaran Tagihan
                         </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={handleClose}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleClose();
+                          router.push("/invoice");
+                        }}
+                      >
                         <Text
                           mx={20}
                           color={mode === "dark" ? "white" : "black"}

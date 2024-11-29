@@ -3,4 +3,5 @@ export default {
   danger: "#B91C1C",
   box: "#13161B",
   border: "#373A41",
+  boxWarning: "#F59E0B",
 };
