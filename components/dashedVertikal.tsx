@@ -1,18 +1,20 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-const DashedDivider = () => {
+const DashedVertical = () => {
   return <View style={styles.dashedLine} />;
 };
 
 const styles = StyleSheet.create({
   dashedLine: {
-    borderBottomColor: "gray",
-    borderBottomWidth: 1,
+    position: "absolute",
+    left: "30%",
+    borderRightColor: "gray",
+    borderRightWidth: 2,
     borderStyle: "dashed",
-    marginVertical: 10,
-    width: "100%",
+    height: "100%",
+    marginHorizontal: 10,
   },
 });
 
-export default DashedDivider;
+export default DashedVertical;

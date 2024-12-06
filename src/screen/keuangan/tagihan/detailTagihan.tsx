@@ -59,14 +59,7 @@ const DetailInvoice = () => {
             </Text>
           </HStack>
 
-          <HStack justifyContent="space-between">
-            <VStack space="md">
-              <Text color={mode == "dark" ? "white" : "black"}>
-                Bayar Sebelum
-              </Text>
-              <Text>21 Oct 2024 16:49</Text>
-            </VStack>
-          </HStack>
+          <HStack justifyContent="space-between"></HStack>
           <Divider bgColor={colors.border} />
 
           <Text color={mode == "dark" ? "white" : "black"} mt={10}>
@@ -188,9 +181,9 @@ const DetailInvoice = () => {
           bgColor={colors.primary}
           borderRadius={10}
           mt={4}
-          onPress={() => router.push("/bayarInvoice")}
+          onPress={() => router.push("/metodeBayar")}
         >
-          <Text color="white">Bayar Invoice</Text>
+          <Text color="white">Selanjutnya</Text>
         </Button>
       </VStack>
     </SafeAreaView>

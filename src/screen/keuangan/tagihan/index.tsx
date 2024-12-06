@@ -1,5 +1,6 @@
-import Header from "@/components/Header";
+import Berlangsung from "@/components/Berlangsung";
 import NoData from "@/components/NoData";
+import Proses from "@/components/Proses";
 import colors from "@/src/config/colors";
 import {
   Ionicons,
@@ -13,32 +14,75 @@ import {
   HStack,
   Input,
   InputField,
-  InputSlot,
   SafeAreaView,
   Text,
   VStack,
   ScrollView,
+  View,
 } from "@gluestack-ui/themed";
-import { router, Stack } from "expo-router";
+import { router } from "expo-router";
 import React, { useState } from "react";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
-import { Tabs } from "react-native-collapsible-tab-view";
+import {
+  Dimensions,
+  TouchableOpacity,
+  useColorScheme,
+  useWindowDimensions,
+} from "react-native";
+import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
 const Tagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const [showActionsheet, setShowActionsheet] = useState(false);
+  const layout = useWindowDimensions();
+  const [index, setIndex] = useState(0);
   const [data, setData] = useState("1");
+  const dataOngoing = [
+    {
+      id: "1",
+      no_tagihan: "TG00294581",
+      no_invoice: "INV/20241022",
+      tagihan_name: "Pembelian Buku",
+      total: "100.000",
+    },
+    {
+      id: "2",
+      no_tagihan: "TG00294581",
+      no_invoice: "INV/20241122",
+      tagihan_name: "Pembelian Buku",
+      total: "300.000",
+    },
+    {
+      id: "3",
+      no_tagihan: "TG00294581",
+      no_invoice: "INV/20241222",
+      tagihan_name: "Pembelian Buku",
+      total: "200.000",
+    },
+  ];
+
+  const FirstRoute = () => <Berlangsung data={dataOngoing} />;
+  const SecondRoute = () => <Proses data={dataOngoing} />;
+
+  const renderScene = SceneMap({
+    first: FirstRoute,
+    second: SecondRoute,
+  });
+
+  const routes = [
+    { key: "first", title: "Sedang Berlangsung" },
+    { key: "second", title: "Dalam Proses" },
+  ];
 
   return (
-    <ScrollView>
-      <SafeAreaView
-        backgroundColor={mode === "dark" ? "black" : "white"}
-        height={screenHeight}
-      >
+    <SafeAreaView
+      backgroundColor={mode === "dark" ? "black" : "white"}
+      height={screenHeight}
+    >
+      <ScrollView>
         <Box backgroundColor={mode === "dark" ? "black" : "white"}>
+          {/* Back Button and Title */}
           <TouchableOpacity onPress={() => router.back()}>
-            <HStack m={5}>
+            <HStack m={5} alignItems="center">
               <MaterialIcons
                 name="chevron-left"
                 color={mode === "dark" ? "white" : "black"}
@@ -56,27 +100,27 @@ const Tagihan = () => {
             </HStack>
           </TouchableOpacity>
 
-          <HStack mt={15} space="md" m={5}>
+          {/* Search and Filter */}
+          <HStack mt={15} space="md" m={5} alignItems="center">
             <Input
               variant="rounded"
-              width={"85%"}
-              borderColor={"transparent"}
+              width="85%"
+              borderColor="transparent"
               backgroundColor={mode === "dark" ? "#13161B" : "white"}
             >
               <InputField placeholder="Cari transaksi disini" />
             </Input>
-
-            <TouchableOpacity onPress={() => setShowActionsheet(true)}>
+            <TouchableOpacity>
               <Box
-                borderRadius={"$full"}
-                backgroundColor={"transparent"}
+                backgroundColor="transparent"
                 borderWidth={1}
                 borderColor={colors.border}
+                borderRadius={100}
               >
                 <Ionicons
                   name="filter"
                   size={25}
-                  color="white"
+                  color={mode === "dark" ? "white" : "black"}
                   style={{ margin: 8 }}
                 />
               </Box>
@@ -85,22 +129,41 @@ const Tagihan = () => {
           <Divider mt={20} bgColor="#3a3a3b" />
         </Box>
 
-        <VStack m={10}>
-          {!data ? (
+        {/* Content */}
+        <VStack m={5}>
+          {data.length === 0 ? (
             <NoData
               title="Belum ada tagihan"
               desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
             />
           ) : (
-            <>
-              {/* <Stack>
-                <Stack.Screen name="(top-tabs)" />
-              </Stack> */}
-            </>
+            <TabView
+              navigationState={{ index, routes }}
+              renderScene={renderScene}
+              onIndexChange={setIndex}
+              initialLayout={{ width: layout.width }}
+              style={{
+                backgroundColor: "transparent",
+              }}
+              renderTabBar={(props) => (
+                <TabBar
+                  {...props}
+                  style={{
+                    backgroundColor: "trasnparent",
+                  }}
+                  indicatorStyle={{
+                    backgroundColor: mode === "dark" ? "#fff" : "#000",
+                  }}
+                  // labelStyle={{
+                  //   color: mode === "dark" ? "#fff" : "#000",
+                  // }}
+                />
+              )}
+            />
           )}
         </VStack>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

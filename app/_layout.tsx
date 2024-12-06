@@ -69,6 +69,9 @@ export default function RootLayout() {
 
           {/* akademik */}
           <Stack.Screen name="rangking" />
+          <Stack.Screen name="detailMapel" />
+          <Stack.Screen name="jadwalPelajaran" />
+          <Stack.Screen name="detailJadwalMasuk" />
 
           <Stack.Screen name="+not-found" />
         </Stack>
