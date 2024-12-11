@@ -37,7 +37,12 @@ const detailJadwalMasuk = () => {
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const data = [{ value: 50 }, { value: 80 }, { value: 90 }, { value: 70 }];
+  const data = [
+    { value: 80, color: "#10B981" },
+    { value: 10, color: "#EF4444" },
+    { value: 5, color: "#F59E0B" },
+    { value: 5, color: "#61656C" },
+  ];
   const handleClose = () => setShowActionsheet(!showActionsheet);
   const data_jadwal = [
     {
@@ -132,14 +137,57 @@ const detailJadwalMasuk = () => {
               data={data}
               donut
               innerCircleColor={mode === "dark" ? "black" : "white"}
+              innerRadius={80}
             />
           </Center>
 
-          <HStack justifyContent="space-between" mx={20}>
-            <Text color={mode === "dark" ? "white" : "black"}>Hadir</Text>
-            <Text color={mode === "dark" ? "white" : "black"}>Tidak Hadir</Text>
-            <Text color={mode === "dark" ? "white" : "black"}>Izin</Text>
-            <Text color={mode === "dark" ? "white" : "black"}>Belum Absen</Text>
+          <HStack justifyContent="space-between" mx={20} mt={10}>
+            <VStack>
+              <Box
+                backgroundColor="#10B981"
+                height={20}
+                width={20}
+                borderRadius={5}
+                ml={"15%"}
+              />
+              <Text color={mode === "dark" ? "white" : "black"}>Hadir</Text>
+            </VStack>
+
+            <VStack>
+              <Box
+                backgroundColor="#EF4444"
+                height={20}
+                width={20}
+                borderRadius={5}
+                ml={"40%"}
+              />
+              <Text color={mode === "dark" ? "white" : "black"}>
+                Tidak Hadir
+              </Text>
+            </VStack>
+
+            <VStack>
+              <Box
+                backgroundColor="#F59E0B"
+                height={20}
+                width={20}
+                borderRadius={5}
+              />
+              <Text color={mode === "dark" ? "white" : "black"}>Izin</Text>
+            </VStack>
+
+            <VStack>
+              <Box
+                backgroundColor="#61656C"
+                height={20}
+                width={20}
+                borderRadius={5}
+                ml={"40%"}
+              />
+              <Text color={mode === "dark" ? "white" : "black"}>
+                Belum Absen
+              </Text>
+            </VStack>
           </HStack>
 
           <Box py="$10">

@@ -133,6 +133,9 @@ const MenuHome = () => {
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  w={35}
+                  justifyContent="center"
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="calendar-blank-outline"
