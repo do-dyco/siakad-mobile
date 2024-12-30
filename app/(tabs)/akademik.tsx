@@ -62,7 +62,9 @@ export default function akademik() {
     >
       <ScrollView>
         <Center>
-          <Text color={mode === "dark" ? "white" : "black"}>Akademik</Text>
+          <Text color={mode === "dark" ? "white" : "black"} mt={30}>
+            Akademik
+          </Text>
         </Center>
 
         <VStack space="md" mx={10} mt={10}>

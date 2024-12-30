@@ -79,7 +79,7 @@ const Tagihan = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Box backgroundColor={mode === "dark" ? "black" : "white"}>
+        <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
           {/* Back Button and Title */}
           <TouchableOpacity onPress={() => router.back()}>
             <HStack m={5} alignItems="center">

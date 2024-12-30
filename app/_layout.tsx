@@ -14,6 +14,7 @@ import { config } from "@gluestack-ui/config";
 import "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,48 +35,52 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider config={config}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <GluestackUIProvider config={config}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack.Screen name="login" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="forgetPassword" />
-          <Stack.Screen name="confirmPassword" />
-          {/* account */}
-          <Stack.Screen name="informasiDiri" />
-          <Stack.Screen name="informasiWali" />
-          <Stack.Screen name="keamananAkun" />
-          <Stack.Screen name="pengaturanAkun" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="login" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="forgetPassword" />
+            <Stack.Screen name="confirmPassword" />
+            {/* account */}
+            <Stack.Screen name="informasiDiri" />
+            <Stack.Screen name="informasiWali" />
+            <Stack.Screen name="keamananAkun" />
+            <Stack.Screen name="pengaturanAkun" />
 
-          {/* keuangan */}
-          <Stack.Screen name="saldo" />
-          <Stack.Screen name="detailTransaksi" />
-          <Stack.Screen name="topUp" />
-          <Stack.Screen name="metodeBayar" />
-          <Stack.Screen name="transferNow" />
-          <Stack.Screen name="statusTransaksi" />
-          <Stack.Screen name="tagihan" />
-          <Stack.Screen name="invoice" />
-          <Stack.Screen name="bayarInvoice" />
+            {/* keuangan */}
+            <Stack.Screen name="saldo" />
+            <Stack.Screen name="detailTransaksi" />
+            <Stack.Screen name="topUp" />
+            <Stack.Screen name="metodeBayar" />
+            <Stack.Screen name="transferNow" />
+            <Stack.Screen name="statusTransaksi" />
+            <Stack.Screen name="tagihan" />
+            <Stack.Screen name="invoice" />
+            <Stack.Screen name="bayarInvoice" />
 
-          {/* pengasuhan */}
-          <Stack.Screen name="absensi" />
-          <Stack.Screen name="absensiHp" />
-          <Stack.Screen name="pelanggaran" />
+            {/* pengasuhan */}
+            <Stack.Screen name="absensi" />
+            <Stack.Screen name="absensiHp" />
+            <Stack.Screen name="pelanggaran" />
 
-          {/* akademik */}
-          <Stack.Screen name="rangking" />
-          <Stack.Screen name="detailMapel" />
-          <Stack.Screen name="jadwalPelajaran" />
-          <Stack.Screen name="detailJadwalMasuk" />
+            {/* akademik */}
+            <Stack.Screen name="rangking" />
+            <Stack.Screen name="detailMapel" />
+            <Stack.Screen name="jadwalPelajaran" />
+            <Stack.Screen name="detailJadwalMasuk" />
 
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </GluestackUIProvider>
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+      </GluestackUIProvider>
+    </GestureHandlerRootView>
   );
 }

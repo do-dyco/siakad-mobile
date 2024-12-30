@@ -29,88 +29,77 @@ const account = () => {
       backgroundColor={mode === "dark" ? "black" : "white"}
       height={screenHeight}
     >
-      <Box>
-        <ImageBackground
-          source={require("@/assets/images/personalinfo.png")}
-          style={{
-            width: "auto",
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-            height: "120%",
-          }}
-          imageStyle={{
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-          }}
-        />
+      <Box position="relative" bgColor={colors.primary} height={"20%"}>
         <Center>
-          <Box
-            bgColor={mode === "dark" ? "#22262F" : "white"}
-            mt={-40}
-            my={20}
-            width={"80%"}
-            borderTopLeftRadius={10}
-            borderTopRightRadius={10}
-          >
-            <HStack space="md" mx={20} mt={10}>
-              <Avatar>
-                <AvatarFallbackText>Sandeep Srivastava</AvatarFallbackText>
-              </Avatar>
-              <VStack>
-                <Text
-                  fontSize={14}
-                  fontWeight={"$bold"}
-                  color={mode === "dark" ? "#F7F7F7" : "black"}
-                >
-                  Muhammad Robby
-                </Text>
-                <Text fontSize={12} color={"#85888E"}>
-                  muhammad.robby@gmail.com
-                </Text>
-              </VStack>
-            </HStack>
-          </Box>
-          <Box
-            borderBottomLeftRadius={10}
-            borderBottomRightRadius={10}
-            bgColor={colors.primary}
-            mt={-20}
-            my={1}
-            width={"80%"}
-          >
-            <ImageBackground
-              source={require("@/assets/images/personalinfo.png")}
-              style={{
-                borderBottomLeftRadius: 16,
-                borderBottomRightRadius: 16,
-                width: "auto",
-              }}
-              imageStyle={{
-                borderBottomLeftRadius: 16,
-                borderBottomRightRadius: 16,
-              }}
-            />
-            <TouchableOpacity onPress={() => router.push("/informasiDiri")}>
-              <HStack space="md" justifyContent="space-between" mt={20} mx={10}>
-                <Text color="white">Edit informasi diri</Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={20}
-                  color={"white"}
-                />
-              </HStack>
-            </TouchableOpacity>
-          </Box>
+          <Text color="white" mt={"20%"}>
+            Pengaturan Akun
+          </Text>
         </Center>
       </Box>
 
+      <Center>
+        <Box
+          bgColor={mode === "dark" ? "#22262F" : "white"}
+          mt={"-30%"}
+          my={20}
+          width={"80%"}
+          borderTopLeftRadius={10}
+          borderTopRightRadius={10}
+        >
+          <HStack space="md" mx={20} mt={10}>
+            <Avatar>
+              <AvatarFallbackText> Muhammad Robby</AvatarFallbackText>
+            </Avatar>
+            <VStack>
+              <Text
+                fontSize={14}
+                fontWeight={"$bold"}
+                color={mode === "dark" ? "#F7F7F7" : "black"}
+              >
+                Muhammad Robby
+              </Text>
+              <Text fontSize={12} color={"#85888E"}>
+                muhammad.robby@gmail.com
+              </Text>
+            </VStack>
+          </HStack>
+        </Box>
+        <Box
+          bgColor={colors.primary}
+          my={20}
+          width={"80%"}
+          mt={"-5%"}
+          borderBottomLeftRadius={10}
+          borderBottomRightRadius={10}
+          height={"25%"}
+        >
+          <TouchableOpacity onPress={() => router.push("/informasiDiri")}>
+            <HStack space="md" mx={20} justifyContent="space-between" mt={12}>
+              <Text
+                fontSize={14}
+                fontWeight={"$bold"}
+                color={mode === "dark" ? "#F7F7F7" : "black"}
+              >
+                Edit informasi diri
+              </Text>
+              <Entypo
+                name={"chevron-right"}
+                size={20}
+                color={"white"}
+                mt={10}
+              />
+            </HStack>
+          </TouchableOpacity>
+        </Box>
+      </Center>
+
       <Box
         mx={40}
+        mt={"-20%"}
         borderWidth={1}
         borderColor="transparent"
         borderRadius={10}
         bgColor={mode === "dark" ? "#22262F" : "white"}
-        mt={110}
         width={"80%"}
       >
         <HStack justifyContent="space-around" m={15}>

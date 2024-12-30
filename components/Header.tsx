@@ -10,9 +10,11 @@ import {
   Heading,
   StatusBar,
   Text,
+  View,
+  VStack,
 } from "@gluestack-ui/themed";
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 
 import { useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -23,8 +25,18 @@ function Header({ data }: any) {
 
   return (
     <>
-      <StatusBar />
-      <Box backgroundColor={theme === "dark" ? "black" : "white"}>
+      <View
+        style={{
+          backgroundColor: theme === "dark" ? "black" : "white",
+          marginBottom: 20,
+        }}
+      >
+        <StatusBar
+          barStyle={theme === "dark" ? "light-content" : "dark-content"}
+          backgroundColor={theme === "dark" ? "black" : "white"}
+        />
+      </View>
+      <Box backgroundColor={theme === "dark" ? "black" : "white"} mt={30}>
         <TouchableOpacity onPress={() => router.back()}>
           <HStack m={5}>
             <MaterialIcons

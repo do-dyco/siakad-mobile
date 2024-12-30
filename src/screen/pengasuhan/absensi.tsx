@@ -52,7 +52,7 @@ const absensi = () => {
         backgroundColor={mode === "dark" ? "black" : "white"}
         height={screenHeight}
       >
-        <Box backgroundColor={mode === "dark" ? "black" : "white"}>
+        <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
           <TouchableOpacity onPress={() => router.back()}>
             <HStack m={5}>
               <MaterialIcons

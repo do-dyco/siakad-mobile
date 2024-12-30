@@ -78,7 +78,7 @@ const Rangking = () => {
           source={require("@/assets/images/rangking.jpg")}
           alt="logo"
         />
-        <Box position="absolute" top={10}>
+        <Box position="absolute" top={10} mt={30}>
           <HStack justifyContent="space-between">
             <TouchableOpacity onPress={() => router.back()}>
               <MaterialIcons

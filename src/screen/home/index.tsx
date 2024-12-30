@@ -110,7 +110,7 @@ const Home = () => {
               borderWidth={1}
               backgroundColor="#506A7A"
               height={50}
-              mt={20}
+              mt={-5}
               borderColor="transparent"
             >
               <HStack justifyContent="space-between" mx={20} my={3} mt={10}>

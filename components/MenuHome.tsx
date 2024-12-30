@@ -192,167 +192,166 @@ const MenuHome = () => {
       </Box>
       <Actionsheet isOpen={showActionsheet} onClose={handleClose} zIndex={999}>
         <ActionsheetBackdrop />
-        <ScrollView>
-          <ActionsheetContent
-            maxHeight={"98%"}
-            zIndex={999}
-            backgroundColor={mode === "dark" ? "black" : "white"}
-          >
-            <ActionsheetDragIndicatorWrapper>
-              <ActionsheetDragIndicator />
-            </ActionsheetDragIndicatorWrapper>
+        <ActionsheetContent
+          maxHeight={"70%"}
+          flex={1}
+          zIndex={999}
+          backgroundColor={mode === "dark" ? "black" : "white"}
+        >
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
 
-            <ScrollView width={"95%"}>
-              <Box alignItems="flex-start" width={"95%"} borderRadius={10}>
-                <Text color={mode === "dark" ? "white" : "black"} size="lg">
-                  All Menu
+          <ScrollView width={"95%"}>
+            <Box alignItems="flex-start" width={"95%"} borderRadius={10}>
+              <Text color={mode === "dark" ? "white" : "black"} size="lg">
+                All Menu
+              </Text>
+            </Box>
+            <Box
+              alignItems="flex-start"
+              width={"95%"}
+              backgroundColor={mode === "dark" ? colors.box : "white"}
+              borderRadius={10}
+              mt={20}
+            >
+              <VStack m={5} space="lg">
+                <Text
+                  mx={10}
+                  size="md"
+                  color={mode === "dark" ? "white" : "black"}
+                >
+                  Keuangan
                 </Text>
-              </Box>
-              <Box
-                alignItems="flex-start"
-                width={"95%"}
-                backgroundColor={mode === "dark" ? colors.box : "white"}
-                borderRadius={10}
-                mt={20}
-              >
-                <VStack m={5} space="lg">
-                  <Text
-                    mx={10}
-                    size="md"
-                    color={mode === "dark" ? "white" : "black"}
-                  >
-                    Keuangan
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/tagihan");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Tagihan
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/tagihan");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Tagihan
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleClose}>
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Pembayaran Tagihan
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleClose();
-                      router.push("/invoice");
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Invoice
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleClose}>
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Pembayaran Mesin
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/saldo");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Saldo
-                    </Text>
-                  </TouchableOpacity>
-                </VStack>
-              </Box>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClose}>
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Pembayaran Tagihan
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleClose();
+                    router.push("/invoice");
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Invoice
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClose}>
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Pembayaran Mesin
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/saldo");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Saldo
+                  </Text>
+                </TouchableOpacity>
+              </VStack>
+            </Box>
 
-              <Box
-                alignItems="flex-start"
-                width={"95%"}
-                backgroundColor={mode === "dark" ? colors.box : "white"}
-                borderRadius={10}
-                mt={20}
-              >
-                <VStack m={5} space="lg">
+            <Box
+              alignItems="flex-start"
+              width={"95%"}
+              backgroundColor={mode === "dark" ? colors.box : "white"}
+              borderRadius={10}
+              mt={20}
+            >
+              <VStack m={5} space="lg">
+                <Text mx={10} color={mode === "dark" ? "white" : "black"}>
+                  Akademik
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/jadwalPelajaran");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Jadwal Pelajaran
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/rangking");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Rangking
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClose}>
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Hafalan Al-Qur'an
+                  </Text>
+                </TouchableOpacity>
+              </VStack>
+            </Box>
+
+            <Box
+              alignItems="flex-start"
+              width={"95%"}
+              backgroundColor={mode === "dark" ? colors.box : "white"}
+              borderRadius={10}
+              mt={20}
+            >
+              <VStack space="lg">
+                <TouchableOpacity onPress={handleClose}>
                   <Text mx={10} color={mode === "dark" ? "white" : "black"}>
-                    Akademik
+                    Pengasuhan
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/jadwalPelajaran");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Jadwal Pelajaran
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/rangking");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Rangking
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleClose}>
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Hafalan Al-Qur'an
-                    </Text>
-                  </TouchableOpacity>
-                </VStack>
-              </Box>
-
-              <Box
-                alignItems="flex-start"
-                width={"95%"}
-                backgroundColor={mode === "dark" ? colors.box : "white"}
-                borderRadius={10}
-                mt={20}
-              >
-                <VStack space="lg">
-                  <TouchableOpacity onPress={handleClose}>
-                    <Text mx={10} color={mode === "dark" ? "white" : "black"}>
-                      Pengasuhan
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/absensi");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Absensi Biasa
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/absensiHp");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Absensi HP
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push("/pelanggaran");
-                      handleClose();
-                    }}
-                  >
-                    <Text mx={20} color={mode === "dark" ? "white" : "black"}>
-                      Pelanggaran
-                    </Text>
-                  </TouchableOpacity>
-                </VStack>
-              </Box>
-            </ScrollView>
-          </ActionsheetContent>
-        </ScrollView>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/absensi");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Absensi Biasa
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/absensiHp");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Absensi HP
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/pelanggaran");
+                    handleClose();
+                  }}
+                >
+                  <Text mx={20} color={mode === "dark" ? "white" : "black"}>
+                    Pelanggaran
+                  </Text>
+                </TouchableOpacity>
+              </VStack>
+            </Box>
+          </ScrollView>
+        </ActionsheetContent>
       </Actionsheet>
     </>
   );

@@ -88,13 +88,14 @@ export default function Keuangan() {
           <Image
             width={screenWidth}
             height={screenHeight / 3 - 30}
+            alt="image"
             source={{
               uri: "../../assets/images/Akademik & Keuangan/BackgroundKeuangan_Dark.png",
             }}
           />
           <SaldoBox />
         </Box>
-        =
+
         <VStack space="md" mt={20} mx={10}>
           <Text color={mode === "dark" ? "white" : "black"}>
             Ringkasan keuangan
