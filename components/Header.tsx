@@ -55,7 +55,7 @@ function Header({ data }: any) {
             </Center>
           </HStack>
         </TouchableOpacity>
-        <Divider mt={10} bgColor="#3a3a3b" />
+        <Divider mt={10} bgColor="transparent" />
       </Box>
     </>
   );

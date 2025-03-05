@@ -45,14 +45,14 @@ export default function ForgetPassword() {
               <VStack space="md">
                 <Text
                   fontWeight={"$bold"}
-                  fontSize={"$xl"}
-                  color={mode === "dark" ? "white" : "black"}
+                  fontSize={24}
+                  color={mode === "dark" ? "white" : colors.gray.light[900]}
                 >
                   Setel ulang kata sandi
                 </Text>
                 <Text
-                  fontSize={"$lg"}
-                  color={mode === "dark" ? "white" : "black"}
+                  fontSize={16}
+                  color={mode === "dark" ? "white" : colors.gray.light[600]}
                 >
                   Masukkan alamat email yang terkait dengan akun Anda, dan kami
                   akan mengirimkan tautan untuk mengatur ulang kata sandi Anda
@@ -83,9 +83,9 @@ export default function ForgetPassword() {
                   action="primary"
                   isDisabled={false}
                   isFocusVisible={false}
-                  bgColor={colors.primary}
+                  bgColor={colors.brand[500]}
                   borderRadius={10}
-                  height={"15%"}
+                  height={"20%"}
                   mt={20}
                   onPress={() => router.push("/confirmPassword")}
                 >

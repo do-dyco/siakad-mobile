@@ -157,7 +157,7 @@ export default function Keuangan() {
             </VStack>
           </HStack>
         </VStack>
-        <Divider bgColor={colors.border} mt={10} h={10} />
+        <Divider bgColor={"transparent"} mt={10} h={10} />
         <HStack mt={15} space="md" m={5} alignItems="center">
           <Input
             variant="rounded"

@@ -62,7 +62,11 @@ export default function akademik() {
     >
       <ScrollView>
         <Center>
-          <Text color={mode === "dark" ? "white" : "black"} mt={30}>
+          <Text
+            color={mode === "dark" ? "white" : "black"}
+            mt={40}
+            font_type={"bold"}
+          >
             Akademik
           </Text>
         </Center>

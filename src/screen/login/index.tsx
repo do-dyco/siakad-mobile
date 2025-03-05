@@ -41,23 +41,23 @@ export default function Login() {
             <VStack space="md">
               <Text
                 fontWeight={"$extrabold"}
-                fontSize={"$xl"}
-                color={mode === "dark" ? "white" : "black"}
+                fontSize={24}
+                color={mode === "dark" ? "white" : colors.gray.light[900]}
               >
                 Selamat datang
               </Text>
-              <Text color={mode === "dark" ? "white" : "black"}>
+              <Text color={mode === "dark" ? "white" : colors.gray.light[400]}>
                 Masukkan email, kode instansi dan kata sandi Anda untuk masuk ke
                 dalam aplikasi.
               </Text>
 
               <Input
                 variant="outline"
-                size="md"
+                size={"md"}
                 isDisabled={false}
                 isInvalid={false}
                 isReadOnly={false}
-                borderRadius={8}
+                borderRadius={12}
               >
                 <InputSlot mx={10}>
                   <MaterialCommunityIcons
@@ -71,11 +71,11 @@ export default function Login() {
 
               <Input
                 variant="outline"
-                size="md"
+                size={"md"}
                 isDisabled={false}
                 isInvalid={false}
                 isReadOnly={false}
-                borderRadius={8}
+                borderRadius={12}
               >
                 <InputSlot mx={10}>
                   <FontAwesome name="id-card-o" size={20} color={"#535862"} />
@@ -85,7 +85,7 @@ export default function Login() {
 
               <Input
                 variant="outline"
-                size="md"
+                size={"md"}
                 isDisabled={false}
                 isInvalid={false}
                 isReadOnly={false}
@@ -104,9 +104,9 @@ export default function Login() {
                 action="primary"
                 isDisabled={false}
                 isFocusVisible={false}
-                bgColor={colors.primary}
+                bgColor={colors.brand[500]}
                 mt={20}
-                borderRadius={10}
+                borderRadius={12}
                 onPress={() => router.push("/(tabs)")}
               >
                 <Text color="#ffffff">Masuk</Text>
@@ -116,7 +116,11 @@ export default function Login() {
                 <TouchableOpacity
                   onPress={() => router.push("forgetPassword" as never)}
                 >
-                  <Text>Lupa Kata Sandi ?</Text>
+                  <Text
+                    color={mode === "dark" ? "white" : colors.gray.light[900]}
+                  >
+                    Lupa Kata Sandi ?
+                  </Text>
                 </TouchableOpacity>
               </Center>
             </VStack>

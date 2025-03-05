@@ -99,50 +99,50 @@ const JadwalPelajaran = () => {
       backgroundColor={mode === "dark" ? "black" : "white"}
       height={screenHeight}
     >
-      <ScrollView>
-        <Header data="Jadwal Pelajaran" />
-        <VStack space="md" mx={10}>
-          <HStack space="md" mx={10}>
-            <Input
-              variant="outline"
-              size="md"
-              isDisabled={false}
-              isInvalid={false}
-              isReadOnly={false}
-              borderRadius={8}
-              mt={10}
-              width={"70%"}
-            >
-              <InputField placeholder="Pilih Tahun" />
-              <InputSlot mr={10}>
-                <MaterialCommunityIcons
-                  name="calendar-outline"
-                  size={25}
-                  color={"#535862"}
-                />
-              </InputSlot>
-            </Input>
+      <Header data="Jadwal Pelajaran" />
+      <VStack space="md" mx={10}>
+        <HStack space="md" mx={10}>
+          <Input
+            variant="outline"
+            size="md"
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+            borderRadius={8}
+            mt={10}
+            width={"70%"}
+          >
+            <InputField placeholder="Pilih Tahun" />
+            <InputSlot mr={10}>
+              <MaterialCommunityIcons
+                name="calendar-outline"
+                size={25}
+                color={"#535862"}
+              />
+            </InputSlot>
+          </Input>
 
-            <Select width={"30%"} mt={10}>
-              <SelectTrigger variant="outline" size="md" borderRadius={8}>
-                <SelectInput />
-                <SelectIcon>
-                  <Icon as={ChevronDownIcon} style={{ marginRight: 3 }} />
-                </SelectIcon>
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  <SelectItem label="Ganjil" value="ganjil" />
-                  <SelectItem label="Genap" value="genap" />
-                </SelectContent>
-              </SelectPortal>
-            </Select>
-          </HStack>
+          <Select width={"30%"} mt={10}>
+            <SelectTrigger variant="outline" size="md" borderRadius={8}>
+              <SelectInput />
+              <SelectIcon>
+                <Icon as={ChevronDownIcon} style={{ marginRight: 3 }} />
+              </SelectIcon>
+            </SelectTrigger>
+            <SelectPortal>
+              <SelectBackdrop />
+              <SelectContent>
+                <SelectDragIndicatorWrapper>
+                  <SelectDragIndicator />
+                </SelectDragIndicatorWrapper>
+                <SelectItem label="Ganjil" value="ganjil" />
+                <SelectItem label="Genap" value="genap" />
+              </SelectContent>
+            </SelectPortal>
+          </Select>
+        </HStack>
 
+        <ScrollView>
           {!data ? (
             <NoData
               title="Belum ada jadwal pelajaran"
@@ -263,8 +263,8 @@ const JadwalPelajaran = () => {
               ))}
             </VStack>
           )}
-        </VStack>
-      </ScrollView>
+        </ScrollView>
+      </VStack>
     </SafeAreaView>
   );
 };

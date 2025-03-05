@@ -20,6 +20,7 @@ import { Dimensions, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import MenuHome from "@/components/MenuHome";
+import HomeCard from "@/components/HomeCard";
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -35,15 +36,20 @@ const Home = () => {
         height={screenHeight}
       >
         <ScrollView>
-          <VStack mt={40} mx={10} space="md">
+          <VStack mt={40} mx={16} space="md" mb={24}>
             <Image
-              style={{ width: 50, height: 50, margin: 20 }}
+              style={{ width: 50, height: 50, margin: 16 }}
               source={require("@/assets/images/LOGO.png")}
               alt="logo"
               mt="5%"
             />
 
-            <Text fontSize={14}>Good Morning,</Text>
+            <Text
+              fontSize={14}
+              color={mode === "dark" ? "white" : colors.gray.light[400]}
+            >
+              Good Morning,
+            </Text>
             <Text
               fontSize={18}
               fontWeight={"$bold"}
@@ -53,72 +59,7 @@ const Home = () => {
             </Text>
           </VStack>
 
-          <VStack mx={10} my={5} mt={20}>
-            <Box
-              borderTopLeftRadius={16}
-              borderTopRightRadius={16}
-              borderWidth={1}
-              borderColor="transparent"
-            >
-              <ImageBackground
-                source={require("@/assets/images/One.png")}
-                style={{
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                  width: "auto",
-                }}
-                imageStyle={{
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                }}
-              >
-                <VStack>
-                  <Text m={10} fontSize={12} color="white">
-                    Total Saldo Anda
-                  </Text>
-                  <HStack
-                    m={10}
-                    justifyContent="space-between"
-                    mr="10%"
-                    mb={40}
-                  >
-                    <HStack space="md">
-                      <Text fontWeight={"$bold"} color={"white"}>
-                        Rp.104.589.000
-                      </Text>
-                      <Entypo name="eye-with-line" size={25} color={"white"} />
-                    </HStack>
-
-                    <HStack space="md">
-                      <Text fontWeight={"$bold"} color="white">
-                        |
-                      </Text>
-                      <TouchableOpacity onPress={() => router.push("/topUp")}>
-                        <MaterialIcons
-                          name="add-box"
-                          size={25}
-                          color={"white"}
-                        />
-                      </TouchableOpacity>
-                    </HStack>
-                  </HStack>
-                </VStack>
-              </ImageBackground>
-            </Box>
-            <Box
-              borderRadius={10}
-              borderWidth={1}
-              backgroundColor="#506A7A"
-              height={50}
-              mt={-5}
-              borderColor="transparent"
-            >
-              <HStack justifyContent="space-between" mx={20} my={3} mt={10}>
-                <Text color="#ffffff">Detail</Text>
-                <AntDesign name="arrowright" size={20} color="white" />
-              </HStack>
-            </Box>
-          </VStack>
+          <HomeCard />
 
           <MenuHome />
 

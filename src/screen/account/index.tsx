@@ -75,11 +75,7 @@ const account = () => {
         >
           <TouchableOpacity onPress={() => router.push("/informasiDiri")}>
             <HStack space="md" mx={20} justifyContent="space-between" mt={12}>
-              <Text
-                fontSize={14}
-                fontWeight={"$bold"}
-                color={mode === "dark" ? "#F7F7F7" : "black"}
-              >
+              <Text fontSize={14} fontWeight={"$bold"} color={"#F7F7F7"}>
                 Edit informasi diri
               </Text>
               <Entypo

@@ -12,16 +12,16 @@ import "react-native-reanimated";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import "react-native-gesture-handler";
-
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Lato: require("../assets/fonts/Lato-Regular.ttf"), // Fixed the typo here
   });
 
   useEffect(() => {
