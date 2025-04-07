@@ -21,7 +21,11 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    Lato: require("../assets/fonts/Lato-Regular.ttf"), // Fixed the typo here
+    ["Lato"]: require("../assets/fonts/Lato-Regular.ttf"),
+    ["Lato-Bold"]: require("../assets/fonts/Lato-Bold.ttf"),
+    ["Lato-Italic"]: require("../assets/fonts/Lato-Italic.ttf"),
+    ["Lato-Thin"]: require("../assets/fonts/Lato-Thin.ttf"),
+    ["Lato-Black"]: require("../assets/fonts/Lato-Black.ttf"),
   });
 
   useEffect(() => {

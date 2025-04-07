@@ -45,6 +45,7 @@ const Home = () => {
             />
 
             <Text
+              fontFamily="Lato"
               fontSize={14}
               color={mode === "dark" ? "white" : colors.gray.light[400]}
             >
@@ -52,7 +53,7 @@ const Home = () => {
             </Text>
             <Text
               fontSize={18}
-              fontWeight={"$bold"}
+              fontFamily="Lato-Bold"
               color={mode === "dark" ? "white" : "black"}
             >
               Muhammad Roby
@@ -90,15 +91,17 @@ const Home = () => {
               <HStack justifyContent="space-between" width={"auto"}>
                 <VStack width={"70%"}>
                   <Text
-                    fontWeight={"$bold"}
-                    fontSize={15}
+                    fontFamily="Lato-Bold"
+                    fontSize={20}
                     color={mode === "dark" ? "white" : "black"}
                   >
                     Ganti Kata Sandi Anda!
                   </Text>
                   <Text
-                    fontSize={12}
+                    fontSize={14}
+                    fontFamily="Lato"
                     color={mode === "dark" ? "white" : "black"}
+                    mt={2}
                   >
                     Untuk keamanan akun anda, kami sarankan untuk mengganti kata
                     sandi secara berkala, minimal 4 bulan sekali.
@@ -119,13 +122,20 @@ const Home = () => {
 
           <HStack mt={20} mx={20} justifyContent="space-between">
             <Text
-              fontWeight={"$extrabold"}
+              fontFamily="Lato-Black"
               color={mode === "dark" ? "white" : "black"}
+              fontSize={20}
             >
               Artikel Terbaru
             </Text>
 
-            <Text color={mode === "dark" ? "white" : "black"}>Lihat Semua</Text>
+            <Text
+              color={mode === "dark" ? "white" : "black"}
+              fontSize={14}
+              fontFamily="Lato"
+            >
+              Lihat Semua
+            </Text>
           </HStack>
 
           <HStack mb={50}>
@@ -151,7 +161,7 @@ const Home = () => {
                   />
                   <VStack space="md" m={10}>
                     <Text
-                      fontWeight={"$bold"}
+                      fontFamily="Lato-Black"
                       fontSize={14}
                       color={mode === "dark" ? "white" : "black"}
                     >
@@ -160,6 +170,7 @@ const Home = () => {
                     <Text
                       fontSize={12}
                       color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
                     >
                       Untuk keamanan akun anda, kami sarankan untuk mengganti
                       kata sandi secara berkala, minimal 4 bulan sekali.

@@ -71,13 +71,13 @@ export default function SaldoScreen() {
               }}
             >
               <VStack>
-                <Text m={16} fontSize={16} color="white">
+                <Text m={16} fontSize={16} color="white" fontFamily="Lato">
                   {item.title}
                 </Text>
                 <HStack m={16} justifyContent="space-between" mr="10%" mb={40}>
                   <HStack space="md">
                     <Text
-                      fontWeight="bold"
+                      fontFamily="Lato-Black"
                       color="white"
                       style={{ fontSize: 24 }}
                     >
@@ -89,7 +89,7 @@ export default function SaldoScreen() {
                   {item.id === 1 && (
                     <HStack space="md">
                       <Text
-                        fontWeight="bold"
+                        fontFamily="Lato-Bold"
                         color="white"
                         style={{ fontSize: 24 }}
                       >
@@ -104,6 +104,7 @@ export default function SaldoScreen() {
                             mt={1}
                             textAlign="center"
                             color="white"
+                            fontFamily="Lato"
                             style={{ fontSize: 12 }}
                           >
                             Top Up
@@ -126,7 +127,9 @@ export default function SaldoScreen() {
               mt={-15}
             >
               <HStack justifyContent="space-between" mx={20} my={3} mt={15}>
-                <Text color="white">Detail</Text>
+                <Text color="white" fontFamily="Lato-Bold">
+                  Detail
+                </Text>
                 <AntDesign name="arrowright" size={20} color="white" />
               </HStack>
             </Box>

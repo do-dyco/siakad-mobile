@@ -41,12 +41,17 @@ export default function Login() {
             <VStack space="md">
               <Text
                 fontWeight={"$extrabold"}
+                fontFamily="Lato"
                 fontSize={24}
                 color={mode === "dark" ? "white" : colors.gray.light[900]}
               >
                 Selamat datang
               </Text>
-              <Text color={mode === "dark" ? "white" : colors.gray.light[400]}>
+              <Text
+                fontSize={14}
+                fontFamily="Lato"
+                color={mode === "dark" ? "white" : colors.gray.light[400]}
+              >
                 Masukkan email, kode instansi dan kata sandi Anda untuk masuk ke
                 dalam aplikasi.
               </Text>
@@ -109,7 +114,9 @@ export default function Login() {
                 borderRadius={12}
                 onPress={() => router.push("/(tabs)")}
               >
-                <Text color="#ffffff">Masuk</Text>
+                <Text color="#ffffff" fontFamily="Lato">
+                  Masuk
+                </Text>
               </Button>
 
               <Center mt={20}>
@@ -117,6 +124,7 @@ export default function Login() {
                   onPress={() => router.push("forgetPassword" as never)}
                 >
                   <Text
+                    fontFamily="Lato"
                     color={mode === "dark" ? "white" : colors.gray.light[900]}
                   >
                     Lupa Kata Sandi ?

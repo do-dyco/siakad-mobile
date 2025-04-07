@@ -4,11 +4,11 @@
     "slug": "akademik",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/LOGO.png",
+    "icon": "./assets/images/logo1.png",
     "scheme": "akademik",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash2.png",
+      "image": "./assets/images/logo1.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/LOGO.png",
+        "foregroundImage": "./assets/images/logo1.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.dodhy18.akademik",

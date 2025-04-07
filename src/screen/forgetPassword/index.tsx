@@ -45,13 +45,16 @@ export default function ForgetPassword() {
               <VStack space="md">
                 <Text
                   fontWeight={"$bold"}
+                  fontFamily="Lato"
                   fontSize={24}
                   color={mode === "dark" ? "white" : colors.gray.light[900]}
                 >
                   Setel ulang kata sandi
                 </Text>
                 <Text
+                  mt={16}
                   fontSize={16}
+                  fontFamily="Lato"
                   color={mode === "dark" ? "white" : colors.gray.light[600]}
                 >
                   Masukkan alamat email yang terkait dengan akun Anda, dan kami
@@ -60,6 +63,7 @@ export default function ForgetPassword() {
                 </Text>
 
                 <Input
+                  mt={40}
                   variant="outline"
                   size="md"
                   isDisabled={false}
@@ -85,11 +89,13 @@ export default function ForgetPassword() {
                   isFocusVisible={false}
                   bgColor={colors.brand[500]}
                   borderRadius={10}
-                  height={"20%"}
-                  mt={20}
+                  height={"15%"}
+                  mt={24}
                   onPress={() => router.push("/confirmPassword")}
                 >
-                  <Text color="#ffffff">Kirim Tautan</Text>
+                  <Text color="#ffffff" fontFamily="Lato">
+                    Kirim Tautan
+                  </Text>
                 </Button>
               </VStack>
             </Center>
