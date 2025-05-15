@@ -1,3 +1,4 @@
+
 import Berlangsung from "@/components/Berlangsung";
 import NoData from "@/components/NoData";
 import Proses from "@/components/Proses";
@@ -106,17 +107,12 @@ const Tagihan = () => {
               variant="rounded"
               width="85%"
               borderColor="transparent"
-              backgroundColor={mode === "dark" ? "#13161B" : "white"}
+              backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]}
             >
               <InputField placeholder="Cari transaksi disini" />
             </Input>
             <TouchableOpacity>
-              <Box
-                backgroundColor="transparent"
-                borderWidth={1}
-                borderColor={colors.border}
-                borderRadius={100}
-              >
+              <Box borderRadius={"$full"} backgroundColor={mode === "light" ? colors.gray.light[200] : colors.gray.dark[800]}>
                 <Ionicons
                   name="filter"
                   size={25}
@@ -149,14 +145,18 @@ const Tagihan = () => {
                 <TabBar
                   {...props}
                   style={{
-                    backgroundColor: "trasnparent",
+                    backgroundColor: "transparent",
                   }}
                   indicatorStyle={{
-                    backgroundColor: mode === "dark" ? "#fff" : "#000",
+                    backgroundColor: mode === "dark" ? "white" : "black",
                   }}
-                  // labelStyle={{
-                  //   color: mode === "dark" ? "#fff" : "#000",
-                  // }}
+                  activeColor={mode === "dark" ? "white" : "black"}
+                  inactiveColor={mode === "dark" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)"}
+                  labelStyle={{
+                    color: mode === "dark" ? "white" : "black",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                  }}
                 />
               )}
             />

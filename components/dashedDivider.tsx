@@ -1,3 +1,4 @@
+import colors from "@/src/config/colors";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
@@ -7,7 +8,7 @@ const DashedDivider = () => {
 
 const styles = StyleSheet.create({
   dashedLine: {
-    borderBottomColor: "gray",
+    borderBottomColor: colors.gray.light[200],
     borderBottomWidth: 1,
     borderStyle: "dashed",
     marginVertical: 10,

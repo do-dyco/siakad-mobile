@@ -1,3 +1,5 @@
+import CustomBadge from "@/components/CustomBadge";
+import DashedDivider from "@/components/dashedDivider";
 import NoData from "@/components/NoData";
 import colors from "@/src/config/colors";
 import {
@@ -80,7 +82,7 @@ const Invoice = () => {
               variant="rounded"
               width={"85%"}
               borderColor={"transparent"}
-              backgroundColor={mode === "dark" ? "#13161B" : "white"}
+              backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]}
             >
               <InputField placeholder="Cari transaksi disini" />
             </Input>
@@ -88,7 +90,7 @@ const Invoice = () => {
             <TouchableOpacity onPress={() => setShowActionsheet(true)}>
               <Box
                 borderRadius={"$full"}
-                backgroundColor={"transparent"}
+                backgroundColor={mode === "light" ? colors.gray.light[200] : colors.gray.dark[800]}
                 borderWidth={1}
                 borderColor={colors.border}
               >
@@ -101,7 +103,7 @@ const Invoice = () => {
               </Box>
             </TouchableOpacity>
           </HStack>
-          <Divider mt={20} bgColor="#3a3a3b" />
+          <Divider mt={20} bgColor={colors.gray.light[200]} />
         </Box>
 
         {/* Invoice List */}
@@ -114,70 +116,71 @@ const Invoice = () => {
             />
           ) : (
             invoice.map((item, index) => (
-              <React.Fragment key={index}>
-                <TouchableOpacity onPress={() => router.push("/detailInvoice")}>
-                  <Box
-                    borderWidth={1}
-                    borderTopLeftRadius={10}
-                    borderTopRightRadius={10}
-                    borderColor={colors.border}
-                    backgroundColor={mode === "dark" ? colors.box : "white"}
-                    mt={20}
-                  >
-                    <HStack justifyContent="space-between" mx={10} p={15}>
-                      <HStack space="md">
-                        <Box
-                          borderWidth={1}
-                          borderRadius={6}
-                          borderColor={colors.border}
-                          justifyContent="center"
-                          alignContent="center"
-                          backgroundColor={colors.boxWarning}
-                          height={20}
-                          width={20}
-                        >
-                          <MaterialCommunityIcons
-                            name="text-box-outline"
-                            size={16}
-                            color={"white"}
-                          />
-                        </Box>
+          <React.Fragment key={index}>
+            <TouchableOpacity onPress={() => router.push("/detailInvoice")}>
+              <Box
+                borderWidth={1}
+                borderRadius={10}
+                borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
+                mb={20}
+                mt={20}
+              >
+                <Box
+                  borderTopRightRadius={10}
+                  borderTopLeftRadius={10}
+                  bgColor={mode === 'light' ? colors.gray.light[200] : colors.box}
+                >
+                  <HStack justifyContent="space-between" m={10}>
+                    <HStack space="md">
+                      
+                      <Box
+                        borderRadius={8}
+                        borderWidth={1}
+                        borderColor="transparent"
+                        bgColor={colors.boxWarning}
+                        height={25}
+                        width={25}
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <MaterialCommunityIcons
+                          name="text-box-outline"
+                          size={20}
+                          color={"white"}
+                        />
+                      </Box>
+                      <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"} mt={4}>
+                        Invoice
+                      </Text>
+                    </HStack>
+                    <Text color={mode === "dark" ? "white" : "black"}  fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+                      {item.no_invoice}
+                    </Text>
+                  </HStack>
+                </Box>
 
-                        <Text color={mode === "dark" ? "white" : "black"}>
-                          Invoice
-                        </Text>
-                      </HStack>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        {item.no_invoice}
-                      </Text>
-                    </HStack>
-                  </Box>
-                  <Box
-                    borderBottomLeftRadius={10}
-                    borderBottomRightRadius={10}
-                    borderWidth={1}
-                    borderColor={colors.border}
-                  >
-                    <HStack justifyContent="space-between" mx={10} p={10}>
-                      <VStack space="xs">
-                        <Text color={mode === "dark" ? "white" : "black"}>
-                          Bayar Sebelum
-                        </Text>
-                        <Text color={mode === "dark" ? "white" : "black"}>
-                          {item.date}
-                        </Text>
-                      </VStack>
-                    </HStack>
+                <HStack justifyContent="space-between" mt={10} m={10}>
+                  <VStack space="md">
+                    <Text color={mode === "dark" ? "white" : "black"}  fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+                      Bayar Sebelum
+                    </Text>
+                    <Text fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>{item.no_invoice} 16:49</Text>
+                  </VStack>
+                  <CustomBadge variant="danger" label="05:59:49 "/>
+                </HStack>
+                <DashedDivider />
+                <VStack mx={10} mt={10} mb={10}>
 
-                    <HStack justifyContent="space-between" mx={10} p={10}>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Nominal Tertagih
-                      </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        {item.total}
-                      </Text>
-                    </HStack>
-                  </Box>
+                  <HStack justifyContent="space-between" mt={10}>
+                    <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+                      Nominal Tertagih
+                    </Text>
+                    <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+                      Rp.{item.total}
+                    </Text>
+                  </HStack>
+                </VStack>
+              </Box>
                 </TouchableOpacity>
               </React.Fragment>
             ))

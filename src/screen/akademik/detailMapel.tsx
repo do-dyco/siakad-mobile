@@ -88,11 +88,11 @@ const DetailMapel = () => {
         <Header data={"Matematika"} />
         <VStack space="md" m={10} mt={10}>
           <HStack justifyContent="space-between">
-            <Text color={mode === "dark" ? "white" : "black"}>
+            <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
               Jadwal Masuk
             </Text>
             <TouchableOpacity onPress={() => router.push("/detailJadwalMasuk")}>
-              <Text color={mode === "dark" ? "white" : "black"}>
+              <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                 Lihat Semua
               </Text>
             </TouchableOpacity>
@@ -104,7 +104,7 @@ const DetailMapel = () => {
                 key={index}
                 borderWidth={1}
                 borderRadius={10}
-                borderColor={colors.border}
+                borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
                 mr={10}
               >
                 <VStack space="md" m={10}>
@@ -135,10 +135,10 @@ const DetailMapel = () => {
             ))}
           </ScrollView>
 
-          <Text color={mode === "dark" ? "white" : "black"}>
+          <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={18} fontWeight={"$bold"}>
             Nilai Pelajaran dan Ujian
           </Text>
-          <Text fontSize={"$md"}>Kelas 12 IPA 1</Text>
+          <Text fontSize={"$md"} fontFamily="Lato" fontSize={12}>Kelas 12 IPA 1</Text>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {data_menu.map((item, index) => (
@@ -165,13 +165,13 @@ const DetailMapel = () => {
               key={index}
               borderWidth={1}
               borderRadius={20}
-              borderColor={colors.border}
+              borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
               backgroundColor={mode === "dark" ? "#22262F" : "white"}
               mr={10}
               p={10}
             >
               <HStack justifyContent="space-between">
-                <Text color={mode === "dark" ? "white" : "black"}>
+                <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$bold"}>
                   {item.label}
                 </Text>
                 <HStack space="md">
@@ -180,27 +180,27 @@ const DetailMapel = () => {
                     size={20}
                     color={mode === "dark" ? "white" : "black"}
                   />
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={12} fontWeight={"$bold"}>
                     {item.date}
                   </Text>
                 </HStack>
               </HStack>
 
-              <Text mt={30}>Deskripsi</Text>
-              <Text color={mode === "dark" ? "white" : "black"}>
+              <Text mt={30} fontFamily="Lato" fontSize={12} color={colors.gray.light[400]}>Deskripsi</Text>
+              <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
                 {item.desc}
               </Text>
               <Box
                 borderWidth={1}
                 borderRadius={10}
-                borderColor={colors.border}
+                borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
                 backgroundColor={mode === "dark" ? "#1f1f1f" : "white"}
                 height={"20%"}
                 mt={20}
                 mb={20}
               >
                 <HStack justifyContent="space-between" mx={10}>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={12}>
                     Lihat bukti
                   </Text>
                   <MaterialCommunityIcons

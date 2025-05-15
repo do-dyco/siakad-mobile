@@ -17,6 +17,7 @@ import {
 } from "@gluestack-ui/themed";
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import CustomBadge from "./CustomBadge";
 
 const Proses = (props: any) => {
   const mode = useColorScheme();
@@ -31,13 +32,13 @@ const Proses = (props: any) => {
             <Box
               borderWidth={1}
               borderRadius={10}
-              borderColor={colors.border}
+              borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
               mb={20}
             >
               <Box
                 borderTopRightRadius={10}
                 borderTopLeftRadius={10}
-                bgColor={colors.box}
+                bgColor={mode === 'light' ? colors.gray.light[200] : colors.box}
               >
                 <HStack justifyContent="space-between" m={10}>
                   <HStack space="md">
@@ -57,11 +58,11 @@ const Proses = (props: any) => {
                         color={"white"}
                       />
                     </Box>
-                    <Text color={mode === "dark" ? "white" : "black"}>
+                    <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                       Tagihan
                     </Text>
                   </HStack>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     {item.no_tagihan}
                   </Text>
                 </HStack>
@@ -69,39 +70,29 @@ const Proses = (props: any) => {
 
               <HStack justifyContent="space-between" mt={10} m={10}>
                 <VStack space="md">
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"}  fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     Invoice Number
                   </Text>
-                  <Text color={colors.primary}>{item.no_invoice} 16:49</Text>
+                  <Text color={colors.primary} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>{item.no_invoice} 16:49</Text>
                 </VStack>
-                <Badge
-                  size="md"
-                  variant="solid"
-                  borderRadius={20}
-                  backgroundColor={"#451A03"}
-                  alignContent="center"
-                  justifyContent="center"
-                  height={30}
-                >
-                  <Text color="#FCD34D">05:59:49</Text>
-                </Badge>
+                <CustomBadge variant="warning" label="Dalam Proses" />
               </HStack>
               <DashedDivider />
               <VStack mx={10} mt={10} mb={10}>
                 <HStack justifyContent="space-between">
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     Nama Tagihan
                   </Text>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     {item.tagihan_name}
                   </Text>
                 </HStack>
 
-                <HStack justifyContent="space-between">
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                <HStack justifyContent="space-between"mt={10}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     Nominal Tertagih
                   </Text>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
                     Rp.{item.total}
                   </Text>
                 </HStack>

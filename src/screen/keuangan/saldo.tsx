@@ -43,6 +43,7 @@ import SkeletonList from "@/components/SkeletonList";
 import { TouchableOpacity } from "react-native";
 import colors from "@/src/config/colors";
 import { router } from "expo-router";
+import CustomBadge from "@/components/CustomBadge";
 
 const Saldo = () => {
   const screenHeight = Dimensions.get("window").height;
@@ -86,7 +87,7 @@ const Saldo = () => {
                 }}
               >
                 <VStack mt={2}>
-                  <Text m={10} fontSize={12} color="white">
+                  <Text m={10} fontSize={16} fontFamily="Lato" color="white">
                     Total Saldo Anda
                   </Text>
                   <HStack space="md">
@@ -97,7 +98,7 @@ const Saldo = () => {
                       mb={40}
                     >
                       <HStack space="md">
-                        <Text fontWeight={"$bold"} color={"white"}>
+                        <Text fontWeight={"$bold"} color={"white"} fontSize={24} fontFamily={"$semibold"}>
                           Rp.104.589.000
                         </Text>
                         <Entypo
@@ -109,18 +110,21 @@ const Saldo = () => {
                     </HStack>
                   </HStack>
                   <Center>
-                    <HStack justifyContent="space-between" space="md">
+                    <HStack justifyContent="space-between" space="md" mt={10}>
                       <HStack space="md">
-                        <Box backgroundColor="#22262F" borderRadius={8}>
+                        <Box backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[100]} borderRadius={8}>
                           <Entypo
                             name="plus"
                             size={25}
-                            color="white"
+                            color={mode === "dark" ? "white" : "black"}
                             style={{ margin: 5 }}
                           />
                         </Box>
                         <Text
-                          mt={4}
+                          mt={10}
+                          fontFamily="Lato"
+                          fontSize={12}
+                          fontWeight={"$semibold"}
                           color={mode === "dark" ? "white" : "black"}
                         >
                           Top Up
@@ -131,19 +135,22 @@ const Saldo = () => {
                         |{" "}
                       </Text>
                       <HStack>
-                        <Box backgroundColor="#22262F" borderRadius={8}>
+                        <Box backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[100]} borderRadius={8}>
                           <FontAwesome5
                             name="hand-holding-medical"
                             size={20}
-                            color="white"
+                            color={mode === "dark" ? "white" : "black"}
                             style={{ margin: 5 }}
                           />
                         </Box>
                         <Text
-                          mt={4}
+                          mt={10}
+                          fontFamily="Lato"
+                          fontSize={12}
+                          fontWeight={"$semibold"}
                           color={mode === "dark" ? "white" : "black"}
                         >
-                          {" "}
+                          {"  "}
                           Tarik Tunai
                         </Text>
                       </HStack>
@@ -155,17 +162,17 @@ const Saldo = () => {
                       variant="rounded"
                       width={"85%"}
                       borderColor={"transparent"}
-                      backgroundColor={mode === "dark" ? "#13161B" : "white"}
+                      backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]}
                     >
                       <InputField placeholder="Cari transaksi disini" />
                     </Input>
 
                     <TouchableOpacity onPress={() => setShowActionsheet(true)}>
-                      <Box borderRadius={"$full"} backgroundColor="#22262F">
+                      <Box borderRadius={"$full"} backgroundColor={mode === "light" ? colors.gray.light[200] : colors.gray.dark[800]}>
                         <Ionicons
                           name="filter"
                           size={25}
-                          color="white"
+                          color={mode === 'dark' ? "white" : 'black'}
                           style={{ margin: 8 }}
                         />
                       </Box>
@@ -175,6 +182,7 @@ const Saldo = () => {
                   <VStack space="md">
                     <Text
                       mt={15}
+                      fontFamily="Lato"
                       fontWeight={"$bold"}
                       color={mode === "dark" ? "white" : "black"}
                     >
@@ -207,7 +215,7 @@ const Saldo = () => {
                       </Box>
                     ) : (
                       <Box>
-                        <Text size="xs" color={"#94979C"}>
+                        <Text size="xs" color={"#94979C"} mb={10} ontFamily="Lato" fontWeight={"$semibold"}>
                           Minggu, 20 Okt 2024
                         </Text>
 
@@ -234,23 +242,20 @@ const Saldo = () => {
                                 </Box>
                                 <VStack space="sm">
                                   <Text
+                                    fontSize={16}
+                                    fontFamily="Lato" fontWeight={"$bold"}
                                     color={mode === "dark" ? "white" : "black"}
                                   >
                                     Pembayaran Tagihan
                                   </Text>
-                                  <Text>20 Oct 2024 | 13.40</Text>
+                                  <Text fontSize={14}
+                                    fontFamily="Lato" fontWeight={"$bold"}>20 Oct 2024 | 13.40</Text>
                                 </VStack>
                               </HStack>
                               <VStack space="sm">
-                                <Text>- Rp. 10.000</Text>
-                                <Badge
-                                  size="md"
-                                  variant="solid"
-                                  borderRadius={12}
-                                  action="error"
-                                >
-                                  <BadgeText>Dana Keluar</BadgeText>
-                                </Badge>
+                                <Text fontFamily="Lato" fontWeight={"$bold"} color={mode === "dark" ? "white" : "black"} fontSize={16}>- Rp. 10.000</Text>
+                               
+                                <CustomBadge variant="danger2" label="Dana Keluar" />
                               </VStack>
                             </HStack>
                           </Box>

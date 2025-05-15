@@ -7,7 +7,6 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetItem,
   ActionsheetItemText,
-  Badge,
   Box,
   Center,
   Divider,
@@ -20,33 +19,21 @@ import {
   Text,
   VStack,
 } from "@gluestack-ui/themed";
-import Header from "@/components/Header";
-import {
-  MaterialCommunityIcons,
-  MaterialIcons,
-  Octicons,
-} from "@expo/vector-icons";
-import {
-  Dimensions,
-  Touchable,
-  TouchableOpacity,
-  useColorScheme,
-} from "react-native";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 import SkeletonList from "@/components/SkeletonList";
 import { router } from "expo-router";
 import NoData from "@/components/NoData";
 import colors from "@/src/config/colors";
+import CustomBadge from "@/components/CustomBadge";
 
 const AbsensiHp = () => {
   const mode = useColorScheme();
-  const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
   const [showActionsheet, setShowActionsheet] = useState(false);
   const handleClose = () => setShowActionsheet(!showActionsheet);
   const [data, setData] = useState("1");
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
 
   return (
     <ScrollView>
@@ -56,7 +43,7 @@ const AbsensiHp = () => {
       >
         <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
           <TouchableOpacity onPress={() => router.back()}>
-            <HStack m={5}>
+            <HStack m={5} alignItems="center">
               <MaterialIcons
                 name="chevron-left"
                 color={mode === "dark" ? "white" : "black"}
@@ -67,6 +54,7 @@ const AbsensiHp = () => {
                   color={mode === "dark" ? "white" : "black"}
                   size="sm"
                   mr={20}
+                  fontFamily="Lato"
                 >
                   Absensi Hp
                 </Text>
@@ -79,14 +67,12 @@ const AbsensiHp = () => {
               variant="outline"
               size="md"
               isDisabled={true}
-              isInvalid={false}
-              isReadOnly={false}
               borderRadius={8}
               mt={10}
               mx={10}
               borderColor="transparent"
             >
-              <InputField placeholder="Pilih Tanggal" />
+              <InputField placeholder="Pilih Tanggal" fontFamily="Lato" />
               <InputSlot mx={10}>
                 <MaterialCommunityIcons
                   name="calendar-blank"
@@ -96,14 +82,16 @@ const AbsensiHp = () => {
               </InputSlot>
             </Input>
           </TouchableOpacity>
+
           <Divider mt={20} bgColor="#3a3a3b" />
         </Box>
 
-        <Text color={mode === "dark" ? "white" : "black"} m={10}>
+        <Text color={mode === "dark" ? "white" : "black"} m={10} fontFamily="Lato">
           Oktober 2024
         </Text>
 
-        {loading ? <SkeletonList /> : null}
+        {loading && <SkeletonList />}
+
         {!data && !loading ? (
           <NoData
             title="Belum ada data absensi hp"
@@ -111,7 +99,8 @@ const AbsensiHp = () => {
           />
         ) : (
           <>
-            <HStack space="md" m={10} justifyContent="space-between">
+            <HStack space="md" m={10} justifyContent="space-between" alignItems="flex-start">
+              {/* Tanggal Box */}
               <HStack space="md">
                 <VStack height={70} width={50}>
                   <Box
@@ -120,7 +109,7 @@ const AbsensiHp = () => {
                     borderTopLeftRadius={10}
                   >
                     <Center>
-                      <Text color="#94979C">Oct</Text>
+                      <Text color="#94979C" fontFamily="Lato">Oct</Text>
                     </Center>
                   </Box>
                   <Divider bgColor="#22262F" />
@@ -131,9 +120,10 @@ const AbsensiHp = () => {
                   >
                     <Center>
                       <Text
-                        fontWeight={"$bold"}
+                        fontWeight="$bold"
                         color={mode === "dark" ? "white" : "black"}
                         mb={2}
+                        fontFamily="Lato"
                       >
                         1
                       </Text>
@@ -141,75 +131,50 @@ const AbsensiHp = () => {
                   </Box>
                 </VStack>
 
-                <VStack>
-                  <Text color="#94979C">Merk Hp</Text>
-                  <Text color="#94979C">Waktu Menyerahkan</Text>
-                  <Text color="#94979C">Status</Text>
-                  <Text color="#94979C">Waktu Pengambilan</Text>
+                {/* Label Keterangan */}
+                <VStack justifyContent="space-between">
+                  <Text color="#94979C" fontFamily="Lato">Merk Hp</Text>
+                  <Text color="#94979C" fontFamily="Lato">Waktu Menyerahkan</Text>
+                  <Text color="#94979C" fontFamily="Lato">Status</Text>
+                  <Text color="#94979C" fontFamily="Lato">Waktu Pengambilan</Text>
                 </VStack>
               </HStack>
 
-              <VStack>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  textAlign="right"
-                >
+              {/* Isi Keterangan */}
+              <VStack alignItems="flex-end" justifyContent="space-between">
+                <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
                   Iphone 11, Ungu
                 </Text>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  textAlign="right"
-                >
+                <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
                   12:24:33
                 </Text>
-                <Badge
-                  size="md"
-                  variant="solid"
-                  borderRadius={12}
-                  backgroundColor="#450A0A"
-                  width={"80%"}
-                  alignContent="center"
-                >
-                  <Center>
-                    <Text color="#FCA5A5" size="md" ml={"35%"}>
-                      05:59:49
-                    </Text>
-                  </Center>
-                </Badge>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  textAlign="right"
-                >
-                  {" "}
-                  -{" "}
+                <CustomBadge variant="danger2" label="05:59:59" />
+                <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
+                  -
                 </Text>
               </VStack>
             </HStack>
 
             <Divider bgColor={colors.border} />
 
-            <Actionsheet
-              isOpen={showActionsheet}
-              onClose={handleClose}
-              zIndex={999}
-            >
+            {/* Action Sheet */}
+            <Actionsheet isOpen={showActionsheet} onClose={handleClose} zIndex={999}>
               <ActionsheetBackdrop />
               <ActionsheetContent h="$72" zIndex={999}>
                 <ActionsheetDragIndicatorWrapper>
                   <ActionsheetDragIndicator />
                 </ActionsheetDragIndicatorWrapper>
-                <ActionsheetItem onPress={handleClose}></ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Share</ActionsheetItemText>
+                  <ActionsheetItemText fontFamily="Lato">Share</ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Play</ActionsheetItemText>
+                  <ActionsheetItemText fontFamily="Lato">Play</ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Favourite</ActionsheetItemText>
+                  <ActionsheetItemText fontFamily="Lato">Favourite</ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Cancel</ActionsheetItemText>
+                  <ActionsheetItemText fontFamily="Lato">Cancel</ActionsheetItemText>
                 </ActionsheetItem>
               </ActionsheetContent>
             </Actionsheet>

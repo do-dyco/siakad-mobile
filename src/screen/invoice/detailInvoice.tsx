@@ -1,3 +1,4 @@
+import CustomBadge from "@/components/CustomBadge";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -39,20 +40,22 @@ const DetailInvoice = () => {
         <Header data={"Detail Transaksi"} />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
-            <Text>Jumlah Tagihan</Text>
-            <Text>Invoice ID</Text>
+            <Text color={colors.gray.light[400]} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>Jumlah Tagihan</Text>
+            <Text color={colors.gray.light[400]} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>Invoice ID</Text>
           </HStack>
 
           <HStack justifyContent="space-between">
             <Text
               fontSize={16}
               fontWeight={"$bold"}
+              fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
               Rp. 450.000
             </Text>
             <Text
               fontWeight={"$bold"}
+              fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
               INV/20241022
@@ -61,15 +64,19 @@ const DetailInvoice = () => {
 
           <HStack justifyContent="space-between">
             <VStack space="md">
-              <Text color={mode == "dark" ? "white" : "black"}>
-                Bayar Sebelum
-              </Text>
-              <Text>21 Oct 2024 16:49</Text>
+              <HStack justifyContent="space-between" alignItems="center" width="100%">
+                <Text color={mode == "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+                  Bayar Sebelum
+                </Text>
+
+                <CustomBadge variant="danger" label="05:59:49 " />
+              </HStack>
+              <Text  color={mode == "dark" ? "white" : "black"} fontSize={12} fontFamily="Lato">21 Oct 2024 16:49</Text>
             </VStack>
           </HStack>
           <Divider bgColor={colors.border} />
 
-          <Text color={mode == "dark" ? "white" : "black"} mt={10}>
+          <Text color={mode == "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} mt={10} fontWeight={"$semibold"}>
             Tagihan
           </Text>
 
@@ -109,7 +116,7 @@ const DetailInvoice = () => {
                               />
                             </Box>
 
-                            <Text color={mode === "dark" ? "white" : "black"}>
+                            <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}fontWeight={"$semibold"}>
                               Tagihan ID#TG00294581
                             </Text>
                           </HStack>
@@ -135,43 +142,43 @@ const DetailInvoice = () => {
               <AccordionContent>
                 <Box
                   borderWidth={1}
-                  borderRadius={6}
-                  borderColor={colors.border}
+                  borderRadius={8}
+                   borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
                   backgroundColor={mode === "dark" ? "black" : "white"}
                 >
                   <VStack m={10} space="md">
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
                         Nama Tagihan
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                         Pembelian Buku
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
                         Tanggal
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                         21 Oct 2024
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
                         Waktu
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                         16:49
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
                         Nominal Tertagih
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                         Rp. 100.000
                       </Text>
                     </HStack>
@@ -190,7 +197,7 @@ const DetailInvoice = () => {
           mt={4}
           onPress={() => router.push("/bayarInvoice")}
         >
-          <Text color="white">Bayar Invoice</Text>
+          <Text color="white" fontFamily="Lato" fontSize={16}>Bayar Invoice</Text>
         </Button>
       </VStack>
     </SafeAreaView>

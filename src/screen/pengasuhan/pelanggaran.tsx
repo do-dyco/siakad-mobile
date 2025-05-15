@@ -1,3 +1,4 @@
+import CustomBadge from "@/components/CustomBadge";
 import DashedDivider from "@/components/dashedDivider";
 import Header from "@/components/Header";
 import NoData from "@/components/NoData";
@@ -19,6 +20,7 @@ const Pelanggaran = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [data, setData] = useState("1");
+
   const item = [
     {
       title: "Tidak Mengerjakan PR",
@@ -51,64 +53,77 @@ const Pelanggaran = () => {
             />
           ) : (
             item.map((data, index) => (
-              <>
+              <React.Fragment key={index}>
                 <Box
                   borderWidth={1}
                   borderRadius={10}
                   borderColor={colors.border}
                   mt={20}
+                  bgColor={mode === "dark" ? "#1a1a1a" : "white"}
                 >
-                  <VStack mt={10} mx={10}>
-                    <HStack justifyContent="space-between" mx={5}>
-                      <Text color={mode === "dark" ? "white" : "black"}>
+                  <VStack px={15} py={10} space="md">
+                    <HStack justifyContent="space-between" alignItems="center">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={16}
+                        fontWeight="$bold"
+                      >
                         {data.title}
                       </Text>
 
-                      <Badge
-                        size="md"
-                        variant="solid"
-                        borderRadius={12}
-                        bgColor="#22262F"
-                        width={"30%"}
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Text color="white" size="md" textAlign="center">
-                          {data.status}
-                        </Text>
-                      </Badge>
+                      <CustomBadge variant="primary" label="Ringan"/>
                     </HStack>
-                    <DashedDivider />
-                    <Text>Tanggal Pelanggaran</Text>
-                    <Text color={mode === "dark" ? "white" : "black"}>
-                      {data.date}
-                    </Text>
 
-                    <Text>Hukuman</Text>
-                    <Text color={mode === "dark" ? "white" : "black"}>
-                      {data.punishment}
-                    </Text>
+                    <DashedDivider />
+
+                    <VStack space="xs">
+                      <Text fontFamily="Lato" size="sm" color="#94979C">
+                        Tanggal Pelanggaran
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        size="sm"
+                      >
+                        {data.date}
+                      </Text>
+
+                      <Text fontFamily="Lato" size="sm" color="#94979C" mt={10}>
+                        Hukuman
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        size="sm"
+                      >
+                        {data.punishment}
+                      </Text>
+                    </VStack>
                   </VStack>
                 </Box>
 
                 <Box
                   borderWidth={1}
-                  borderBottomRightRadius={10}
-                  borderBottomLeftRadius={10}
+                  borderTopWidth={0}
                   borderColor={colors.border}
-                  borderTopColor="transparent"
-                  mt={-14}
+                  borderBottomLeftRadius={10}
+                  borderBottomRightRadius={10}
                   backgroundColor={colors.primary}
+                  mt={-20}
                 >
                   <Text
                     m={10}
-                    color={mode === "dark" ? "white" : "black"}
+                    color={"white"}
                     textAlign="center"
+                    fontFamily="Lato"
+                    fontSize={14}
+                    fontWeight="$bold"
                   >
                     {data.status_punish}
                   </Text>
                 </Box>
-              </>
+              </React.Fragment>
             ))
           )}
         </VStack>

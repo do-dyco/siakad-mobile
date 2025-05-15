@@ -70,16 +70,18 @@ const Rangking = () => {
       total_siswa: "30",
     },
   ];
+
   return (
     <>
-      <Box position="relative" style={{ width: "100%", height: "30%" }}>
+      <Box position="relative" width="100%" height="30%">
         <Image
-          style={{ width: "100%", height: "100%" }}
+          width="100%"
+          height="100%"
           source={require("@/assets/images/rangking.jpg")}
-          alt="logo"
+          alt="rangking-background"
         />
-        <Box position="absolute" top={10} mt={30}>
-          <HStack justifyContent="space-between">
+        <Box position="absolute" top={10} left={0} right={0} px={4} mt={30}>
+          <HStack justifyContent="space-between" alignItems="center">
             <TouchableOpacity onPress={() => router.back()}>
               <MaterialIcons
                 name="chevron-left"
@@ -87,9 +89,10 @@ const Rangking = () => {
                 size={30}
               />
             </TouchableOpacity>
-            <Text color="white" size="xl">
+            <Text color="white" fontSize={18} fontWeight="$bold" fontFamily="Lato">
               Rangking
             </Text>
+            <Box width={30} />
           </HStack>
         </Box>
       </Box>
@@ -97,7 +100,7 @@ const Rangking = () => {
       <ScrollView>
         <SafeAreaView
           backgroundColor={mode === "dark" ? "black" : "white"}
-          height={screenHeight}
+          minHeight={screenHeight}
         >
           <Box
             borderTopRightRadius={40}
@@ -107,7 +110,7 @@ const Rangking = () => {
             overflow="hidden"
           >
             <VStack space="md" m={10}>
-              <Text color={mode === "dark" ? "$white" : "$black"}>
+              <Text color={mode === "dark" ? "$white" : "$black"} fontWeight="$bold" fontFamily="Lato" fontSize={18}>
                 List Rangking
               </Text>
             </VStack>
@@ -127,42 +130,40 @@ const Rangking = () => {
                 />
               ) : (
                 <>
-                  <Text>Sekolah Menengah Atas</Text>
+                  <Text fontFamily="Lato">Sekolah Menengah Atas</Text>
                   {item_sma.map((data, index) => (
                     <Box
                       key={index}
                       borderWidth={1}
                       borderRadius={10}
                       borderColor="transparent"
-                      backgroundColor={colors.box}
+                      backgroundColor={mode === "dark" ? colors.box : "white"}
                       m={4}
                     >
-                      <HStack justifyContent="space-between" m={4}>
-                        <HStack space="md">
+                      <HStack justifyContent="space-between" m={4} alignItems="center">
+                        <HStack space="md" alignItems="center">
                           {Number(data.peringkat) <= 3 ? (
                             <Image
-                              style={{ width: 30, height: 50 }}
+                              width={30}
+                              height={50}
                               source={rankImages[data.peringkat]}
-                              alt="logo"
+                              alt="rank"
                             />
                           ) : (
-                            <Text size="2xl" mt={5}>
-                              #{data.peringkat}
-                            </Text>
+                            <Text size="2xl" fontFamily="Lato">#{data.peringkat}</Text>
                           )}
                           <VStack space="xs">
-                            <Text color="white">Kelas {data.kelas}</Text>
-                            <Text>{data.kelas_detail}</Text>
+                            <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={16}>Kelas {data.kelas}</Text>
+                            <Text  fontFamily="Lato" fontSize={12}>{data.kelas_detail}</Text>
                           </VStack>
                         </HStack>
-                        <Text mt={8}>
-                          Peringkat <Text color="$white">{data.peringkat}</Text>{" "}
-                          dari <Text color="$white">{data.total_siswa}</Text>{" "}
-                          Siswa
+                        <Text textAlign="right" fontFamily="Lato" fontSize={10}>
+                          Peringkat <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.peringkat}</Text> dari <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.total_siswa}</Text> Siswa
                         </Text>
                       </HStack>
                     </Box>
                   ))}
+
                   <Text>Sekolah Menengah Pertama</Text>
                   {item_smp.map((data, index) => (
                     <Box
@@ -170,35 +171,33 @@ const Rangking = () => {
                       borderWidth={1}
                       borderRadius={10}
                       borderColor="transparent"
-                      backgroundColor={colors.box}
+                      backgroundColor={mode === "dark" ? colors.box : "white"}
                       m={4}
                     >
-                      <HStack justifyContent="space-between" m={4}>
-                        <HStack space="md">
-                          {Number(data.peringkat) < 3 ? (
+                      <HStack justifyContent="space-between" m={4} alignItems="center">
+                        <HStack space="md" alignItems="center">
+                          {Number(data.peringkat) <= 3 ? (
                             <Image
-                              style={{ width: 30, height: 50 }}
+                              width={30}
+                              height={50}
                               source={rankImages[data.peringkat]}
-                              alt="logo"
+                              alt="rank"
                             />
                           ) : (
-                            <Text size="2xl" mt={5}>
-                              #{data.peringkat}
-                            </Text>
+                            <Text size="2xl">#{data.peringkat}</Text>
                           )}
                           <VStack space="xs">
-                            <Text color="white">Kelas {data.kelas}</Text>
+                            <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={16}>Kelas {data.kelas}</Text>
                             <Text>{data.kelas_detail}</Text>
                           </VStack>
                         </HStack>
-                        <Text mt={8}>
-                          Peringkat <Text color="$white">{data.peringkat}</Text>{" "}
-                          dari <Text color="$white">{data.total_siswa}</Text>{" "}
-                          Siswa
+                        <Text textAlign="right"  fontFamily="Lato" fontSize={10}>
+                          Peringkat <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.peringkat}</Text> dari <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.total_siswa}</Text> Siswa
                         </Text>
                       </HStack>
                     </Box>
                   ))}
+
                   <Text>Sekolah Dasar</Text>
                 </>
               )}

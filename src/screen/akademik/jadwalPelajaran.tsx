@@ -163,7 +163,7 @@ const JadwalPelajaran = () => {
                 backgroundColor={mode === "dark" ? colors.box : "white"}
               >
                 <VStack mx={20} space="md">
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
                     Nilai Rata - Rata
                   </Text>
 
@@ -182,15 +182,16 @@ const JadwalPelajaran = () => {
                         mr={10}
                       >
                         <VStack space="md" mx={10} mt={10}>
-                          <Text color={mode === "dark" ? "white" : "black"}>
+                          <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$bold"}>
                             {data.mapel}
                           </Text>
                           <Text
                             size="3xl"
                             fontWeight={"$bold"}
                             color={colors.primary}
+                            fontFamily="Lato"
                           >
-                            {data.nilai} <Text>dari 100</Text>
+                            {data.nilai} <Text fontFamily="Lato" fontSize={12} fontWeight={"$semibold"}>dari 100</Text>
                           </Text>
                         </VStack>
                       </Box>
@@ -199,10 +200,10 @@ const JadwalPelajaran = () => {
                 </VStack>
               </Box>
 
-              <Text color={mode === "dark" ? "white" : "black"}>
+              <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={18} fontWeight={"$bold"}>
                 Jadwal Pelajaran
               </Text>
-              <Text>Kelas 12 . IPA - 1</Text>
+              <Text fontFamily="Lato" fontSize={12}>Kelas 12 . IPA - 1</Text>
 
               {data_mapel.map((data, index) => (
                 <HStack
@@ -213,7 +214,7 @@ const JadwalPelajaran = () => {
                   <Box>
                     <Text
                       fontWeight="bold"
-                      color={mode === "dark" ? "white" : "black"}
+                      color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$bold"}
                     >
                       {data.day.charAt(0).toUpperCase() + data.day.slice(1)}
                     </Text>
@@ -242,11 +243,11 @@ const JadwalPelajaran = () => {
                             <VStack>
                               <Text
                                 color={mode === "dark" ? "white" : "black"}
-                                fontWeight="medium"
+                                fontFamily="Lato" fontSize={14} fontWeight={"$bold"}
                               >
                                 {pelajaran.nama}
                               </Text>
-                              <Text fontWeight="medium">{pelajaran.waktu}</Text>
+                              <Text fontFamily="Lato" fontSize={12} >{pelajaran.waktu}</Text>
                             </VStack>
                             <MaterialCommunityIcons
                               name="chevron-right"
