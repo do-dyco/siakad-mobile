@@ -20,14 +20,20 @@ import {
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Dimensions, useColorScheme } from "react-native";
+import { Dimensions, ImageBackground, useColorScheme } from "react-native";
 
 const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [selected, setSelected] = useState(false);
 
+  const textColor = mode === "dark" ? "white" : "black";
+  const borderColor = selected ? colors.primary : "#373A41";
+  const boxBgColor = mode === "dark" ? "#262729" : colors.gray.light[200];
+  const dividerColor = mode === "dark" ? "#373A41" : colors.gray.light[300];
+
   useEffect(() => {}, [selected]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -36,14 +42,26 @@ const MetodeBayar = () => {
         height={screenHeight}
       >
         <Header data={"Pilih Metode Bayar"} />
+
         <VStack space="md" m={10} flex={1}>
+          <ImageBackground
+            source={require("@/assets/images/Card-Trasanction.png")}
+            style={{
+              borderRadius: 16,
+              overflow: "hidden",
+            }}
+            imageStyle={{
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            }}
+          >
+
           <Box
             borderRadius={10}
             borderWidth={1}
             borderColor="transparent"
             mt={20}
-            bgColor="#262729"
-          >
+            >
             <VStack mx={10} space="md" m={10}>
               <HStack space="md">
                 <Box
@@ -58,37 +76,45 @@ const MetodeBayar = () => {
                     <SimpleLineIcons name="user" size={20} color={"white"} />
                   </Center>
                 </Box>
-                <Text color="white">Muhammad Robby</Text>
+                <Text color={textColor} fontFamily="Lato">
+                  Muhammad Robby
+                </Text>
               </HStack>
-              <Divider bgColor="#373A41" />
+              <Divider bgColor={dividerColor} />
               <HStack justifyContent="space-between">
-                <Text color="#94979C">Jumlah isi ulang saldo</Text>
-                <Text color="white">Rp.100.000</Text>
+                <Text color="#94979C" fontFamily="Lato">
+                  Jumlah isi ulang saldo
+                </Text>
+                <Text color={textColor} fontFamily="Lato">
+                  Rp.100.000
+                </Text>
               </HStack>
             </VStack>
           </Box>
+          </ImageBackground>
 
-          <Text color={mode === "dark" ? "white" : "black"} mt={20}>
+          <Text color={textColor} mt={20} fontFamily="Lato" fontWeight={"$bold"}>
             Metode Transfer
           </Text>
 
           <Box
             borderRadius={10}
             borderWidth={1}
-            borderColor={selected === false ? "#373A41" : colors.primary}
+            borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
             mx={10}
-          >
+            bgColor={"transparent"}
+            >
             <VStack space="md" m={10}>
               <HStack justifyContent="space-between">
                 <HStack space="md">
                   <Image
                     size="xs"
                     source={require("@/assets/images/bank/mandiri.png")}
-                    alt="artikel"
+                    alt="mandiri"
                     borderRadius={10}
                     mt={"-5%"}
-                  />
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                    />
+                  <Text color={textColor} fontFamily="Lato">
                     Transfer Mandiri
                   </Text>
                 </HStack>
@@ -99,28 +125,30 @@ const MetodeBayar = () => {
                     isInvalid={false}
                     isDisabled={false}
                     onChange={() => setSelected(true)}
-                  >
+                    >
                     <RadioIndicator mr="$2">
                       <RadioIcon as={CircleIcon} color={colors.primary} />
                     </RadioIndicator>
                   </Radio>
                 </RadioGroup>
               </HStack>
-              <Divider bgColor="#373A41" />
-              <Text color={mode === "dark" ? "white" : "black"}>
+              <Divider bgColor={dividerColor} />
+              <Text color={textColor} fontFamily="Lato">
                 Mohon masukkan nominal beserta kode unik di halaman selanjutnya
                 ketika akan Transfer.
               </Text>
             </VStack>
           </Box>
         </VStack>
+
         <Divider />
         <HStack justifyContent="space-between" m={20}>
           <VStack>
-            <Text>Total Transfer</Text>
+            <Text fontFamily="Lato">Total Transfer</Text>
             <Text
-              color={mode === "dark" ? "white" : "black"}
+              color={textColor}
               fontWeight={"$semibold"}
+              fontFamily="Lato"
             >
               Rp.100.000
             </Text>
@@ -131,7 +159,9 @@ const MetodeBayar = () => {
             mt={4}
             onPress={() => router.push("/transferNow")}
           >
-            <Text color="white">Selanjutnya</Text>
+            <Text color="white" fontFamily="Lato">
+              Selanjutnya
+            </Text>
           </Button>
         </HStack>
       </ScrollView>

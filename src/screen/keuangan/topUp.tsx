@@ -13,7 +13,6 @@ import {
   AvatarFallbackText,
   Input,
   InputField,
-  Badge,
   Image,
   Divider,
   Button,
@@ -25,6 +24,9 @@ import { Dimensions, useColorScheme } from "react-native";
 const topUp = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
+
+  const borderColor = mode === "dark" ? colors.box : colors.gray.light[100];
+  const textColor = mode === "dark" ? "white" : "black";
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -56,203 +58,100 @@ const topUp = () => {
             >
               <Center>
                 <HStack justifyContent="space-between" width={"100%"} mt={"5%"}>
-                  <Text color="white" mx={10}>
+                  <Text color="white" mx={10} fontFamily="Lato" fontSize={16}>
                     Saldo
                   </Text>
-                  <Text color="white" mx={10}>
+                  <Text color="white" mx={10} fontFamily="Lato" fontSize={16}>
                     Rp.104.389.000
                   </Text>
                 </HStack>
               </Center>
             </ImageBackground>
           </Box>
+
           <Center>
             <Avatar bgColor={colors.primary} size="md" borderRadius="$full">
               <AvatarFallbackText>Muhammad Robby</AvatarFallbackText>
             </Avatar>
-            <Text color={mode === "dark" ? "white" : "black"}>
+            <Text color={textColor} fontFamily="Lato" fontSize={16}>
               Muhammad Robby
             </Text>
             <HStack mt={20}>
-              <Text
-                size="2xl"
-                fontWeight={"$bold"}
-                color={mode === "dark" ? "white" : "black"}
-              >
-                Rp
-              </Text>
-              <Input
-                variant="underlined"
-                size="xl"
-                isDisabled={false}
-                isInvalid={false}
-                isReadOnly={false}
-                style={{ borderColor: "transparent" }}
-              >
+              <Input variant="underlined" size="xl">
                 <InputField
-                  color={mode === "dark" ? "white" : "black"}
+                  color={textColor}
                   fontSize={18}
                   fontWeight={"$bold"}
-                  // placeholder="0"
                 />
               </Input>
             </HStack>
           </Center>
 
+          {/* First Row */}
           <HStack justifyContent="space-between">
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto100k.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    50k
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
-
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto100k.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    100k
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
-
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto100k.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    200k
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
+            {[50, 100, 200].map((nominal) => (
+              <Box
+                key={nominal}
+                borderRadius={999}
+                borderWidth={1}
+                borderColor={borderColor}
+                backgroundColor="transparent"
+                width="30%"
+                py="$2"
+                px="$3"
+              >
+                <Center>
+                  <HStack space="md" alignItems="center">
+                    <Image
+                      source={require("@/assets/images/money/upto100k.png")}
+                      alt={`${nominal}k`}
+                      style={{ width: 24, height: 24, resizeMode: "contain" }}
+                    />
+                    <Text color={textColor} fontFamily="Lato" fontSize={16}>
+                      {nominal}k
+                    </Text>
+                  </HStack>
+                </Center>
+              </Box>
+            ))}
           </HStack>
 
-          <HStack justifyContent="space-between">
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto300k.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    300k
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
-
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto500k.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    500k
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
-
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              backgroundColor={colors.box}
-              width={"30%"}
-            >
-              <Center>
-                <HStack space="md" alignItems="center">
-                  <Image
-                    source={require("@/assets/images/money/upto1mil.png")}
-                    alt="artikel"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      resizeMode: "contain",
-                    }}
-                  />
-                  <Text color="white" size="md">
-                    1jt
-                  </Text>
-                </HStack>
-              </Center>
-            </Badge>
+          {/* Second Row */}
+          <HStack justifyContent="space-between" mt="$2">
+            {[300, 500, 1000].map((nominal) => (
+              <Box
+                key={nominal}
+                borderRadius={999}
+                borderWidth={1}
+                borderColor={borderColor}
+                backgroundColor="transparent"
+                width="30%"
+                py="$2"
+                px="$3"
+              >
+                <Center>
+                  <HStack space="md" alignItems="center">
+                    <Image
+                      source={
+                        nominal === 300
+                          ? require("@/assets/images/money/upto300k.png")
+                          : nominal === 500
+                          ? require("@/assets/images/money/upto500k.png")
+                          : require("@/assets/images/money/upto1mil.png")
+                      }
+                      alt={`${nominal >= 1000 ? nominal / 1000 + "jt" : nominal + "k"}`}
+                      style={{ width: 24, height: 24, resizeMode: "contain" }}
+                    />
+                    <Text color={textColor} fontFamily="Lato" fontSize={16}>
+                      {nominal >= 1000 ? nominal / 1000 + "jt" : nominal + "k"}
+                    </Text>
+                  </HStack>
+                </Center>
+              </Box>
+            ))}
           </HStack>
         </VStack>
+
         <Divider mb={20} bgColor="#22262F" />
         <VStack mt="auto" mx={10} mb={20}>
           <Button
