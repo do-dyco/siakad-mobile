@@ -32,7 +32,6 @@ const Home = () => {
   return (
     <>
       <SafeAreaView
-        backgroundColor={mode === "dark" ? colors.box : "white"}
         height={screenHeight}
       >
         <ScrollView>
@@ -66,11 +65,10 @@ const Home = () => {
 
           <Box
             borderRadius={10}
-            bgColor="white"
             mt={20}
             mx={10}
             my={5}
-            backgroundColor={mode === "dark" ? "black" : "#F5F5F5"}
+            backgroundColor={mode === "dark" ? "black" : "white"}
           >
             <VStack space="md" m={20}>
               <HStack justifyContent="space-between">
@@ -129,6 +127,7 @@ const Home = () => {
               Artikel Terbaru
             </Text>
 
+           <TouchableOpacity onPress={() => router.push("/allArticle")}>
             <Text
               color={mode === "dark" ? "white" : "black"}
               fontSize={14}
@@ -136,6 +135,7 @@ const Home = () => {
             >
               Lihat Semua
             </Text>
+          </TouchableOpacity>
           </HStack>
 
           <HStack mb={50}>
@@ -184,7 +184,6 @@ const Home = () => {
                 borderRadius={10}
                 bgColor="white"
                 mt={20}
-                mx={10}
                 my={5}
                 backgroundColor={mode === "dark" ? "black" : "white"}
               >

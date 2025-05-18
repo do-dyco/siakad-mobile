@@ -38,7 +38,7 @@ const TransferNow = () => {
   const [showModal, setShowModal] = useState(false);
   const ref = useRef();
 
-  const textColor = mode === "dark" ? colors.textDark : colors.textLight;
+  const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.backgroundDark : colors.backgroundLight;
 
   return (

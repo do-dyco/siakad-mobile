@@ -28,7 +28,7 @@ function Header({ data }: any) {
       <View
         style={{
           backgroundColor: theme === "dark" ? "black" : "white",
-          marginBottom: 20,
+          
         }}
       >
         <StatusBar

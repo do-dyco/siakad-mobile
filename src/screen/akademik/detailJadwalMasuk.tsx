@@ -37,6 +37,7 @@ const detailJadwalMasuk = () => {
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
   const [showActionsheet, setShowActionsheet] = useState(false);
+  const color = mode === "light" ? colors.gray.light[200] : colors.gray.dark[800];
   const data = [
     { value: 80, color: "#10B981" },
     { value: 10, color: "#EF4444" },
@@ -98,6 +99,7 @@ const detailJadwalMasuk = () => {
               />
               <Center flex={1} mr={20}>
                 <Text
+                  fontFamily="Lato"
                   color={mode === "dark" ? "white" : "black"}
                   size="sm"
                   mr={20}
@@ -150,7 +152,7 @@ const detailJadwalMasuk = () => {
                 borderRadius={5}
                 ml={"15%"}
               />
-              <Text color={mode === "dark" ? "white" : "black"}>Hadir</Text>
+              <Text fontFamily="Lato" color={mode === "dark" ? "white" : "black"}>Hadir</Text>
             </VStack>
 
             <VStack>
@@ -161,9 +163,7 @@ const detailJadwalMasuk = () => {
                 borderRadius={5}
                 ml={"40%"}
               />
-              <Text color={mode === "dark" ? "white" : "black"}>
-                Tidak Hadir
-              </Text>
+              <Text fontFamily="Lato" color={mode === "dark" ? "white" : "black"}>Tidak Hadir</Text>
             </VStack>
 
             <VStack>
@@ -173,7 +173,7 @@ const detailJadwalMasuk = () => {
                 width={20}
                 borderRadius={5}
               />
-              <Text color={mode === "dark" ? "white" : "black"}>Izin</Text>
+              <Text fontFamily="Lato" color={mode === "dark" ? "white" : "black"}>Izin</Text>
             </VStack>
 
             <VStack>
@@ -184,14 +184,12 @@ const detailJadwalMasuk = () => {
                 borderRadius={5}
                 ml={"40%"}
               />
-              <Text color={mode === "dark" ? "white" : "black"}>
-                Belum Absen
-              </Text>
+              <Text fontFamily="Lato" color={mode === "dark" ? "white" : "black"}>Belum Absen</Text>
             </VStack>
           </HStack>
 
           <Box py="$10">
-            <Heading size="xl" p="$4" pb="$3">
+            <Heading size="lg" p="$4" pb="$3" fontFamily="Lato">
               Inbox
             </Heading>
 
@@ -216,17 +214,18 @@ const detailJadwalMasuk = () => {
                         borderTopLeftRadius={10}
                       >
                         <Center>
-                          <Text color="#94979C">{item.month}</Text>
+                          <Text fontFamily="Lato" color="#94979C">{item.month}</Text>
                         </Center>
                       </Box>
-                      <Divider bgColor="#22262F" />
+                      <Divider bgColor={color} />
                       <Box
-                        bgColor="#22262F"
+                        bgColor={color}
                         borderBottomRightRadius={10}
                         borderBottomLeftRadius={10}
                       >
                         <Center>
                           <Text
+                            fontFamily="Lato"
                             fontWeight={"$bold"}
                             color={mode === "dark" ? "white" : "black"}
                             mb={2}
@@ -238,7 +237,8 @@ const detailJadwalMasuk = () => {
                     </VStack>
                     <VStack>
                       <Text
-                        color="$coolGray800"
+                        fontFamily="Lato"
+                        color={mode === "dark" ? "white" : "black"}
                         fontWeight="$bold"
                         $dark-color="$warmGray100"
                       >
@@ -246,7 +246,8 @@ const detailJadwalMasuk = () => {
                       </Text>
                     </VStack>
                     <Text
-                      color="$coolGray800"
+                      fontFamily="Lato"
+                      color={mode === "dark" ? "white" : "black"}
                       alignSelf="flex-start"
                       $dark-color="$warmGray100"
                     >
@@ -272,16 +273,16 @@ const detailJadwalMasuk = () => {
             </ActionsheetDragIndicatorWrapper>
             <ActionsheetItem onPress={handleClose}></ActionsheetItem>
             <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText>Share</ActionsheetItemText>
+              <ActionsheetItemText fontFamily="Lato">Share</ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText>Play</ActionsheetItemText>
+              <ActionsheetItemText fontFamily="Lato">Play</ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText>Favourite</ActionsheetItemText>
+              <ActionsheetItemText fontFamily="Lato">Favourite</ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={handleClose}>
-              <ActionsheetItemText>Cancel</ActionsheetItemText>
+              <ActionsheetItemText fontFamily="Lato">Cancel</ActionsheetItemText>
             </ActionsheetItem>
           </ActionsheetContent>
         </Actionsheet>

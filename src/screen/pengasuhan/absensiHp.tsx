@@ -34,6 +34,7 @@ const AbsensiHp = () => {
   const handleClose = () => setShowActionsheet(!showActionsheet);
   const [data, setData] = useState("1");
   const [loading, setLoading] = useState(false);
+  const color = mode === "light" ? colors.gray.light[200] : colors.gray.dark[800];
 
   return (
     <ScrollView>
@@ -114,7 +115,7 @@ const AbsensiHp = () => {
                   </Box>
                   <Divider bgColor="#22262F" />
                   <Box
-                    bgColor="#22262F"
+                    bgColor={color}
                     borderBottomRightRadius={10}
                     borderBottomLeftRadius={10}
                   >
@@ -132,7 +133,7 @@ const AbsensiHp = () => {
                 </VStack>
 
                 {/* Label Keterangan */}
-                <VStack justifyContent="space-between">
+                <VStack justifyContent="space-between" space="md">
                   <Text color="#94979C" fontFamily="Lato">Merk Hp</Text>
                   <Text color="#94979C" fontFamily="Lato">Waktu Menyerahkan</Text>
                   <Text color="#94979C" fontFamily="Lato">Status</Text>
@@ -141,14 +142,14 @@ const AbsensiHp = () => {
               </HStack>
 
               {/* Isi Keterangan */}
-              <VStack alignItems="flex-end" justifyContent="space-between">
+              <VStack alignItems="flex-end" justifyContent="space-between" space="md">
                 <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
                   Iphone 11, Ungu
                 </Text>
                 <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
                   12:24:33
                 </Text>
-                <CustomBadge variant="danger2" label="05:59:59" />
+                <CustomBadge variant="danger2" label="05:59:59" style={{marginLeft: 40}}/>
                 <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato">
                   -
                 </Text>

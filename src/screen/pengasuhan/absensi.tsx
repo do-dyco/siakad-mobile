@@ -19,21 +19,19 @@ import {
   Text,
   VStack,
 } from "@gluestack-ui/themed";
-import Header from "@/components/Header";
 import {
   MaterialCommunityIcons,
   MaterialIcons,
-  Octicons,
 } from "@expo/vector-icons";
 import {
   Dimensions,
-  Touchable,
   TouchableOpacity,
   useColorScheme,
 } from "react-native";
 import SkeletonList from "@/components/SkeletonList";
 import { router } from "expo-router";
 import NoData from "@/components/NoData";
+import colors from "@/src/config/colors";
 
 const absensi = () => {
   const mode = useColorScheme();
@@ -41,10 +39,11 @@ const absensi = () => {
   const screenHeight = Dimensions.get("window").height;
   const [showActionsheet, setShowActionsheet] = useState(false);
   const handleClose = () => setShowActionsheet(!showActionsheet);
-  const [data, setData] = useState("");
+  const [data, setData] = useState("1");
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const color = mode === "light" ? colors.gray.light[200] : colors.gray.dark[800];
 
   return (
     <ScrollView>
@@ -65,6 +64,7 @@ const absensi = () => {
                   color={mode === "dark" ? "white" : "black"}
                   size="sm"
                   mr={20}
+                  style={{ fontFamily: "Lato" }}
                 >
                   Absensi
                 </Text>
@@ -97,7 +97,7 @@ const absensi = () => {
           <Divider mt={20} bgColor="#3a3a3b" />
         </Box>
 
-        <Text color={mode === "dark" ? "white" : "black"} m={10}>
+        <Text color={mode === "dark" ? "white" : "black"} m={10} style={{ fontFamily: "Lato" }}>
           Oktober 2024
         </Text>
 
@@ -118,12 +118,12 @@ const absensi = () => {
                     borderTopLeftRadius={10}
                   >
                     <Center>
-                      <Text color="#94979C">Oct</Text>
+                      <Text color="#94979C" style={{ fontFamily: "Lato" }}>Oct</Text>
                     </Center>
                   </Box>
                   <Divider bgColor="#22262F" />
                   <Box
-                    bgColor="#22262F"
+                    bgColor={color}
                     borderBottomRightRadius={10}
                     borderBottomLeftRadius={10}
                   >
@@ -132,6 +132,7 @@ const absensi = () => {
                         fontWeight={"$bold"}
                         color={mode === "dark" ? "white" : "black"}
                         mb={2}
+                        style={{ fontFamily: "Lato" }}
                       >
                         1
                       </Text>
@@ -139,21 +140,21 @@ const absensi = () => {
                   </Box>
                 </VStack>
 
-                <VStack>
-                  <Text color="#94979C">Berangkat Sekolah</Text>
-                  <Text color="#94979C">Pulang Sekolah</Text>
-                  <Text color="#94979C">Sholat Berjamaah</Text>
+                <VStack space="md">
+                  <Text color="#94979C" style={{ fontFamily: "Lato" }}>Berangkat Sekolah</Text>
+                  <Text color="#94979C" style={{ fontFamily: "Lato" }}>Pulang Sekolah</Text>
+                  <Text color="#94979C" style={{ fontFamily: "Lato" }}>Sholat Berjamaah</Text>
                 </VStack>
               </HStack>
 
-              <VStack>
-                <Text color={mode === "dark" ? "white" : "black"}>
+              <VStack space="md">
+                <Text color={mode === "dark" ? "white" : "black"} style={{ fontFamily: "Lato" }}>
                   06:40:22
                 </Text>
-                <Text color={mode === "dark" ? "white" : "black"}>
+                <Text color={mode === "dark" ? "white" : "black"} style={{ fontFamily: "Lato" }}>
                   12:24:33
                 </Text>
-                <Text color={mode === "dark" ? "white" : "black"}>
+                <Text color={mode === "dark" ? "white" : "black"} style={{ fontFamily: "Lato" }}>
                   11:47:22
                 </Text>
               </VStack>
@@ -171,16 +172,24 @@ const absensi = () => {
                 </ActionsheetDragIndicatorWrapper>
                 <ActionsheetItem onPress={handleClose}></ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Share</ActionsheetItemText>
+                  <ActionsheetItemText style={{ fontFamily: "Lato" }}>
+                    Share
+                  </ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Play</ActionsheetItemText>
+                  <ActionsheetItemText style={{ fontFamily: "Lato" }}>
+                    Play
+                  </ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Favourite</ActionsheetItemText>
+                  <ActionsheetItemText style={{ fontFamily: "Lato" }}>
+                    Favourite
+                  </ActionsheetItemText>
                 </ActionsheetItem>
                 <ActionsheetItem onPress={handleClose}>
-                  <ActionsheetItemText>Cancel</ActionsheetItemText>
+                  <ActionsheetItemText style={{ fontFamily: "Lato" }}>
+                    Cancel
+                  </ActionsheetItemText>
                 </ActionsheetItem>
               </ActionsheetContent>
             </Actionsheet>

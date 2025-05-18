@@ -44,22 +44,25 @@ const MetodeBayar = () => {
         <Header data={"Pilih Metode Bayar"} />
 
         <VStack space="md" m={10} flex={1}>
-          <ImageBackground
-            source={require("@/assets/images/Card-Trasanction.png")}
+          {/* <ImageBackground
+            source={mode === 'light' ? require("@/assets/images/Card-Trasanction.png") : ""}
             style={{
               borderRadius: 16,
               overflow: "hidden",
+              width: "100%",
+              height: 120,
+              margin: 10,
             }}
             imageStyle={{
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
             }}
-          >
+          > */}
 
           <Box
             borderRadius={10}
             borderWidth={1}
-            borderColor="transparent"
+            borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
             mt={20}
             >
             <VStack mx={10} space="md" m={10}>
@@ -91,7 +94,7 @@ const MetodeBayar = () => {
               </HStack>
             </VStack>
           </Box>
-          </ImageBackground>
+          {/* </ImageBackground> */}
 
           <Text color={textColor} mt={20} fontFamily="Lato" fontWeight={"$bold"}>
             Metode Transfer

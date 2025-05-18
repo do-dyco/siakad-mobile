@@ -158,6 +158,7 @@ const topUp = () => {
             bgColor={colors.primary}
             borderRadius={10}
             mt={4}
+            mb={20}
             onPress={() => router.push("/metodeBayar")}
           >
             <Text color="white">Selanjutnya</Text>
