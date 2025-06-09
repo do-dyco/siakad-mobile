@@ -25,12 +25,20 @@ import { Dimensions, ImageBackground, useColorScheme } from "react-native";
 const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
-  const [selected, setSelected] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
 
   const textColor = mode === "dark" ? "white" : "black";
   const borderColor = selected ? colors.primary : "#373A41";
   const boxBgColor = mode === "dark" ? "#262729" : colors.gray.light[200];
   const dividerColor = mode === "dark" ? "#373A41" : colors.gray.light[300];
+
+  const handleRadioClick = (value: string) => {
+    if (selected === value) {
+      setSelected(null); // toggle off
+    } else {
+      setSelected(value); // select
+    }
+  };
 
   useEffect(() => {}, [selected]);
 
@@ -62,9 +70,11 @@ const MetodeBayar = () => {
           <Box
             borderRadius={10}
             borderWidth={1}
-            borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
+            borderColor={
+              mode === "dark" ? colors.border : colors.gray.light[200]
+            }
             mt={20}
-            >
+          >
             <VStack mx={10} space="md" m={10}>
               <HStack space="md">
                 <Box
@@ -96,17 +106,24 @@ const MetodeBayar = () => {
           </Box>
           {/* </ImageBackground> */}
 
-          <Text color={textColor} mt={20} fontFamily="Lato" fontWeight={"$bold"}>
+          <Text
+            color={textColor}
+            mt={20}
+            fontFamily="Lato"
+            fontWeight={"$bold"}
+          >
             Metode Transfer
           </Text>
 
           <Box
             borderRadius={10}
             borderWidth={1}
-            borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
+            borderColor={
+              mode === "dark" ? colors.border : colors.gray.light[200]
+            }
             mx={10}
             bgColor={"transparent"}
-            >
+          >
             <VStack space="md" m={10}>
               <HStack justifyContent="space-between">
                 <HStack space="md">
@@ -116,19 +133,18 @@ const MetodeBayar = () => {
                     alt="mandiri"
                     borderRadius={10}
                     mt={"-5%"}
-                    />
+                  />
                   <Text color={textColor} fontFamily="Lato">
                     Transfer Mandiri
                   </Text>
                 </HStack>
-                <RadioGroup>
+                <RadioGroup value={selected}>
                   <Radio
                     value="change"
                     size="md"
-                    isInvalid={false}
-                    isDisabled={false}
-                    onChange={() => setSelected(true)}
-                    >
+                    isChecked={selected === "change"}
+                    onPress={() => handleRadioClick("change")}
+                  >
                     <RadioIndicator mr="$2">
                       <RadioIcon as={CircleIcon} color={colors.primary} />
                     </RadioIndicator>
@@ -148,11 +164,7 @@ const MetodeBayar = () => {
         <HStack justifyContent="space-between" m={20}>
           <VStack>
             <Text fontFamily="Lato">Total Transfer</Text>
-            <Text
-              color={textColor}
-              fontWeight={"$semibold"}
-              fontFamily="Lato"
-            >
+            <Text color={textColor} fontWeight={"$semibold"} fontFamily="Lato">
               Rp.100.000
             </Text>
           </VStack>

@@ -31,9 +31,7 @@ const Home = () => {
 
   return (
     <>
-      <SafeAreaView
-        height={screenHeight}
-      >
+      <SafeAreaView height={screenHeight}>
         <ScrollView>
           <VStack mt={40} mx={16} space="md" mb={24}>
             <Image
@@ -127,15 +125,16 @@ const Home = () => {
               Artikel Terbaru
             </Text>
 
-           <TouchableOpacity onPress={() => router.push("/allArticle")}>
-            <Text
-              color={mode === "dark" ? "white" : "black"}
-              fontSize={14}
-              fontFamily="Lato"
-            >
-              Lihat Semua
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/allArticle")}>
+              <Text
+                color={mode === "dark" ? "white" : "black"}
+                fontSize={14}
+                fontFamily="Lato"
+                mt={4}
+              >
+                Lihat Semua
+              </Text>
+            </TouchableOpacity>
           </HStack>
 
           <HStack mb={50}>

@@ -18,12 +18,20 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  TouchableOpacity,
+  useColorScheme,
+} from "react-native";
+import { useState } from "react";
 
 export default function Login() {
   const router = useRouter();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       <ScrollView>
@@ -32,7 +40,7 @@ export default function Login() {
           height={screenHeight}
         >
           <Image
-            style={{ width: 70, height: 70, margin: 20 }}
+            style={{ width: 50, height: 50, margin: 30 }}
             source={require("@/assets/images/LOGO.png")}
             alt="logo"
             mt="20%"
@@ -49,6 +57,7 @@ export default function Login() {
               </Text>
               <Text
                 fontSize={14}
+                mb={30}
                 fontFamily="Lato"
                 color={mode === "dark" ? "white" : colors.gray.light[400]}
               >
@@ -88,18 +97,19 @@ export default function Login() {
                 <InputField placeholder="Masukkan kode instansi" />
               </Input>
 
-              <Input
-                variant="outline"
-                size={"md"}
-                isDisabled={false}
-                isInvalid={false}
-                isReadOnly={false}
-                borderRadius={8}
-              >
-                <InputField placeholder="Kata sandi" />
-
+              <Input variant="outline" size="md" borderRadius={8}>
+                <InputField
+                  placeholder="Kata sandi"
+                  type={showPassword ? "text" : "password"}
+                />
                 <InputSlot mx={10}>
-                  <Entypo name="eye-with-line" size={25} color={"#535862"} />
+                  <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    <Entypo
+                      name={showPassword ? "eye" : "eye-with-line"}
+                      size={25}
+                      color="#535862"
+                    />
+                  </Pressable>
                 </InputSlot>
               </Input>
 

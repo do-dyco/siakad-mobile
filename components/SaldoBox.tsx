@@ -1,137 +1,148 @@
-import colors from "@/src/config/colors";
 import {
-  AntDesign,
-  Entypo,
-  Feather,
-  FontAwesome5,
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-  Octicons,
-} from "@expo/vector-icons";
-import {
-  Box,
-  HStack,
-  ImageBackground,
-  VStack,
-  Text,
-  Center,
-  Input,
-  InputField,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetItem,
-  Checkbox,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckIcon,
   ScrollView,
-  Switch,
-  Radio,
-  CircleIcon,
-  RadioIndicator,
-  RadioIcon,
-  RadioGroup,
-  Divider,
-  Badge,
-  Button,
-} from "@gluestack-ui/themed";
-import { router } from "expo-router";
-import React, { useState } from "react";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+  TouchableOpacity,
+  ImageBackground,
+  Dimensions,
+} from "react-native";
+import { VStack, Box, HStack, Text } from "@gluestack-ui/themed";
+import { Entypo, MaterialIcons, AntDesign, Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 
-const SaldoBox = () => {
-  const mode = useColorScheme();
-  const screenHeight = Dimensions.get("window").height;
-  const [showActionsheet, setShowActionsheet] = useState(false);
-  const handleClose = () => setShowActionsheet(!showActionsheet);
-  const [chooseDate, setChooseDate] = useState(false);
+const saldoData = [
+  {
+    id: 1,
+    title: "Total Saldo Anda",
+    amount: "Rp.104.589.000",
+    image: require("@/assets/images/One.png"),
+    color: "#506A7A",
+  },
+];
+
+export default function SaldoBox() {
+  const router = useRouter();
+  const screenWidth = Dimensions.get("window").width * 0.9;
+
+  const [visibleAmounts, setVisibleAmounts] = useState<Record<number, boolean>>(
+    saldoData.reduce((acc, item) => {
+      acc[item.id] = true;
+      return acc;
+    }, {} as Record<number, boolean>)
+  );
+
+  const toggleAmountVisibility = (itemId: number) => {
+    setVisibleAmounts((prev) => ({
+      ...prev,
+      [itemId]: !prev[itemId],
+    }));
+  };
+
+  const getMaskedAmount = (amount: string) => {
+    return "Rp." + "•".repeat(8);
+  };
 
   return (
-    <>
-      <VStack>
-        <Box
-          borderTopLeftRadius={16}
-          borderTopRightRadius={16}
-          borderWidth={1}
-          borderColor="transparent"
-          mx={20}
-        >
-          <ImageBackground
-            source={require("@/assets/images/One.png")}
-            style={{
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              overflow: "hidden",
-            }}
-            imageStyle={{
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-            }}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: 15, gap: 4 }}
+    >
+      {saldoData.map((item) => (
+        <VStack key={item.id}>
+          {/* Card Container */}
+          <Box
+            borderTopLeftRadius={16}
+            borderTopRightRadius={16}
+            borderWidth={1}
+            borderColor="transparent"
           >
-            <VStack>
-              <Text m={16} fontSize={16} color="white">
-                Total Saldo Anda
-              </Text>
-              <HStack m={16} justifyContent="space-between" mr="10%" mb={40}>
-                <HStack space="md">
-                  <Text
-                    fontWeight="bold"
-                    color="white"
-                    style={{ fontSize: 24 }}
-                  >
-                    Rp.104.589.000
-                  </Text>
-                  <Feather name="eye-off" size={24} color="white" />
-                </HStack>
+            {/* Image Background */}
+            <ImageBackground
+              source={item.image}
+              style={{
+                width: screenWidth,
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
+                overflow: "hidden",
+              }}
+              imageStyle={{
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
+              }}
+            >
+              <VStack>
+                {/* Title */}
+                <Text m={16} fontSize={16} color="white" fontFamily="Lato">
+                  {item.title}
+                </Text>
 
-                <HStack space="md">
-                  <Text
-                    fontWeight="bold"
-                    color="white"
-                    style={{ fontSize: 24 }}
-                  >
-                    |
-                  </Text>
-                  <TouchableOpacity onPress={() => router.push("/topUp")}>
-                    <VStack alignItems="center">
-                      <Box borderRadius={6} backgroundColor="white" p={3}>
-                        <MaterialIcons name="add" size={20} color="black" />
-                      </Box>
-                      <Text
-                        mt={1}
-                        textAlign="center"
+                {/* Amount and Optional Action */}
+                <HStack m={16} justifyContent="space-between" mr="10%" mb={40}>
+                  <HStack space="md" alignItems="center">
+                    <Text fontFamily="Lato-Black" color="white" fontSize={24}>
+                      {visibleAmounts[item.id]
+                        ? item.amount
+                        : getMaskedAmount(item.amount)}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => toggleAmountVisibility(item.id)}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Feather
+                        name={visibleAmounts[item.id] ? "eye" : "eye-off"}
+                        size={24}
                         color="white"
-                        style={{ fontSize: 12 }}
-                      >
-                        Top Up
+                      />
+                    </TouchableOpacity>
+                  </HStack>
+
+                  {/* Only show Top Up button on first item */}
+                  {item.id === 1 && (
+                    <HStack space="md">
+                      <Text fontFamily="Lato-Bold" color="white" fontSize={24}>
+                        |
                       </Text>
-                    </VStack>
-                  </TouchableOpacity>
+                      <TouchableOpacity onPress={() => router.push("/topUp")}>
+                        <VStack alignItems="center">
+                          <Box borderRadius={6} backgroundColor="white" p={3}>
+                            <MaterialIcons name="add" size={20} color="black" />
+                          </Box>
+                          <Text
+                            mt={1}
+                            textAlign="center"
+                            color="white"
+                            fontFamily="Lato"
+                            fontSize={12}
+                          >
+                            Top Up
+                          </Text>
+                        </VStack>
+                      </TouchableOpacity>
+                    </HStack>
+                  )}
                 </HStack>
+              </VStack>
+            </ImageBackground>
+
+            {/* Footer Box */}
+            <Box
+              borderRadius={16}
+              borderWidth={1}
+              backgroundColor={item.color}
+              height={50}
+              borderColor="transparent"
+              mt={-20}
+            >
+              <HStack justifyContent="space-between" mx={20} my={3} mt={15}>
+                <Text color="white" fontFamily="Lato-Bold">
+                  Detail
+                </Text>
+                <AntDesign name="arrowright" size={20} color="white" />
               </HStack>
-            </VStack>
-          </ImageBackground>
-        </Box>
-
-        <Box
-          borderRadius={10}
-          borderWidth={1}
-          backgroundColor={"#506A7A"}
-          height={50}
-          borderColor="transparent"
-          mt={-10}
-          mx={20}
-        >
-          <HStack justifyContent="space-between" mx={20} my={3} mt={15}>
-            <Text color="white">Detail</Text>
-            <AntDesign name="arrowright" size={20} color="white" />
-          </HStack>
-        </Box>
-      </VStack>
-    </>
+            </Box>
+          </Box>
+        </VStack>
+      ))}
+    </ScrollView>
   );
-};
-
-export default SaldoBox;
+}

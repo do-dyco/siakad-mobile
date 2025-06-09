@@ -12,17 +12,22 @@ import {
   LinkText,
   Center,
   Badge,
-  BadgeText,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import {
+  Dimensions,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import SaldoBox from "@/components/SaldoBox";
 import { PieChart } from "react-native-gifted-charts";
 import { Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import SkeletonList from "@/components/SkeletonList";
 import { useState } from "react";
+import CustomBadge from "@/components/CustomBadge";
 
 export default function Keuangan() {
   const router = useRouter();
@@ -31,6 +36,7 @@ export default function Keuangan() {
   const screenWidth = Dimensions.get("window").width;
   const [loading, setLoading] = useState("");
   const [dataTransaksi, setDataTransaksi] = useState("1");
+
   const data = [
     { value: 45, color: "#10B981" },
     { value: 20, color: "#6172F3" },
@@ -57,25 +63,6 @@ export default function Keuangan() {
         },
       ],
     },
-    {
-      date: "Sabtu, 09 Dec 2024",
-      transactions: [
-        {
-          id: 3,
-          category: "Uang Keluar",
-          amount: 20000,
-          description: "Ibta Mart",
-          time: "09:15 AM",
-        },
-        {
-          id: 4,
-          category: "Uang Keluar",
-          amount: 20000,
-          description: "Ibta Mart",
-          time: "15:15 AM",
-        },
-      ],
-    },
   ];
 
   return (
@@ -84,20 +71,47 @@ export default function Keuangan() {
       height={screenHeight}
     >
       <ScrollView>
-        <Box position="relative" width={screenWidth}>
+        {/* Header dengan Background Melengkung */}
+        <Box
+          position="relative"
+          width={screenWidth}
+          height={screenHeight / 3 - 30}
+          borderBottomLeftRadius={20}
+          borderBottomRightRadius={20}
+          overflow="hidden"
+        >
           <Image
-            width={screenWidth}
-            height={screenHeight / 3 - 30}
-            alt="image"
-            source={{
-              uri: "../../assets/images/Akademik & Keuangan/BackgroundKeuangan_Dark.png",
+            alt="Background Keuangan"
+            source={
+              mode === "dark"
+                ? require("../../assets/images/Akademik & Keuangan/BackgroundKeuangan_Dark.png")
+                : require("../../assets/images/Akademik & Keuangan/BackgroundKeuangan_Light.png")
+            }
+            resizeMode="cover"
+            style={{
+              width: screenWidth,
+              height: screenHeight / 3 - 30,
             }}
           />
-          <SaldoBox />
+          <Box
+            position="absolute"
+            top={48}
+            left={0}
+            right={0}
+            zIndex={1}
+            mt={20}
+          >
+            <SaldoBox />
+          </Box>
         </Box>
 
+        {/* Ringkasan Keuangan */}
         <VStack space="md" mt={20} mx={10}>
-          <Text color={mode === "dark" ? "white" : "black"}>
+          <Text
+            fontSize={18}
+            fontFamily="Lato-Bold"
+            color={mode === "dark" ? "white" : "black"}
+          >
             Ringkasan keuangan
           </Text>
           <HStack justifyContent="space-around">
@@ -108,7 +122,6 @@ export default function Keuangan() {
               innerRadius={40}
               radius={70}
             />
-
             <VStack space="md">
               <HStack space="md">
                 <Box
@@ -118,13 +131,22 @@ export default function Keuangan() {
                   borderRadius={5}
                 />
                 <VStack>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato-Bold"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
                     Rp 10.000.500
                   </Text>
-                  <Text>Uang Masuk</Text>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
+                    Uang Masuk
+                  </Text>
                 </VStack>
               </HStack>
-
               <HStack space="md">
                 <Box
                   backgroundColor="#6172F3"
@@ -133,13 +155,22 @@ export default function Keuangan() {
                   borderRadius={5}
                 />
                 <VStack>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato-Bold"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
                     Rp 500.000
                   </Text>
-                  <Text>Tarik Tunai</Text>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
+                    Tarik Tunai
+                  </Text>
                 </VStack>
               </HStack>
-
               <HStack space="md">
                 <Box
                   backgroundColor="#EF4444"
@@ -148,51 +179,82 @@ export default function Keuangan() {
                   borderRadius={5}
                 />
                 <VStack>
-                  <Text color={mode === "dark" ? "white" : "black"}>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato-Bold"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
                     Rp 7.600.000
                   </Text>
-                  <Text>Uang Keluar</Text>
+                  <Text
+                    fontSize={14}
+                    fontFamily="Lato"
+                    color={mode === "dark" ? "white" : "black"}
+                  >
+                    Uang Keluar
+                  </Text>
                 </VStack>
               </HStack>
             </VStack>
           </HStack>
         </VStack>
+
+        {/* Input dan Filter */}
         <Divider bgColor={"transparent"} mt={10} h={10} />
         <HStack mt={15} space="md" m={5} alignItems="center">
           <Input
             variant="rounded"
             width="85%"
             borderColor="transparent"
-            backgroundColor={mode === "dark" ? "#13161B" : "white"}
+            backgroundColor={
+              mode === "dark" ? "#13161B" : colors.gray.light[50]
+            }
           >
             <InputField placeholder="Cari transaksi disini" />
           </Input>
+
           <TouchableOpacity>
             <Box
               backgroundColor="transparent"
               borderWidth={1}
-              borderColor={colors.border}
+              borderColor={mode === "dark" ? "#373A41" : "#E0E0E0"}
               borderRadius={100}
+              p={2} // padding tambahan untuk kesan lebih lapang
             >
               <Ionicons
                 name="filter"
                 size={25}
                 color={mode === "dark" ? "white" : "black"}
-                style={{ margin: 8 }}
+                style={{ margin: 0 }} // hapus margin untuk kontrol jarak secara lebih konsisten
               />
             </Box>
           </TouchableOpacity>
         </HStack>
-        <HStack justifyContent="space-between" m={5} mt={10}>
-          <Text color={mode === "dark" ? "white" : "black"}>
+
+        {/* Riwayat Transaksi */}
+        <HStack justifyContent="space-between" m={20} mt={10}>
+          <Text
+            fontSize={18}
+            fontFamily="Lato-Bold"
+            color={mode === "dark" ? "white" : "black"}
+          >
             Riwayat Transaksi
           </Text>
-          <Link href="#">
+          <Text
+            fontSize={14}
+            fontFamily="Lato"
+            color={mode === "dark" ? "white" : "black"}
+          >
+            Lihat Detail
+          </Text>
+          {/* <Link href="#">
             <LinkText color="white">Lihat detail</LinkText>
-          </Link>
+          </Link> */}
         </HStack>
-        <VStack space="md" mb={200} mx={10}>
+
+        <VStack space="md" mb={20} mx={10}>
           {loading ? <SkeletonList /> : null}
+
           {!dataTransaksi && !loading ? (
             <Box justifyContent="center" mt={screenHeight / 6}>
               <Center>
@@ -222,49 +284,64 @@ export default function Keuangan() {
                   {item.date}
                 </Text>
 
-                <TouchableOpacity
-                  onPress={() => router.push("/detailTransaksi")}
-                >
-                  <Box
-                    borderRadius={10}
-                    borderWidth={1}
-                    borderColor="#373A41"
-                    mt={10}
+                {item.transactions.map((trx) => (
+                  <TouchableOpacity
+                    key={trx.id}
+                    onPress={() => router.push("/detailTransaksi")}
                   >
-                    <HStack justifyContent="space-between" m={10}>
-                      <HStack space="md">
-                        <Box borderRadius={10} backgroundColor="#22262F">
-                          <MaterialCommunityIcons
-                            name="text-box-outline"
-                            size={30}
-                            color="white"
-                            style={{ margin: 8 }}
-                          />
-                        </Box>
-                        <VStack space="sm">
+                    <Box
+                      borderRadius={10}
+                      borderWidth={1}
+                      borderColor={mode === "dark" ? "#373A41" : "#E0E0E0"}
+                      mt={10}
+                      height={92}
+                    >
+                      <HStack justifyContent="space-between" m={10}>
+                        <HStack space="md">
+                          <Box
+                            borderRadius={8}
+                            backgroundColor={
+                              trx.description === "Pembayaran Tagihan"
+                                ? "#F59E0B"
+                                : "#15B392"
+                            }
+                            justifyContent="center"
+                            alignItems="center"
+                            height={30}
+                            width={30}
+                          >
+                            <MaterialCommunityIcons
+                              name="text-box-outline"
+                              size={20}
+                              color="white"
+                            />
+                          </Box>
+                          <VStack space="sm">
+                            <Text color={mode === "dark" ? "white" : "black"}>
+                              {trx.description}
+                            </Text>
+                            <Text>{trx.time}</Text>
+                          </VStack>
+                        </HStack>
+                        <VStack space="sm" alignItems="flex-end">
                           <Text color={mode === "dark" ? "white" : "black"}>
-                            Pembayaran Tagihan
+                            {trx.category === "Uang Masuk"
+                              ? `+ Rp. ${trx.amount.toLocaleString()}`
+                              : `- Rp. ${trx.amount.toLocaleString()}`}
                           </Text>
-                          <Text>20 Oct 2024 | 13.40</Text>
+                          <CustomBadge
+                            variant={
+                              trx.category === "Uang Masuk"
+                                ? "success"
+                                : "danger"
+                            }
+                            label={trx.category}
+                          />
                         </VStack>
                       </HStack>
-                      <VStack space="sm">
-                        <Text color={mode === "dark" ? "white" : "black"}>
-                          {" "}
-                          - Rp. 10.000
-                        </Text>
-                        <Badge
-                          size="md"
-                          variant="solid"
-                          borderRadius={12}
-                          backgroundColor="#450A0A"
-                        >
-                          <Text color="#FCA5A5">Dana Keluar</Text>
-                        </Badge>
-                      </VStack>
-                    </HStack>
-                  </Box>
-                </TouchableOpacity>
+                    </Box>
+                  </TouchableOpacity>
+                ))}
               </Box>
             ))
           )}

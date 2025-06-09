@@ -21,10 +21,13 @@ import {
   SelectItem,
   HStack,
   Badge,
+  Image,
+  Box,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { Link, useRouter } from "expo-router";
 import { Dimensions, Pressable, useColorScheme } from "react-native";
+import { useState } from "react";
 import Header from "@/components/Header";
 import NoData from "@/components/NoData";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -33,6 +36,8 @@ export default function akademik() {
   const router = useRouter();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const screenWidth = Dimensions.get("window").width;
+  const [selectedKelas, setSelectedKelas] = useState("1"); // Default selected class
   const dataKelas = [
     {
       id: "1",
@@ -61,7 +66,25 @@ export default function akademik() {
       height={screenHeight}
     >
       <ScrollView>
-        <Center>
+        <Center position="relative">
+          <Image
+            style={{
+              position: "absolute",
+              top: 0,
+              width: screenWidth,
+              height: screenHeight / 3 - 30,
+              zIndex: -1,
+            }}
+            alt="Akademik Background"
+            resizeMode="cover"
+            source={
+              mode === "dark"
+                ? require("../../assets/images/Akademik & Keuangan/BackgroundAkademik_Dark.png")
+                : require("../../assets/images/Akademik & Keuangan/BackgroundAkademik_Light.png")
+            }
+          />
+
+          {/* Text di atas gambar */}
           <Text
             color={mode === "dark" ? "white" : "black"}
             mt={40}
@@ -71,26 +94,59 @@ export default function akademik() {
           </Text>
         </Center>
 
-        <VStack space="md" mx={10} mt={10}>
+        <VStack space="md" mx={10} mt={40} mb={20}>
           <Text>Kelas saat ini</Text>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {dataKelas.map((item, index) => (
-              <Badge
-                key={item.id || index}
-                size="md"
-                variant="solid"
-                borderRadius={20}
-                backgroundColor={mode === "dark" ? "#22262F" : "white"}
-                alignItems="center"
-                justifyContent="center"
-                height={30}
-                px={4}
-              >
-                <Text color={mode === "dark" ? "white" : "black"}>
-                  {item.kelas}
-                </Text>
-              </Badge>
-            ))}
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 5 }}
+          >
+            <HStack space="sm">
+              {dataKelas.map((item, index) => {
+                const isSelected = selectedKelas === item.id;
+                return (
+                  <Pressable
+                    key={item.id || index}
+                    onPress={() => setSelectedKelas(item.id)}
+                  >
+                    <Badge
+                      size="md"
+                      variant="solid"
+                      borderRadius={20}
+                      backgroundColor={
+                        isSelected
+                          ? mode === "dark"
+                            ? "#073F34"
+                            : "#E6F8F2"
+                          : mode === "dark"
+                          ? "#22262F"
+                          : "#F5F5F5"
+                      }
+                      alignItems="center"
+                      justifyContent="center"
+                      height={35}
+                      px={16}
+                      borderWidth={isSelected ? 0 : 1}
+                      borderColor={mode === "dark" ? "#333" : "#E0E0E0"}
+                    >
+                      <Text
+                        color={
+                          isSelected
+                            ? "#0F8B70"
+                            : mode === "dark"
+                            ? "white"
+                            : "black"
+                        }
+                        fontSize="$sm"
+                        fontWeight={isSelected ? "600" : "400"}
+                      >
+                        {item.kelas}
+                      </Text>
+                    </Badge>
+                  </Pressable>
+                );
+              })}
+            </HStack>
           </ScrollView>
           <Select>
             <SelectTrigger variant="rounded" size="md">
@@ -135,7 +191,7 @@ export default function akademik() {
           </HStack>
           <NoData
             title="Belum ada hafalan Al-Qur'an"
-            desc="Hafalan Al-Qur’an akan muncul di sini, ketika anda sudah mensetor hafalan."
+            desc="Hafalan Al-Qur'an akan muncul di sini, ketika anda sudah mensetor hafalan."
             icon={
               <MaterialCommunityIcons
                 name="clipboard-text-outline"
