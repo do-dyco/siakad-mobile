@@ -140,35 +140,37 @@ const MenuHome = () => {
 
           <HStack justifyContent="space-between" m={20} mt={-10}>
             <VStack alignItems="center">
-              <Box
-                backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                p={3}
-                borderRadius={8}
-              >
-                <MaterialCommunityIcons
-                  name="clipboard-check-outline"
-                  size={20}
+              <TouchableOpacity onPress={() => router.push("/hafalan")}>
+                <Box
+                  backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
+                  p={3}
+                  borderRadius={8}
+                >
+                  <MaterialCommunityIcons
+                    name="clipboard-check-outline"
+                    size={20}
+                    color={mode === "dark" ? "white" : "black"}
+                    style={{ padding: 8 }}
+                  />
+                </Box>
+                <Text
+                  mt={8}
+                  fontFamily="Lato-Bold"
+                  fontSize={12}
                   color={mode === "dark" ? "white" : "black"}
-                  style={{ padding: 8 }}
-                />
-              </Box>
-              <Text
-                mt={8}
-                fontFamily="Lato-Bold"
-                fontSize={12}
-                color={mode === "dark" ? "white" : "black"}
-                textAlign="center"
-              >
-                Hafalan
-              </Text>
-              <Text
-                fontFamily="Lato-Bold"
-                fontSize={12}
-                color={mode === "dark" ? "white" : "black"}
-                textAlign="center"
-              >
-                Al-Quran
-              </Text>
+                  textAlign="center"
+                >
+                  Hafalan
+                </Text>
+                <Text
+                  fontFamily="Lato-Bold"
+                  fontSize={12}
+                  color={mode === "dark" ? "white" : "black"}
+                  textAlign="center"
+                >
+                  Al-Quran
+                </Text>
+              </TouchableOpacity>
             </VStack>
 
             <VStack alignItems="center">

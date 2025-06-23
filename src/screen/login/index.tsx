@@ -25,12 +25,14 @@ import {
   useColorScheme,
 } from "react-native";
 import { useState } from "react";
+import AlertCustom from "@/components/Alert";
 
 export default function Login() {
   const router = useRouter();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showPassword, setShowPassword] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   return (
     <>
@@ -144,6 +146,16 @@ export default function Login() {
             </VStack>
           </Center>
         </SafeAreaView>
+        {showAlert === true && (
+          <VStack mx={20} mt={-150}>
+            <AlertCustom
+              boxBgColor={colors.error[500]}
+              iconColor="white"
+              title="Email atau Kata Sandi Salah"
+              message="Email atau kata sandi yang Anda masukkan salah, cek ulang email atau kata sandi Anda."
+            />
+          </VStack>
+        )}
       </ScrollView>
     </>
   );

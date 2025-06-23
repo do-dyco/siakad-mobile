@@ -1,9 +1,16 @@
-import React from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import { Badge, Text } from '@gluestack-ui/themed';
-import colors from '@/src/config/colors';
+import React from "react";
+import { StyleProp, ViewStyle } from "react-native";
+import { Badge, Text } from "@gluestack-ui/themed";
+import colors from "@/src/config/colors";
 
-type Variant = 'success' | 'danger' | 'warning' | 'danger2' | 'warning2' | 'primary';
+type Variant =
+  | "success"
+  | "success2"
+  | "danger"
+  | "warning"
+  | "danger2"
+  | "warning2"
+  | "primary";
 
 interface CustomBadgeProps {
   variant: Variant;
@@ -15,6 +22,10 @@ const badgeStyles = {
   success: {
     bg: colors.success[50],
     color: colors.success[700],
+  },
+  success2: {
+    bg: colors.success[950],
+    color: colors.success[300],
   },
   danger: {
     bg: colors.error[50],
@@ -34,7 +45,7 @@ const badgeStyles = {
   },
   primary: {
     bg: colors.gray.light[200],
-    color: 'black',
+    color: "black",
   },
 };
 
