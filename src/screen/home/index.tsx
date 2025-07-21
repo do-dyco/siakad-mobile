@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import colors from "@/src/config/colors";
 import {
   AntDesign,
@@ -21,6 +21,8 @@ import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import MenuHome from "@/components/MenuHome";
 import HomeCard from "@/components/HomeCard";
+import { useUserStore } from "@/src/store/userStore";
+import apiService from "@/src/service/apiService";
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -28,6 +30,25 @@ const Home = () => {
 
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const [saldoData, setSaldoData] = useState(0);
+
+  console.log("Saldo Data:", saldoData);
+
+  const user = useUserStore((state) => state.user);
+
+  const fetchSaldo = async () => {
+    try {
+      const response = await apiService.mySaldo();
+      setSaldoData(response.data);
+    } catch (error) {
+      setSaldoData(0);
+      console.error("Failed to fetch saldo:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSaldo();
+  }, []);
 
   return (
     <>
@@ -53,11 +74,11 @@ const Home = () => {
               fontFamily="Lato-Bold"
               color={mode === "dark" ? "white" : "black"}
             >
-              Muhammad Roby
+              {user?.username || "User"}
             </Text>
           </VStack>
 
-          <HomeCard />
+          <HomeCard data={saldoData} />
 
           <MenuHome />
 

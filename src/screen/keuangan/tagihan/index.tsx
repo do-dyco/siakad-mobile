@@ -1,13 +1,10 @@
-
 import Berlangsung from "@/components/Berlangsung";
 import NoData from "@/components/NoData";
 import Proses from "@/components/Proses";
 import colors from "@/src/config/colors";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import apiService from "@/src/service/apiService";
+import { useUserStore } from "@/src/store/userStore";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   Box,
   Center,
@@ -18,11 +15,9 @@ import {
   SafeAreaView,
   Text,
   VStack,
-  ScrollView,
-  View,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   TouchableOpacity,
@@ -36,33 +31,19 @@ const Tagihan = () => {
   const screenHeight = Dimensions.get("window").height;
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  const [data, setData] = useState("1");
-  const dataOngoing = [
-    {
-      id: "1",
-      no_tagihan: "TG00294581",
-      no_invoice: "INV/20241022",
-      tagihan_name: "Pembelian Buku",
-      total: "100.000",
-    },
-    {
-      id: "2",
-      no_tagihan: "TG00294581",
-      no_invoice: "INV/20241122",
-      tagihan_name: "Pembelian Buku",
-      total: "300.000",
-    },
-    {
-      id: "3",
-      no_tagihan: "TG00294581",
-      no_invoice: "INV/20241222",
-      tagihan_name: "Pembelian Buku",
-      total: "200.000",
-    },
-  ];
+  const [data, setData] = useState<any>({ tagihan_users: [] });
+  const user = useUserStore((state) => state.user);
+
+  const dataOngoing = (data?.tagihan_users ?? []).filter(
+    (item) => item.status === "Unpaid"
+  );
+
+  const dataProses = (data?.tagihan_users ?? []).filter(
+    (item) => item.status === "Paid"
+  );
 
   const FirstRoute = () => <Berlangsung data={dataOngoing} />;
-  const SecondRoute = () => <Proses data={dataOngoing} />;
+  const SecondRoute = () => <Proses data={dataProses} />;
 
   const renderScene = SceneMap({
     first: FirstRoute,
@@ -74,95 +55,117 @@ const Tagihan = () => {
     { key: "second", title: "Dalam Proses" },
   ];
 
+  const fetchData = async () => {
+    try {
+      const response = await apiService.myTagihan(user.id);
+      setData(response.data);
+    } catch (error) {
+      // console.error("Failed to fetch tagihan:", error);
+      setData({ tagihan_users: [] });
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <SafeAreaView
       backgroundColor={mode === "dark" ? "black" : "white"}
       height={screenHeight}
     >
-      <ScrollView>
-        <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
-          {/* Back Button and Title */}
-          <TouchableOpacity onPress={() => router.back()}>
-            <HStack m={5} alignItems="center">
-              <MaterialIcons
-                name="chevron-left"
+      {/* Header */}
+      <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <HStack m={5} alignItems="center">
+            <MaterialIcons
+              name="chevron-left"
+              color={mode === "dark" ? "white" : "black"}
+              size={30}
+            />
+            <Center flex={1} mr={20}>
+              <Text
                 color={mode === "dark" ? "white" : "black"}
-                size={30}
-              />
-              <Center flex={1} mr={20}>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  size="sm"
-                  mr={20}
-                >
-                  Tagihan
-                </Text>
-              </Center>
-            </HStack>
-          </TouchableOpacity>
-
-          {/* Search and Filter */}
-          <HStack mt={15} space="md" m={5} alignItems="center">
-            <Input
-              variant="rounded"
-              width="85%"
-              borderColor="transparent"
-              backgroundColor={mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]}
-            >
-              <InputField placeholder="Cari transaksi disini" />
-            </Input>
-            <TouchableOpacity>
-              <Box borderRadius={"$full"} backgroundColor={mode === "light" ? colors.gray.light[200] : colors.gray.dark[800]}>
-                <Ionicons
-                  name="filter"
-                  size={25}
-                  color={mode === "dark" ? "white" : "black"}
-                  style={{ margin: 8 }}
-                />
-              </Box>
-            </TouchableOpacity>
+                size="sm"
+                mr={20}
+              >
+                Tagihan
+              </Text>
+            </Center>
           </HStack>
-          <Divider mt={20} bgColor="#3a3a3b" />
-        </Box>
+        </TouchableOpacity>
 
-        {/* Content */}
-        <VStack m={5}>
-          {data.length === 0 ? (
-            <NoData
-              title="Belum ada tagihan"
-              desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
-            />
-          ) : (
-            <TabView
-              navigationState={{ index, routes }}
-              renderScene={renderScene}
-              onIndexChange={setIndex}
-              initialLayout={{ width: layout.width }}
-              style={{
-                backgroundColor: "transparent",
-              }}
-              renderTabBar={(props) => (
-                <TabBar
-                  {...props}
-                  style={{
-                    backgroundColor: "transparent",
-                  }}
-                  indicatorStyle={{
-                    backgroundColor: mode === "dark" ? "white" : "black",
-                  }}
-                  activeColor={mode === "dark" ? "white" : "black"}
-                  inactiveColor={mode === "dark" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)"}
-                  labelStyle={{
-                    color: mode === "dark" ? "white" : "black",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                  }}
-                />
-              )}
-            />
-          )}
-        </VStack>
-      </ScrollView>
+        {/* Search & Filter */}
+        <HStack mt={15} space="md" m={5} alignItems="center">
+          <Input
+            variant="rounded"
+            width="85%"
+            borderColor="transparent"
+            backgroundColor={
+              mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]
+            }
+          >
+            <InputField placeholder="Cari transaksi disini" />
+          </Input>
+          <TouchableOpacity>
+            <Box
+              borderRadius="$full"
+              backgroundColor={
+                mode === "light"
+                  ? colors.gray.light[200]
+                  : colors.gray.dark[800]
+              }
+            >
+              <Ionicons
+                name="filter"
+                size={25}
+                color={mode === "dark" ? "white" : "black"}
+                style={{ margin: 8 }}
+              />
+            </Box>
+          </TouchableOpacity>
+        </HStack>
+
+        <Divider mt={20} bgColor="#3a3a3b" />
+      </Box>
+
+      {/* Content */}
+      <VStack flex={1} m={5}>
+        {data?.tagihan_users?.length === 0 ? (
+          <NoData
+            title="Belum ada tagihan"
+            desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
+          />
+        ) : (
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+            style={{ backgroundColor: "transparent" }}
+            renderTabBar={(props) => (
+              <TabBar
+                {...props}
+                style={{ backgroundColor: "transparent" }}
+                indicatorStyle={{
+                  backgroundColor: mode === "dark" ? "white" : "black",
+                }}
+                activeColor={mode === "dark" ? "white" : "black"}
+                inactiveColor={
+                  mode === "dark"
+                    ? "rgba(255, 255, 255, 0.6)"
+                    : "rgba(0, 0, 0, 0.6)"
+                }
+                labelStyle={{
+                  color: mode === "dark" ? "white" : "black",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                }}
+              />
+            )}
+          />
+        )}
+      </VStack>
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
 export default {
-  API_DEV: "",
+  API_DEV: "https://api-academy-staging.aerish.com",
   API_PROD: "",
 };

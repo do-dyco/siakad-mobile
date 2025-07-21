@@ -1,8 +1,8 @@
 import colors from "@/src/config/colors";
+import { useUserStore } from "@/src/store/userStore";
 import {
   Entypo,
   FontAwesome,
-  FontAwesome5,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import {
@@ -24,6 +24,9 @@ const account = () => {
   const mode = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
+
+  const user = useUserStore((state) => state.user);
+
   return (
     <SafeAreaView
       backgroundColor={mode === "dark" ? "black" : "white"}
@@ -48,7 +51,7 @@ const account = () => {
         >
           <HStack space="md" mx={20} mt={10}>
             <Avatar>
-              <AvatarFallbackText> Muhammad Robby</AvatarFallbackText>
+              <AvatarFallbackText> {user?.username} </AvatarFallbackText>
             </Avatar>
             <VStack>
               <Text
@@ -56,10 +59,10 @@ const account = () => {
                 fontWeight={"$bold"}
                 color={mode === "dark" ? "#F7F7F7" : "black"}
               >
-                Muhammad Robby
+                {user?.username}
               </Text>
               <Text fontSize={12} color={"#85888E"}>
-                muhammad.robby@gmail.com
+                {user?.email}
               </Text>
             </VStack>
           </HStack>
@@ -103,7 +106,7 @@ const account = () => {
             <Text ml={6} color={"#85888E"}>
               Kelas
             </Text>
-            <Text color={mode === "dark" ? "#F7F7F7" : "black"}>12 - A</Text>
+            <Text color={mode === "dark" ? "#F7F7F7" : "black"}>12a</Text>
           </VStack>
           <Text mt={20} color={mode === "dark" ? "#F7F7F7" : "black"}>
             {" "}

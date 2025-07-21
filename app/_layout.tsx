@@ -1,26 +1,29 @@
+// app/_layout.tsx
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
-import "react-native-reanimated";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
-import "react-native-gesture-handler";
+import { Slot, useRouter, useSegments } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
+import { useAuthStore } from "../src/store/authStore";
+import { useFonts } from "expo-font";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  const router = useRouter();
+  const segments = useSegments();
+
+  const { isLoggedIn, hasHydrated } = useAuthStore();
+
+  const [fontsLoaded] = useFonts({
     ["Lato"]: require("../assets/fonts/Lato-Regular.ttf"),
     ["Lato-Bold"]: require("../assets/fonts/Lato-Bold.ttf"),
     ["Lato-Italic"]: require("../assets/fonts/Lato-Italic.ttf"),
@@ -28,15 +31,31 @@ export default function RootLayout() {
     ["Lato-Black"]: require("../assets/fonts/Lato-Black.ttf"),
   });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  const [isMounted, setIsMounted] = useState(false);
 
-  if (!loaded) {
-    return null;
-  }
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!fontsLoaded || !hasHydrated || !isMounted) return;
+
+    const group = segments[0];
+
+    if (!isLoggedIn && group !== "(auth)") {
+      router.replace("/(auth)/login");
+      SplashScreen.hideAsync();
+      return;
+    }
+
+    if (isLoggedIn && (!group || group === "")) {
+      router.replace("/(tabs)");
+      SplashScreen.hideAsync();
+      return;
+    }
+
+    SplashScreen.hideAsync();
+  }, [fontsLoaded, hasHydrated, isLoggedIn, segments, isMounted]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -44,45 +63,7 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="login" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="forgetPassword" />
-            <Stack.Screen name="confirmPassword" />
-            {/* account */}
-            <Stack.Screen name="informasiDiri" />
-            <Stack.Screen name="informasiWali" />
-            <Stack.Screen name="keamananAkun" />
-            <Stack.Screen name="pengaturanAkun" />
-
-            {/* keuangan */}
-            <Stack.Screen name="saldo" />
-            <Stack.Screen name="detailTransaksi" />
-            <Stack.Screen name="topUp" />
-            <Stack.Screen name="metodeBayar" />
-            <Stack.Screen name="transferNow" />
-            <Stack.Screen name="statusTransaksi" />
-            <Stack.Screen name="tagihan" />
-            <Stack.Screen name="invoice" />
-            <Stack.Screen name="bayarInvoice" />
-
-            {/* pengasuhan */}
-            <Stack.Screen name="absensi" />
-            <Stack.Screen name="absensiHp" />
-            <Stack.Screen name="pelanggaran" />
-
-            {/* akademik */}
-            <Stack.Screen name="rangking" />
-            <Stack.Screen name="detailMapel" />
-            <Stack.Screen name="jadwalPelajaran" />
-            <Stack.Screen name="detailJadwalMasuk" />
-
-            <Stack.Screen name="+not-found" />
-          </Stack>
+          <Slot />
         </ThemeProvider>
       </GluestackUIProvider>
     </GestureHandlerRootView>

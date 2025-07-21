@@ -133,7 +133,13 @@ const TransferNow = () => {
               Please Transfer to AL-FUADIYAH Bank Account
             </Text>
 
-            <Box borderRadius={10} borderWidth={1} borderColor="#373A41">
+            <Box
+              borderRadius={10}
+              borderWidth={1}
+              borderColor={
+                mode === "dark" ? colors.border : colors.gray.light[200]
+              }
+            >
               <VStack space="md" m={10}>
                 <HStack justifyContent="space-between">
                   <Text fontFamily="Lato" color={textColor}>
@@ -383,7 +389,9 @@ const TransferNow = () => {
                 </Text>
               </TouchableOpacity>
             </Center>
-            <Divider bgColor={colors.border} />
+            <Divider
+              bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
+            />
             <Text fontFamily="Lato" size="sm" color={textColor}>
               Setelah selesai mentransfer, silakan klik tombol di bawah ini jadi
               kami bisa mulai mengecek transfer-an Anda.

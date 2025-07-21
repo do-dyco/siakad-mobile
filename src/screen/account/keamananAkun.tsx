@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
-import { Entypo, SimpleLineIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import {
   SafeAreaView,
   Text,
@@ -12,14 +12,43 @@ import {
   InputField,
   Input,
   InputSlot,
+  useToast,
 } from "@gluestack-ui/themed";
-import React from "react";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  TouchableOpacity,
+  useColorScheme,
+  Alert,
+} from "react-native";
 import { router } from "expo-router";
 
-const keamananAkun = () => {
+const KeamananAkun = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+
+  const [passwordLama, setPasswordLama] = useState("");
+  const [passwordBaru, setPasswordBaru] = useState("");
+  const [konfirmasiPassword, setKonfirmasiPassword] = useState("");
+
+  const [secureOld, setSecureOld] = useState(true);
+  const [secureNew, setSecureNew] = useState(true);
+  const [secureConfirm, setSecureConfirm] = useState(true);
+
+  const handleSubmit = () => {
+    if (!passwordBaru || !konfirmasiPassword) {
+      Alert.alert("Error", "Silakan isi semua kolom password baru.");
+      return;
+    }
+
+    if (passwordBaru !== konfirmasiPassword) {
+      Alert.alert("Error", "Konfirmasi password tidak cocok.");
+      return;
+    }
+
+    Alert.alert("Sukses", "Kata sandi berhasil diganti!");
+    router.push("/(tabs)");
+  };
 
   return (
     <ScrollView>
@@ -40,48 +69,54 @@ const keamananAkun = () => {
             width={"80%"}
           >
             <VStack space="2xl" p={10} my={20}>
-              <Input
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                isInvalid={false}
-                isReadOnly={false}
-                borderRadius={8}
-              >
-                <InputField placeholder="Kata sandi" />
-
-                <InputSlot mx={10}>
-                  <Entypo name="eye-with-line" size={25} color={"#535862"} />
+              {/* Password Lama */}
+              <Input variant="outline" size="md" borderRadius={8}>
+                <InputField
+                  placeholder="Kata sandi lama"
+                  secureTextEntry={secureOld}
+                  onChangeText={setPasswordLama}
+                />
+                <InputSlot mx={10} onPress={() => setSecureOld(!secureOld)}>
+                  <Entypo
+                    name={secureOld ? "eye-with-line" : "eye"}
+                    size={22}
+                    color={"#535862"}
+                  />
                 </InputSlot>
               </Input>
 
-              <Input
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                isInvalid={false}
-                isReadOnly={false}
-                borderRadius={8}
-              >
-                <InputField placeholder="Kata sandi baru" />
-
-                <InputSlot mx={10}>
-                  <Entypo name="eye-with-line" size={25} color={"#535862"} />
+              {/* Password Baru */}
+              <Input variant="outline" size="md" borderRadius={8}>
+                <InputField
+                  placeholder="Kata sandi baru"
+                  secureTextEntry={secureNew}
+                  onChangeText={setPasswordBaru}
+                />
+                <InputSlot mx={10} onPress={() => setSecureNew(!secureNew)}>
+                  <Entypo
+                    name={secureNew ? "eye-with-line" : "eye"}
+                    size={22}
+                    color={"#535862"}
+                  />
                 </InputSlot>
               </Input>
 
-              <Input
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                isInvalid={false}
-                isReadOnly={false}
-                borderRadius={8}
-              >
-                <InputField placeholder="Konfirmasi kata sandi baru" />
-
-                <InputSlot mx={10}>
-                  <Entypo name="eye-with-line" size={25} color={"#535862"} />
+              {/* Konfirmasi Password */}
+              <Input variant="outline" size="md" borderRadius={8}>
+                <InputField
+                  placeholder="Konfirmasi kata sandi baru"
+                  secureTextEntry={secureConfirm}
+                  onChangeText={setKonfirmasiPassword}
+                />
+                <InputSlot
+                  mx={10}
+                  onPress={() => setSecureConfirm(!secureConfirm)}
+                >
+                  <Entypo
+                    name={secureConfirm ? "eye-with-line" : "eye"}
+                    size={22}
+                    color={"#535862"}
+                  />
                 </InputSlot>
               </Input>
 
@@ -89,13 +124,11 @@ const keamananAkun = () => {
                 size="md"
                 variant="solid"
                 action="primary"
-                isDisabled={false}
-                isFocusVisible={false}
                 bgColor={colors.primary}
                 borderRadius={10}
                 mt={20}
                 mx={30}
-                onPress={() => router.push("/(tabs)")}
+                onPress={handleSubmit}
               >
                 <HStack space="md">
                   <Text color="#ffffff">Ganti Kata Sandi</Text>
@@ -109,4 +142,4 @@ const keamananAkun = () => {
   );
 };
 
-export default keamananAkun;
+export default KeamananAkun;

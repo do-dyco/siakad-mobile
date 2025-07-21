@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
+import { useAuthStore } from "@/src/store/authStore";
+import { useUserStore } from "@/src/store/userStore";
 import {
   Entypo,
   FontAwesome5,
@@ -16,6 +18,7 @@ import {
   ScrollView,
   Button,
 } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
@@ -23,6 +26,15 @@ import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 const pengaturanAkun = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+
+  const clearAuth = useUserStore((state) => state.clearAuth);
+
+  const logout = async () => {
+    await AsyncStorage.clear();
+    clearAuth();
+    useAuthStore.getState().logout();
+    router.replace("/login");
+  };
 
   return (
     <ScrollView>
@@ -175,7 +187,7 @@ const pengaturanAkun = () => {
             borderRadius={10}
             mt={20}
             mx={30}
-            onPress={() => router.push("/(tabs)")}
+            onPress={logout}
           >
             <HStack space="md">
               <SimpleLineIcons name="logout" size={20} color={"white"} />

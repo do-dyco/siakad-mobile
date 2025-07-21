@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
+import { useTagihanStore } from "@/src/store/tagihanStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   HStack,
@@ -28,6 +29,29 @@ import { Dimensions, useColorScheme } from "react-native";
 const DetailInvoice = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const { selectedTagihan } = useTagihanStore();
+  const totalNominal = selectedTagihan.reduce((total, item) => {
+    return total + item.nominal;
+  }, 0);
+
+  const generateInvoiceNumber = () => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    const random = Math.floor(1000 + Math.random() * 9000);
+
+    return `INV/${year}${month}${day}${random}`;
+  };
+
+  const handleNext = () => {
+    router.push({
+      pathname: "/metodeBayar",
+      params: { invoice: generateInvoiceNumber() },
+    });
+  };
 
   return (
     <SafeAreaView
@@ -49,18 +73,20 @@ const DetailInvoice = () => {
               fontWeight={"$bold"}
               color={mode == "dark" ? "white" : "black"}
             >
-              Rp. 450.000
+              Rp. {new Intl.NumberFormat("id-ID").format(totalNominal)}
             </Text>
             <Text
               fontWeight={"$bold"}
               color={mode == "dark" ? "white" : "black"}
             >
-              INV/20241022
+              {generateInvoiceNumber()}
             </Text>
           </HStack>
 
           <HStack justifyContent="space-between"></HStack>
-          <Divider bgColor={colors.border} />
+          <Divider
+            bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
+          />
 
           <Text color={mode == "dark" ? "white" : "black"} mt={10}>
             Tagihan
@@ -70,118 +96,124 @@ const DetailInvoice = () => {
             width="100%"
             size="md"
             bgColor={mode === "dark" ? colors.box : "white"}
-            type="single"
+            type="multiple" // gunakan multiple jika ingin banyak accordion terbuka
             isCollapsible={true}
-            isDisabled={false}
           >
-            <AccordionItem
-              value="a"
-              backgroundColor={mode === "dark" ? "#22262F" : "white"}
-            >
-              <AccordionHeader>
-                <AccordionTrigger>
-                  {({ isExpanded }) => {
-                    return (
-                      <>
-                        <HStack justifyContent="space-between" mx={2}>
-                          <HStack space="md">
-                            <Box
-                              borderWidth={1}
-                              borderRadius={6}
-                              borderColor={colors.border}
-                              justifyContent="center"
-                              alignContent="center"
-                              backgroundColor={colors.boxWarning}
-                              height={20}
-                              width={20}
-                            >
-                              <MaterialCommunityIcons
-                                name="text-box-outline"
-                                size={16}
-                                color={"white"}
-                              />
-                            </Box>
-
-                            <Text color={mode === "dark" ? "white" : "black"}>
-                              Tagihan ID#TG00294581
-                            </Text>
-                          </HStack>
-                        </HStack>
-                        {isExpanded ? (
-                          <AccordionIcon
-                            as={ChevronUpIcon}
-                            ml="$3"
-                            color={mode === "dark" ? "white" : "black"}
-                          />
-                        ) : (
-                          <AccordionIcon
-                            as={ChevronDownIcon}
-                            ml="$3"
-                            color={mode === "dark" ? "white" : "black"}
-                          />
-                        )}
-                      </>
-                    );
-                  }}
-                </AccordionTrigger>
-              </AccordionHeader>
-              <AccordionContent>
-                <Box
-                  borderWidth={1}
-                  borderRadius={6}
-                  borderColor={colors.border}
-                  backgroundColor={mode === "dark" ? "black" : "white"}
+            {selectedTagihan.map((item, index) => {
+              const [tanggal, waktu] = item.expire_at.split(" ");
+              return (
+                <AccordionItem
+                  key={item.id}
+                  value={item.id}
+                  backgroundColor={mode === "dark" ? "#22262F" : "white"}
                 >
-                  <VStack m={10} space="md">
-                    <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Nama Tagihan
-                      </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Pembelian Buku
-                      </Text>
-                    </HStack>
+                  <AccordionHeader>
+                    <AccordionTrigger>
+                      {({ isExpanded }) => (
+                        <>
+                          <HStack justifyContent="space-between" mx={2}>
+                            <HStack space="md">
+                              <Box
+                                borderWidth={1}
+                                borderRadius={6}
+                                borderColor={
+                                  mode === "dark"
+                                    ? colors.border
+                                    : colors.gray.light[200]
+                                }
+                                justifyContent="center"
+                                alignContent="center"
+                                backgroundColor={colors.boxWarning}
+                                height={20}
+                                width={20}
+                              >
+                                <MaterialCommunityIcons
+                                  name="text-box-outline"
+                                  size={16}
+                                  color={"white"}
+                                />
+                              </Box>
+                              <Text color={mode === "dark" ? "white" : "black"}>
+                                Tagihan {item.no_tagihan}
+                              </Text>
+                            </HStack>
+                          </HStack>
+                          <AccordionIcon
+                            as={isExpanded ? ChevronUpIcon : ChevronDownIcon}
+                            ml="$3"
+                            color={mode === "dark" ? "white" : "black"}
+                          />
+                        </>
+                      )}
+                    </AccordionTrigger>
+                  </AccordionHeader>
 
-                    <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Tanggal
-                      </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        21 Oct 2024
-                      </Text>
-                    </HStack>
+                  <AccordionContent>
+                    <Box
+                      borderWidth={1}
+                      borderRadius={6}
+                      borderColor={
+                        mode === "dark" ? colors.border : colors.gray.light[200]
+                      }
+                      backgroundColor={mode === "dark" ? "black" : "white"}
+                    >
+                      <VStack m={10} space="md">
+                        <HStack justifyContent="space-between">
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            Nama Tagihan
+                          </Text>
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            {item.master_tagihan?.nama ?? "-"}
+                          </Text>
+                        </HStack>
 
-                    <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Waktu
-                      </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        16:49
-                      </Text>
-                    </HStack>
+                        <HStack justifyContent="space-between">
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            Tanggal
+                          </Text>
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            {tanggal}
+                          </Text>
+                        </HStack>
 
-                    <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Nominal Tertagih
-                      </Text>
-                      <Text color={mode === "dark" ? "white" : "black"}>
-                        Rp. 100.000
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </Box>
-              </AccordionContent>
-            </AccordionItem>
+                        <HStack justifyContent="space-between">
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            Waktu
+                          </Text>
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            {waktu}
+                          </Text>
+                        </HStack>
+
+                        <HStack justifyContent="space-between">
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            Nominal Tertagih
+                          </Text>
+                          <Text color={mode === "dark" ? "white" : "black"}>
+                            Rp{" "}
+                            {new Intl.NumberFormat("id-ID").format(
+                              item.nominal
+                            )}
+                          </Text>
+                        </HStack>
+                      </VStack>
+                    </Box>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
           </Accordion>
         </VStack>
       </ScrollView>
-      <Divider bgColor={colors.border} />
+      <Divider
+        bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
+      />
       <VStack mt={10} mx={10} mb={20}>
         <Button
           bgColor={colors.primary}
           borderRadius={10}
           mt={4}
-          onPress={() => router.push("/metodeBayar")}
+          onPress={handleNext}
         >
           <Text color="white">Selanjutnya</Text>
         </Button>
