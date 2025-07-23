@@ -113,7 +113,7 @@ const MenuHome = () => {
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center">
+            {/* <VStack alignItems="center">
               <Box
                 backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                 p={3}
@@ -135,10 +135,7 @@ const MenuHome = () => {
               >
                 Pengeluaran
               </Text>
-            </VStack>
-          </HStack>
-
-          <HStack justifyContent="space-between" m={20} mt={-10}>
+            </VStack> */}
             <VStack alignItems="center">
               <TouchableOpacity onPress={() => router.push("/hafalan")}>
                 <Box
@@ -172,7 +169,9 @@ const MenuHome = () => {
                 </Text>
               </TouchableOpacity>
             </VStack>
+          </HStack>
 
+          <HStack space="4xl" m={20} mt={-10}>
             <VStack alignItems="center">
               <TouchableOpacity onPress={() => router.push("/jadwalPelajaran")}>
                 <Box

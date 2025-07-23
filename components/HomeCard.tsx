@@ -21,7 +21,7 @@ export default function SaldoScreen({
 
   const toggleVisibility = () => setVisible((prev) => !prev);
 
-  const getMaskedAmount = () => "Rp.••••••••";
+  const getMaskedAmount = () => "Rp. • • • •";
 
   const formatRupiah = (value: number | string) => {
     const numericValue = typeof value === "string" ? parseFloat(value) : value;

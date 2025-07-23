@@ -23,6 +23,7 @@ import MenuHome from "@/components/MenuHome";
 import HomeCard from "@/components/HomeCard";
 import { useUserStore } from "@/src/store/userStore";
 import apiService from "@/src/service/apiService";
+import TagihanCard from "@/components/TagihanCard";
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -31,8 +32,9 @@ const Home = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [saldoData, setSaldoData] = useState(0);
+  const [dataTagihan, setDataTagihan] = useState({});
 
-  console.log("Saldo Data:", saldoData);
+  console.log("Data:", dataTagihan);
 
   const user = useUserStore((state) => state.user);
 
@@ -46,8 +48,28 @@ const Home = () => {
     }
   };
 
+  const fetchTagihan = async () => {
+    try {
+      const response = await apiService.myTagihan();
+
+      const raw = response.data;
+
+      const transformed = [
+        { id: 1, label: "Tagihan Belum Lunas", saldo: raw.tagihan_belum_lunas },
+        { id: 2, label: "Tagihan Lunas", saldo: raw.tagihan_lunas },
+        { id: 3, label: "Total Tagihan", saldo: raw.tagihan_total },
+      ];
+
+      setDataTagihan(transformed);
+    } catch (error) {
+      setDataTagihan([]);
+      console.error("Failed to fetch saldo:", error);
+    }
+  };
+
   useEffect(() => {
     fetchSaldo();
+    fetchTagihan();
   }, []);
 
   return (
@@ -78,7 +100,10 @@ const Home = () => {
             </Text>
           </VStack>
 
-          <HomeCard data={saldoData} />
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <HomeCard data={saldoData} />
+            <TagihanCard data={dataTagihan} />
+          </ScrollView>
 
           <MenuHome />
 

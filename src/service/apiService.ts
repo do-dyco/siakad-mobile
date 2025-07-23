@@ -29,10 +29,10 @@ export default {
   },
 
   //Tagihan
-  myTagihan: async (id: number) => {
+  myTagihan: async () => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + "/v2/user/tagihan?id=" + id
+        PATH.API_DEV + "/v2/user/tagihan/summary"
       );
       return response.data;
     } catch (error) {
