@@ -40,7 +40,7 @@ import {
   useToast,
 } from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -54,7 +54,7 @@ import * as FileSystem from "expo-file-system";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
 
-const TransferNow = () => {
+const TransferVa = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showModal, setShowModal] = useState(false);
@@ -62,18 +62,16 @@ const TransferNow = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
-  const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice } =
+  const { nama_bank, no_rekening, nama_rekening, nominal, bank_code } =
     useLocalSearchParams();
   const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
-  const [dataInvoice, setDataInvoice] = useState<any>({});
 
   const handleClose = () => setShowActionsheet(false);
-  const rawAmount =
-    (nominal && nominal !== "0" ? nominal : dataInvoice.nominal) || "0";
-  const amount = rawAmount.toString().replace(/\D/g, "").padStart(4, "0");
-  const mainPart = amount.slice(0, -3);
-  const lastThree = amount.slice(-3);
+  const amount = nominal;
+  const mainPart = amount?.slice(0, -3); // '100'
+  const lastThree = amount?.slice(-3);
+
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
 
@@ -81,17 +79,6 @@ const TransferNow = () => {
     return new Intl.NumberFormat("id-ID").format(value);
   };
 
-  const fetchDetail = async () => {
-    try {
-      const response = await apiService.myInvoiceDetail(no_invoice);
-      setDataInvoice(response.data.invoice_tagihan);
-    } catch (error) {
-      setDataInvoice({});
-      console.error("Failed to fetch detail:", error);
-    }
-  };
-
-  // Function untuk copy ke clipboard dengan toast
   const copyToClipboard = async (text, label) => {
     try {
       await Clipboard.setStringAsync(text);
@@ -181,7 +168,6 @@ const TransferNow = () => {
     }
   };
 
-  // Function untuk delete gambar
   const handleDeleteImage = () => {
     setUploadedImage(null);
   };
@@ -189,10 +175,6 @@ const TransferNow = () => {
   const params = {
     bukti: uploadedImage,
   };
-
-  useEffect(() => {
-    fetchDetail();
-  }, []);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -206,7 +188,6 @@ const TransferNow = () => {
           no_rekening: no_rekening,
           nama_rekening: nama_rekening,
           nominal: nominal,
-          no_invoice: dataInvoice.no_invoice,
         },
       });
     } catch (error) {
@@ -257,11 +238,17 @@ const TransferNow = () => {
                   <Image
                     size="xs"
                     source={
-                      nama_bank === "MANDIRI"
-                        ? require("@/assets/images/bank/mandiri.png")
-                        : require("@/assets/images/bank/bca.png")
+                      bank_code === "bca"
+                        ? require("@/assets/images/bank/bca.png")
+                        : bank_code === "bni"
+                        ? require("@/assets/images/bank/bni.png")
+                        : bank_code === "bri"
+                        ? require("@/assets/images/bank/bri.png")
+                        : bank_code === "bmi"
+                        ? require("@/assets/images/bank/bmi.png")
+                        : require("@/assets/images/bank/mandiri.png")
                     }
-                    alt="bank"
+                    alt={bank_code}
                     borderRadius={10}
                   />
                   <VStack>
@@ -310,7 +297,7 @@ const TransferNow = () => {
                   >
                     <HStack spacing={0} alignItems="center">
                       <Text fontFamily="Lato" fontSize="$md" color={textColor}>
-                        Rp.{formatRupiah(Number(mainPart) || 0)}.
+                        Rp.{formatRupiah(mainPart)}.
                       </Text>
                       <Text
                         fontFamily="Lato"
@@ -562,4 +549,4 @@ const TransferNow = () => {
   );
 };
 
-export default TransferNow;
+export default TransferVa;

@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
+import apiService from "@/src/service/apiService";
 import { useTagihanStore } from "@/src/store/tagihanStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -14,44 +15,55 @@ import {
   AccordionItem,
   AccordionHeader,
   AccordionTrigger,
-  AccordionTitleText,
   AccordionIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   AccordionContent,
-  AccordionContentText,
   Button,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
 
 const DetailInvoice = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const { selectedTagihan } = useTagihanStore();
-  const totalNominal = selectedTagihan.reduce((total, item) => {
-    return total + item.nominal;
-  }, 0);
 
-  const generateInvoiceNumber = () => {
-    const now = new Date();
+  const totalNominal = selectedTagihan.reduce(
+    (total, item) => total + item.nominal,
+    0
+  );
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
+  const [invoiceData, setInvoiceData] = useState({}); // Simpan data invoice dari API
 
-    const random = Math.floor(1000 + Math.random() * 9000);
-
-    return `INV/${year}${month}${day}${random}`;
+  const createInvoice = async () => {
+    try {
+      const response = await apiService.createInvoiceNumber({
+        tagihanUserIds: selectedTagihan.map((item) => item.id), // kirim array ID
+      });
+      console.log("Response from createInvoice:", response);
+      setInvoiceData(response.data.invoice_tagihan); // simpan data invoice
+    } catch (error) {
+      console.error("Failed to create invoice:", error);
+    }
   };
 
   const handleNext = () => {
+    if (!invoiceData?.no_invoice) {
+      console.warn("Invoice belum siap");
+      return;
+    }
+
     router.push({
       pathname: "/metodeBayar",
-      params: { invoice: generateInvoiceNumber() },
+      params: { invoice: invoiceData.no_invoice }, // kirim nomor invoice
     });
   };
+
+  useEffect(() => {
+    createInvoice();
+  }, []);
 
   return (
     <SafeAreaView
@@ -79,11 +91,10 @@ const DetailInvoice = () => {
               fontWeight={"$bold"}
               color={mode == "dark" ? "white" : "black"}
             >
-              {generateInvoiceNumber()}
+              {invoiceData?.no_invoice || "Loading..."}
             </Text>
           </HStack>
 
-          <HStack justifyContent="space-between"></HStack>
           <Divider
             bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
           />
@@ -96,10 +107,10 @@ const DetailInvoice = () => {
             width="100%"
             size="md"
             bgColor={mode === "dark" ? colors.box : "white"}
-            type="multiple" // gunakan multiple jika ingin banyak accordion terbuka
+            type="multiple"
             isCollapsible={true}
           >
-            {selectedTagihan.map((item, index) => {
+            {selectedTagihan.map((item) => {
               const [tanggal, waktu] = item.expire_at.split(" ");
               return (
                 <AccordionItem
@@ -214,6 +225,7 @@ const DetailInvoice = () => {
           borderRadius={10}
           mt={4}
           onPress={handleNext}
+          isDisabled={!invoiceData?.no_invoice} // Disable tombol kalau invoice belum ada
         >
           <Text color="white">Selanjutnya</Text>
         </Button>

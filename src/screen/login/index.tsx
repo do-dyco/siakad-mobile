@@ -90,6 +90,15 @@ export default function Login() {
     useAuthStore.getState().login();
   };
 
+  useEffect(() => {
+    const { accessToken } = useUserStore.getState();
+    const { isLoggedIn, hasHydrated } = useAuthStore.getState();
+
+    if (hasHydrated && accessToken && isLoggedIn) {
+      router.replace("/(tabs)");
+    }
+  }, []);
+
   return (
     <ScrollView>
       <SafeAreaView

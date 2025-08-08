@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
     const token = useUserStore.getState().accessToken;
 
-    console.log("Token used in axios interceptor:", token);
+    // console.log("Token used in axios interceptor:", token);
 
     if (token) {
       config.headers = {

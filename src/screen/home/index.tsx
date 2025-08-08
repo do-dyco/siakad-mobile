@@ -34,8 +34,6 @@ const Home = () => {
   const [saldoData, setSaldoData] = useState(0);
   const [dataTagihan, setDataTagihan] = useState({});
 
-  console.log("Data:", dataTagihan);
-
   const user = useUserStore((state) => state.user);
 
   const fetchSaldo = async () => {

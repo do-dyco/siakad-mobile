@@ -31,16 +31,18 @@ const Tagihan = () => {
   const screenHeight = Dimensions.get("window").height;
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  const [data, setData] = useState<any>({ tagihan_users: [] });
+  const [data, setData] = useState<any>([]);
   const user = useUserStore((state) => state.user);
+  const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [status, setStatus] = useState("");
 
-  const dataOngoing = (data?.tagihan_users ?? []).filter(
-    (item) => item.status === "Unpaid"
-  );
+  console.log("data tagihan user", data);
 
-  const dataProses = (data?.tagihan_users ?? []).filter(
-    (item) => item.status === "Paid"
-  );
+  const dataOngoing = (data ?? []).filter((item) => item.status === "UNPAID");
+
+  const dataProses = (data ?? []).filter((item) => item.status === "PAID");
 
   const FirstRoute = () => <Berlangsung data={dataOngoing} />;
   const SecondRoute = () => <Proses data={dataProses} />;
@@ -55,13 +57,20 @@ const Tagihan = () => {
     { key: "second", title: "Dalam Proses" },
   ];
 
+  const params = {
+    search: search,
+    startDate: startDate,
+    endDate: endDate,
+    status: status,
+  };
+
   const fetchData = async () => {
     try {
-      const response = await apiService.myTagihan(user.id);
-      setData(response.data);
+      const response = await apiService.myListTagihan(params);
+      setData(response.data.tagihan_users);
     } catch (error) {
       // console.error("Failed to fetch tagihan:", error);
-      setData({ tagihan_users: [] });
+      setData([]);
     }
   };
 

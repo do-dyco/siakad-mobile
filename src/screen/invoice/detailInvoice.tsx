@@ -1,6 +1,7 @@
 import CustomBadge from "@/components/CustomBadge";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
+import apiService from "@/src/service/apiService";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   HStack,
@@ -22,13 +23,54 @@ import {
   AccordionContentText,
   Button,
 } from "@gluestack-ui/themed";
-import { router } from "expo-router";
-import React from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
 
 const DetailInvoice = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const { noInvoice } = useLocalSearchParams();
+  const [dataInvoice, setDataInvoice] = useState({});
+
+  console.log("noInvoice", dataInvoice);
+
+  const formatRupiah = (value: number) =>
+    new Intl.NumberFormat("id-ID").format(value);
+
+  const fetchDetail = async () => {
+    try {
+      const response = await apiService.myInvoiceDetail(noInvoice);
+      setDataInvoice(response.data.invoice_tagihan);
+    } catch (error) {
+      setDataInvoice({});
+      console.error("Failed to fetch detail:", error);
+    }
+  };
+
+  const handleNext = () => {
+    if (!dataInvoice?.no_invoice) {
+      console.warn("Invoice belum siap");
+      return;
+    }
+
+    if (dataInvoice.status === "PAID") {
+      router.replace({
+        pathname: "/bayarInvoice",
+        params: { invoice: dataInvoice.no_invoice },
+      });
+      return;
+    }
+
+    router.push({
+      pathname: "/metodeBayar",
+      params: { invoice: dataInvoice.no_invoice },
+    });
+  };
+
+  useEffect(() => {
+    fetchDetail();
+  }, []);
 
   return (
     <SafeAreaView
@@ -40,8 +82,22 @@ const DetailInvoice = () => {
         <Header data={"Detail Transaksi"} />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
-            <Text color={colors.gray.light[400]} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>Jumlah Tagihan</Text>
-            <Text color={colors.gray.light[400]} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>Invoice ID</Text>
+            <Text
+              color={colors.gray.light[400]}
+              fontSize={14}
+              fontFamily="Lato"
+              fontWeight={"$semibold"}
+            >
+              Jumlah Tagihan
+            </Text>
+            <Text
+              color={colors.gray.light[400]}
+              fontSize={14}
+              fontFamily="Lato"
+              fontWeight={"$semibold"}
+            >
+              Invoice ID
+            </Text>
           </HStack>
 
           <HStack justifyContent="space-between">
@@ -51,32 +107,53 @@ const DetailInvoice = () => {
               fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
-              Rp. 450.000
+              Rp. {formatRupiah(dataInvoice.nominal)}
             </Text>
             <Text
               fontWeight={"$bold"}
               fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
-              INV/20241022
+              {dataInvoice.no_invoice}
             </Text>
           </HStack>
 
           <HStack justifyContent="space-between">
             <VStack space="md">
-              <HStack justifyContent="space-between" alignItems="center" width="100%">
-                <Text color={mode == "dark" ? "white" : "black"} fontSize={14} fontFamily="Lato" fontWeight={"$semibold"}>
+              <HStack
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+              >
+                <Text
+                  color={mode == "dark" ? "white" : "black"}
+                  fontSize={14}
+                  fontFamily="Lato"
+                  fontWeight={"$semibold"}
+                >
                   Bayar Sebelum
                 </Text>
 
                 <CustomBadge variant="danger" label="05:59:49 " />
               </HStack>
-              <Text  color={mode == "dark" ? "white" : "black"} fontSize={12} fontFamily="Lato">21 Oct 2024 16:49</Text>
+              <Text
+                color={mode == "dark" ? "white" : "black"}
+                fontSize={12}
+                fontFamily="Lato"
+              >
+                {dataInvoice.created_at}
+              </Text>
             </VStack>
           </HStack>
           <Divider bgColor={colors.border} />
 
-          <Text color={mode == "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} mt={10} fontWeight={"$semibold"}>
+          <Text
+            color={mode == "dark" ? "white" : "black"}
+            fontFamily="Lato"
+            fontSize={14}
+            mt={10}
+            fontWeight={"$semibold"}
+          >
             Tagihan
           </Text>
 
@@ -116,8 +193,14 @@ const DetailInvoice = () => {
                               />
                             </Box>
 
-                            <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}fontWeight={"$semibold"}>
-                              Tagihan ID#TG00294581
+                            <Text
+                              color={mode === "dark" ? "white" : "black"}
+                              fontFamily="Lato"
+                              fontSize={14}
+                              fontWeight={"$semibold"}
+                            >
+                              Tagihan{" "}
+                              {dataInvoice?.tagihan_users?.[0]?.no_tagihan}
                             </Text>
                           </HStack>
                         </HStack>
@@ -143,43 +226,94 @@ const DetailInvoice = () => {
                 <Box
                   borderWidth={1}
                   borderRadius={8}
-                   borderColor={mode === 'dark' ? colors.border : colors.gray.light[200]}
+                  borderColor={
+                    mode === "dark" ? colors.border : colors.gray.light[200]
+                  }
                   backgroundColor={mode === "dark" ? "black" : "white"}
                 >
                   <VStack m={10} space="md">
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
                         Nama Tagihan
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
-                        Pembelian Buku
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {dataInvoice?.tagihan_users?.[0]?.master_tagihan?.nama}
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
                         Tanggal
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
-                        21 Oct 2024
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {new Date(
+                          dataInvoice?.tagihan_users?.[0]?.updated_at?.split(
+                            " "
+                          )[0]
+                        ).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
                         Waktu
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
-                        16:49
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {dataInvoice?.tagihan_users?.[0]?.updated_at
+                          ?.split(" ")[1]
+                          ?.slice(0, 5)}
                       </Text>
                     </HStack>
 
                     <HStack justifyContent="space-between">
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14}>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
                         Nominal Tertagih
                       </Text>
-                      <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={14} fontWeight={"$semibold"}>
-                        Rp. 100.000
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        Rp.{" "}
+                        {formatRupiah(
+                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0
+                        )}
                       </Text>
                     </HStack>
                   </VStack>
@@ -195,9 +329,11 @@ const DetailInvoice = () => {
           bgColor={colors.primary}
           borderRadius={10}
           mt={4}
-          onPress={() => router.push("/bayarInvoice")}
+          onPress={handleNext}
         >
-          <Text color="white" fontFamily="Lato" fontSize={16}>Bayar Invoice</Text>
+          <Text color="white" fontFamily="Lato" fontSize={16}>
+            Bayar Invoice
+          </Text>
         </Button>
       </VStack>
     </SafeAreaView>
