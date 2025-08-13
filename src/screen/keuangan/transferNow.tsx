@@ -58,7 +58,7 @@ const TransferNow = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showModal, setShowModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(null);
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
@@ -100,7 +100,7 @@ const TransferNow = () => {
         render: ({ id }) => {
           const toastId = "toast-" + id;
           return (
-            <Toast nativeID={toastId} action="success" variant="solid">
+            <Toast nativeID={toastId} action="success" variant="solid" mb={35}>
               <VStack space="xs">
                 <ToastTitle>Berhasil</ToastTitle>
                 <ToastDescription>
@@ -194,18 +194,44 @@ const TransferNow = () => {
     fetchDetail();
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Wajib upload bukti transfer
+    if (!uploadedImage) {
+      // Pakai Toast gluestack
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Toast nativeID={toastId} action="error" variant="solid" mb={50}>
+              <VStack space="xs">
+                <ToastTitle>Upload bukti transfer dulu</ToastTitle>
+                <ToastDescription>
+                  Silakan unggah bukti transfer sebelum melanjutkan.
+                </ToastDescription>
+              </VStack>
+            </Toast>
+          );
+        },
+      });
+
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = apiService.confirmTransakasi(params, user.id);
+      const response = await apiService.confirmTransakasi(
+        { bukti: uploadedImage },
+        user.id
+      );
 
       router.push({
         pathname: "/statusTransaksi",
         params: {
-          nama_bank: nama_bank,
-          no_rekening: no_rekening,
-          nama_rekening: nama_rekening,
-          nominal: nominal,
+          nama_bank,
+          no_rekening,
+          nama_rekening,
+          nominal,
           no_invoice: dataInvoice.no_invoice,
         },
       });
@@ -219,7 +245,7 @@ const TransferNow = () => {
 
   return (
     <>
-      <SafeAreaView flex={1}>
+      <SafeAreaView flex={1} mb={35}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           backgroundColor={mode === "dark" ? "black" : "white"}

@@ -12,6 +12,10 @@ import {
   Text,
   Button,
   FlatList,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  useToast,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -19,6 +23,7 @@ import { Dimensions, useColorScheme, SafeAreaView } from "react-native";
 import CustomBadge from "./CustomBadge";
 import NoData from "./NoData";
 import { useTagihanStore } from "@/src/store/tagihanStore";
+import apiService from "@/src/service/apiService";
 
 type ItemType = {
   id: string;
@@ -28,16 +33,39 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
-  master_tagihan?: {
-    nama?: string;
-  };
+  master_tagihan?: { nama?: string };
 };
 
-const Berlangsung = ({ data = [] }: { data: ItemType[] }) => {
+type TagihanUser = {
+  id: string;
+  no_tagihan: string;
+  expire_at: string;
+  nominal: number;
+  master_tagihan?: { nama?: string };
+};
+
+type InvoiceTagihan = {
+  id?: string;
+  no_invoice?: string;
+  nominal?: number;
+  status?: "PAID" | "UNPAID" | string;
+  tagihan_users?: TagihanUser[];
+};
+
+type Props = {
+  data?: ItemType[];
+  onReload?: () => Promise<void> | void; // dipanggil setelah create invoice
+};
+
+const Berlangsung = ({ data = [], onReload }: Props) => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const toast = useToast();
+
   const [checkedValue, setCheckedValue] = useState<string[]>([]);
   const { setSelectedTagihan } = useTagihanStore();
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadingCreate, setLoadingCreate] = useState(false);
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -50,10 +78,95 @@ const Berlangsung = ({ data = [] }: { data: ItemType[] }) => {
     );
   };
 
-  const handleSubmit = () => {
-    const selectedData = data.filter((item) => checkedValue.includes(item.id));
-    setSelectedTagihan(selectedData);
-    router.push("/detailTagihan");
+  const handleRefresh = async () => {
+    if (!onReload) return;
+    try {
+      setRefreshing(true);
+      await onReload();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Create invoice + toast + refresh
+  const handleSubmit = async () => {
+    if (checkedValue.length === 0) {
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="warning" variant="solid">
+            <VStack space="xs">
+              <ToastTitle>Pilih tagihan</ToastTitle>
+              <ToastDescription>
+                Silakan pilih minimal satu tagihan terlebih dahulu.
+              </ToastDescription>
+            </VStack>
+          </Toast>
+        ),
+      });
+      return;
+    }
+
+    try {
+      setLoadingCreate(true);
+
+      // kalau masih mau dipakai di screen lain, simpan ke store juga
+      const selectedData = data.filter((item) =>
+        checkedValue.includes(item.id)
+      );
+      setSelectedTagihan(selectedData);
+
+      const payload = { tagihanUserIds: checkedValue }; // array id string
+      const response = await apiService.createInvoiceNumber(payload);
+      const inv: InvoiceTagihan = response?.data?.invoice_tagihan ?? {};
+
+      if (!inv?.no_invoice) {
+        throw new Error("Nomor invoice tidak tersedia");
+      }
+
+      // Toast sukses
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="success" variant="solid">
+            <VStack space="xs">
+              <ToastTitle>Berhasil</ToastTitle>
+              <ToastDescription>
+                Invoice {inv.no_invoice} berhasil dibuat.
+              </ToastDescription>
+            </VStack>
+          </Toast>
+        ),
+      });
+
+      // Refresh data list
+      if (onReload) await onReload();
+
+      // Reset pilihan
+      setCheckedValue([]);
+
+      // (Opsional) langsung ke detail/metode bayar:
+      // router.push({ pathname: "/detailTagihan", params: { no_invoice: inv.no_invoice } });
+      // atau:
+      // router.push({ pathname: "/metodeBayar", params: { invoice: inv.no_invoice } });
+    } catch (error) {
+      console.error("Failed to create invoice:", error);
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="error" variant="solid">
+            <VStack space="xs">
+              <ToastTitle>Gagal</ToastTitle>
+              <ToastDescription>
+                Pembuatan invoice gagal. Coba lagi nanti.
+              </ToastDescription>
+            </VStack>
+          </Toast>
+        ),
+      });
+    } finally {
+      setLoadingCreate(false);
+    }
   };
 
   if (!data.length) {
@@ -66,15 +179,20 @@ const Berlangsung = ({ data = [] }: { data: ItemType[] }) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, position: "relative" }}>
+    <SafeAreaView
+      style={{ flex: 1, position: "relative" }}
+      height={screenHeight + 16}
+    >
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 20,
           paddingBottom: 100,
         }}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
         renderItem={({ item }) => {
           const [tanggal, jam] = item.expire_at?.split(" ") ?? ["-", "-"];
           return (
@@ -223,17 +341,22 @@ const Berlangsung = ({ data = [] }: { data: ItemType[] }) => {
         bottom={0}
         left={0}
         right={0}
-        backgroundColor={mode === "dark" ? colors.gray.dark[900] : "white"}
+        backgroundColor={"transparent"}
         padding={16}
         borderTopWidth={1}
-        borderColor={colors.gray.light[200]}
+        borderColor={"transparent"}
       >
         <Button
           bgColor={colors.primary}
           borderRadius={10}
           onPress={handleSubmit}
+          isDisabled={loadingCreate}
         >
-          <Text color="white">Bayar {checkedValue.length} Tagihan</Text>
+          <Text color="white">
+            {loadingCreate
+              ? "Memproses..."
+              : `Bayar ${checkedValue.length} Tagihan`}
+          </Text>
         </Button>
       </Box>
     </SafeAreaView>

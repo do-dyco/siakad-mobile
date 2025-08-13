@@ -12,7 +12,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       isLoggedIn: false,
       hasHydrated: false,
       login: () => set({ isLoggedIn: true }),
@@ -22,8 +22,12 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.setHydrated?.();
+      // dipanggil SEBELUM dan SESUDAH rehydrate; yang di dalam return ini jalan SESUDAH
+      onRehydrateStorage: () => (state, error) => {
+        // langsung mutasi flag agar pasti true walau action belum terpasang
+        if (state) state.hasHydrated = true;
+        // (opsional) log error kalau ada
+        if (error) console.warn("[persist] rehydrate error:", error);
       },
     }
   )

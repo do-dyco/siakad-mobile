@@ -3,7 +3,6 @@ import NoData from "@/components/NoData";
 import Proses from "@/components/Proses";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   Box,
@@ -17,7 +16,7 @@ import {
   VStack,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   TouchableOpacity,
@@ -26,57 +25,74 @@ import {
 } from "react-native";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
+type ItemType = {
+  id: string;
+  no_tagihan: string;
+  no_invoice: string;
+  tagihan_name: string;
+  total: string;
+  expire_at: string;
+  nominal: number;
+  status?: "UNPAID" | "PAID" | string;
+  master_tagihan?: { nama?: string };
+};
+
 const Tagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const layout = useWindowDimensions();
+
   const [index, setIndex] = useState(0);
-  const [data, setData] = useState<any>([]);
-  const user = useUserStore((state) => state.user);
+  const [data, setData] = useState<ItemType[]>([]);
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
 
-  console.log("data tagihan user", data);
-
-  const dataOngoing = (data ?? []).filter((item) => item.status === "UNPAID");
-
-  const dataProses = (data ?? []).filter((item) => item.status === "PAID");
-
-  const FirstRoute = () => <Berlangsung data={dataOngoing} />;
-  const SecondRoute = () => <Proses data={dataProses} />;
-
-  const renderScene = SceneMap({
-    first: FirstRoute,
-    second: SecondRoute,
-  });
-
-  const routes = [
-    { key: "first", title: "Sedang Berlangsung" },
-    { key: "second", title: "Dalam Proses" },
-  ];
-
-  const params = {
-    search: search,
-    startDate: startDate,
-    endDate: endDate,
-    status: status,
-  };
+  const params = useMemo(
+    () => ({
+      search,
+      startDate,
+      endDate,
+      status,
+    }),
+    [search, startDate, endDate, status]
+  );
 
   const fetchData = async () => {
     try {
       const response = await apiService.myListTagihan(params);
-      setData(response.data.tagihan_users);
+      setData(response?.data?.tagihan_users ?? []);
     } catch (error) {
-      // console.error("Failed to fetch tagihan:", error);
       setData([]);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [params]);
+
+  const dataOngoing = useMemo(
+    () => (data ?? []).filter((item) => item.status === "UNPAID"),
+    [data]
+  );
+  const dataProses = useMemo(
+    () => (data ?? []).filter((item) => item.status === "PAID"),
+    [data]
+  );
+
+  const FirstRoute = () => (
+    <Berlangsung data={dataOngoing} onReload={fetchData} />
+  );
+  const SecondRoute = () => <Proses data={dataProses} onReload={fetchData} />;
+
+  const routes = useMemo(
+    () => [
+      { key: "first", title: "Sedang Berlangsung" },
+      { key: "second", title: "Dalam Proses" },
+    ],
+    []
+  );
 
   return (
     <SafeAreaView
@@ -114,9 +130,20 @@ const Tagihan = () => {
               mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]
             }
           >
-            <InputField placeholder="Cari transaksi disini" />
+            <InputField
+              placeholder="Cari transaksi disini"
+              value={search}
+              onChangeText={setSearch}
+              onSubmitEditing={fetchData} // trigger manual cari
+              returnKeyType="search"
+            />
           </Input>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              // TODO: buka modal filter, lalu panggil fetchData() setelah apply
+              fetchData();
+            }}
+          >
             <Box
               borderRadius="$full"
               backgroundColor={
@@ -140,7 +167,7 @@ const Tagihan = () => {
 
       {/* Content */}
       <VStack flex={1} m={5}>
-        {data?.tagihan_users?.length === 0 ? (
+        {data.length === 0 ? (
           <NoData
             title="Belum ada tagihan"
             desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
@@ -148,7 +175,7 @@ const Tagihan = () => {
         ) : (
           <TabView
             navigationState={{ index, routes }}
-            renderScene={renderScene}
+            renderScene={SceneMap({ first: FirstRoute, second: SecondRoute })}
             onIndexChange={setIndex}
             initialLayout={{ width: layout.width }}
             style={{ backgroundColor: "transparent" }}

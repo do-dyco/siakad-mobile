@@ -323,7 +323,7 @@ const DetailInvoice = () => {
           </Accordion>
         </VStack>
       </ScrollView>
-      <Divider bgColor={colors.border} />
+      <Divider bgColor={"transparent"} />
       <VStack mt={10} mx={10} mb={20}>
         <Button
           bgColor={colors.primary}

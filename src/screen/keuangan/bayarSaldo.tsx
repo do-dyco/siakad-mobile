@@ -238,7 +238,7 @@ const BayarSaldo = () => {
   }
   return (
     <>
-      <SafeAreaView flex={1}>
+      <SafeAreaView flex={1} mb={35}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           backgroundColor={mode === "dark" ? "black" : "white"}

@@ -24,11 +24,12 @@ import HomeCard from "@/components/HomeCard";
 import { useUserStore } from "@/src/store/userStore";
 import apiService from "@/src/service/apiService";
 import TagihanCard from "@/components/TagihanCard";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;
   const cardWidth = screenWidth * 0.5;
-
+  const insets = useSafeAreaInsets();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [saldoData, setSaldoData] = useState(0);
@@ -73,7 +74,11 @@ const Home = () => {
   return (
     <>
       <SafeAreaView height={screenHeight}>
-        <ScrollView>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+          showsVerticalScrollIndicator={false}
+        >
           <VStack mt={40} mx={16} space="md" mb={24}>
             <Image
               style={{ width: 50, height: 50, margin: 16 }}

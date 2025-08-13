@@ -19,36 +19,47 @@ import {
   CircleIcon,
   Button,
   Image,
+  Spinner,
 } from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+
+type AnyObj = Record<string, any>;
 
 const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [selected, setSelected] = useState<string | null>(null);
-  const { invoice } = useLocalSearchParams();
+  const { invoice } = useLocalSearchParams<{ invoice?: string }>();
   const { selectedTagihan } = useTagihanStore();
-  const [saldoData, setSaldoData] = useState(0);
-  const [dataRekening, setDataRekening] = useState([]);
-  const [dataVa, setDataVa] = useState([]);
-  const [dataInvoice, setDataInvoice] = useState<any>({});
-  const [selectedRekening, setSelectedRekening] = useState<string | null>(null);
+
+  const [saldoData, setSaldoData] = useState<number>(0);
+  const [dataRekening, setDataRekening] = useState<any[]>([]);
+  const [dataVa, setDataVa] = useState<any[]>([]);
+  const [dataInvoice, setDataInvoice] = useState<AnyObj>({});
+  const [selectedRekening, setSelectedRekening] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const allowedCodes = ["bca", "bni", "bri", "bmi", "mandiri"];
-  const vaItem = dataVa.find((item) => item.code === "va");
-  const vaChannels =
-    vaItem?.channels?.filter((channel) =>
-      allowedCodes.includes(channel.code)
-    ) || [];
+  const vaItem = useMemo(
+    () => dataVa.find((item: AnyObj) => item.code === "va"),
+    [dataVa]
+  );
+  const vaChannels: any[] = useMemo(
+    () =>
+      vaItem?.channels?.filter((channel: AnyObj) =>
+        allowedCodes.includes((channel.code || "").toLowerCase())
+      ) || [],
+    [vaItem]
+  );
 
   const textColor = mode === "dark" ? "white" : "black";
   const dividerColor = mode === "dark" ? "#373A41" : colors.gray.light[300];
 
-  const totalNominal = selectedTagihan.reduce(
-    (total, item) => total + parseInt(item.nominal || 0),
+  const totalNominal = (selectedTagihan || []).reduce(
+    (total: number, item: AnyObj) => total + parseInt(item.nominal || 0),
     0
   );
 
@@ -64,125 +75,75 @@ const MetodeBayar = () => {
     }
   };
 
-  const fetchDetail = async () => {
-    try {
-      const response = await apiService.myInvoiceDetail(invoice);
-      setDataInvoice(response.data.invoice_tagihan);
-    } catch (error) {
-      setDataInvoice({});
-      console.error("Failed to fetch detail:", error);
-    }
+  // --- Redirect helper: arahkan sesuai metode jika pembayaran sudah ada ---
+  const resolveVaFee = (bankCode: string) => {
+    const ch = vaChannels.find(
+      (c) => (c.code || "").toLowerCase() === bankCode.toLowerCase()
+    );
+    return ch?.transaction_fee?.actual_fee ?? 0;
   };
 
-  const handleNext = async () => {
-    if (!selected) {
-      alert("Silakan pilih metode pembayaran terlebih dahulu.");
+  const redirectByPembayaran = (inv: AnyObj) => {
+    const pay: AnyObj = inv?.pembayaran_tagihan || inv?.pembayaran || {};
+
+    if (!pay || Object.keys(pay).length === 0) return;
+
+    const metode = String(pay.metode || "").toUpperCase();
+    const bankCode = String(pay.nama_bank || pay.bank_code || "").toLowerCase();
+    const nominal = pay.nominal ?? inv?.nominal ?? totalNominal ?? 0;
+
+    if (metode === "SALDO") {
+      router.push({
+        pathname: "/bayarSaldo",
+        params: {
+          nominal,
+          no_invoice: inv?.no_invoice,
+        },
+      });
       return;
     }
 
-    if (selected === "saldo") {
-      const params = {
-        invoiceId: dataInvoice.id,
-        metode: "SALDO",
-      };
-
-      try {
-        const response = await apiService.payment(params);
-        if (response.data.success) {
-          router.push({
-            pathname: "/bayarSaldo",
-            params: {
-              nominal: totalNominal,
-              no_invoice: dataInvoice.no_invoice,
-            },
-          });
-        } else {
-          setShowAlert(true);
-          setTimeout(() => setShowAlert(false), 3000);
-        }
-        return;
-      } catch (error) {
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
-        console.error("Failed to fetch saldo:", error);
-        return;
-      }
+    if (metode === "VA" || metode === "VIRTUAL_ACCOUNT") {
+      router.push({
+        pathname: "/transferVa",
+        params: {
+          bank_code: bankCode,
+          nama_bank: bankCode.toUpperCase(),
+          nominal,
+          no_invoice: inv?.no_invoice,
+          va_fee: resolveVaFee(bankCode),
+          no_rekening: pay.no_rekening,
+        },
+      });
+      return;
     }
 
-    if (selected && selected.endsWith("-va")) {
-      const selectedBank = selected.replace("-va", "");
-      const vaChannel = vaChannels.find((ch) => ch.code === selectedBank);
-
-      if (!vaChannel) {
-        alert("Virtual Account tidak ditemukan.");
-        return;
-      }
-
-      const paramsVa = {
-        bankType: "va",
-        metode: "va",
-        namaBank: vaChannel.code,
-        invoiceId: dataInvoice.id,
-      };
-
-      try {
-        const response = await apiService.paymentVa(paramsVa);
-        const vaNumber = response.data.pembayaran_tagihan;
-        router.push({
-          pathname: "/transferVa",
-          params: {
-            bank_code: vaNumber.nama_bank,
-            nama_bank: vaNumber.nama_bank.toUpperCase(),
-            nominal: vaNumber.nominal,
-            no_invoice: dataInvoice.no_invoice,
-            va_fee: vaChannel.transaction_fee?.actual_fee || 0,
-            no_rekening: vaNumber.no_rekening,
-          },
-        });
-        return;
-      } catch (error) {
-        setShowAlert(true);
-        console.error("Failed to fetch VA:", error);
-        setTimeout(() => setShowAlert(false), 3000);
-        return;
-      }
-    }
-
-    // transfer bank
-    if (selected.startsWith("transfer-")) {
-      const selectedBank = selected.replace("transfer-", "").toUpperCase();
-      const rekeningDipilih = dataRekening.find(
-        (rek) => rek.nama_bank.toUpperCase() === selectedBank
-      );
-
-      const paramsTransfer = {
-        invoiceId: dataInvoice.id,
-        metode: "TRANSFER_MANUAL",
-        rekeningSekolahId: selectedRekening?.id,
-      };
-
-      if (!rekeningDipilih) {
-        alert("Rekening tidak ditemukan.");
-        return;
-      }
-
-      try {
-        const response = await apiService.payment(paramsTransfer);
-        return response.data;
-      } catch (error) {
-        console.error("Failed to fetch saldo:", error);
-      }
-
+    if (metode === "TRANSFER_MANUAL") {
       router.push({
         pathname: "/transferNow",
         params: {
-          nama_bank: rekeningDipilih.nama_bank,
-          no_rekening: rekeningDipilih.no_rekening,
-          nama_rekening: rekeningDipilih.nama_rekening,
-          nominal: totalNominal,
-          no_invoice: dataInvoice.no_invoice,
+          nama_bank: (pay.nama_bank || "").toUpperCase(),
+          no_rekening: pay.no_rekening || "",
+          nama_rekening: pay.nama_rekening || "",
+          nominal,
+          no_invoice: inv?.no_invoice,
         },
       });
+      return;
+    }
+  };
+
+  // --- API calls ---
+  const fetchDetail = async () => {
+    try {
+      const response = await apiService.myInvoiceDetail(invoice);
+      const inv = response?.data?.invoice_tagihan || {};
+      setDataInvoice(inv);
+      // Auto-redirect jika pembayaran sudah ada
+      redirectByPembayaran(inv);
+    } catch (error) {
+      setDataInvoice({});
+      console.error("Failed to fetch detail:", error);
     }
   };
 
@@ -217,11 +178,186 @@ const MetodeBayar = () => {
   };
 
   useEffect(() => {
-    fetchSaldo();
-    fetchRekening();
-    fetchVa();
-    fetchDetail();
+    const init = async () => {
+      setLoading(true);
+      await Promise.allSettled([
+        fetchSaldo(),
+        fetchRekening(),
+        fetchVa(),
+        fetchDetail(),
+      ]);
+      setLoading(false);
+    };
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // --- Handle Next berdasarkan pilihan user ---
+  const handleNext = async () => {
+    if (!selected) {
+      alert("Silakan pilih metode pembayaran terlebih dahulu.");
+      return;
+    }
+
+    if (!dataInvoice?.id) {
+      alert("Invoice belum siap. Coba beberapa saat lagi.");
+      return;
+    }
+
+    // SALDO
+    if (selected === "saldo") {
+      const params = {
+        invoiceId: dataInvoice.id,
+        metode: "SALDO",
+      };
+
+      try {
+        const response = await apiService.payment(params);
+        if (response?.data?.success) {
+          router.push({
+            pathname: "/bayarSaldo",
+            params: {
+              nominal: totalNominal || dataInvoice?.nominal || 0,
+              no_invoice: dataInvoice.no_invoice,
+            },
+          });
+        } else {
+          setShowAlert(true);
+          setTimeout(() => setShowAlert(false), 3000);
+        }
+        return;
+      } catch (error) {
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+        console.error("Failed to fetch saldo:", error);
+        return;
+      }
+    }
+
+    // VA
+    if (selected.endsWith("-va")) {
+      const selectedBank = selected.replace("-va", "");
+      const vaChannel = vaChannels.find((ch) => ch.code === selectedBank);
+
+      if (!vaChannel) {
+        alert("Virtual Account tidak ditemukan.");
+        return;
+      }
+
+      const paramsVa = {
+        bankType: "va",
+        metode: "va",
+        namaBank: vaChannel.code,
+        invoiceId: dataInvoice.id,
+      };
+
+      try {
+        const response = await apiService.paymentVa(paramsVa);
+        const vaNumber = response?.data?.pembayaran_tagihan || {};
+        router.push({
+          pathname: "/transferVa",
+          params: {
+            bank_code: vaNumber.nama_bank,
+            nama_bank: String(vaNumber.nama_bank || "").toUpperCase(),
+            nominal:
+              vaNumber.nominal ?? totalNominal ?? dataInvoice?.nominal ?? 0,
+            no_invoice: dataInvoice.no_invoice,
+            va_fee: vaChannel.transaction_fee?.actual_fee || 0,
+            no_rekening: vaNumber.no_rekening,
+          },
+        });
+        return;
+      } catch (error) {
+        setShowAlert(true);
+        console.error("Failed to fetch VA:", error);
+        setTimeout(() => setShowAlert(false), 3000);
+        return;
+      }
+    }
+
+    // TRANSFER MANUAL
+    if (selected.startsWith("transfer-")) {
+      const selectedBank = selected.replace("transfer-", "").toUpperCase();
+      const rekeningDipilih = dataRekening.find(
+        (rek) => (rek.nama_bank || "").toUpperCase() === selectedBank
+      );
+
+      if (!rekeningDipilih) {
+        alert("Rekening tidak ditemukan.");
+        return;
+      }
+
+      const paramsTransfer = {
+        invoiceId: dataInvoice.id,
+        metode: "TRANSFER_MANUAL",
+        rekeningSekolahId: selectedRekening?.id,
+      };
+
+      try {
+        await apiService.payment(paramsTransfer);
+      } catch (error) {
+        console.error("Failed to set transfer manual:", error);
+        // tetap lanjut push agar user bisa lihat detail transfer
+      }
+
+      router.push({
+        pathname: "/transferNow",
+        params: {
+          nama_bank: rekeningDipilih.nama_bank,
+          no_rekening: rekeningDipilih.no_rekening,
+          nama_rekening: rekeningDipilih.nama_rekening,
+          nominal: totalNominal || dataInvoice?.nominal || 0,
+          no_invoice: dataInvoice.no_invoice,
+        },
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <Header data="Pilih Metode Bayar" />
+          <VStack flex={1} px={16} py={20}>
+            <VStack alignItems="center" mt={10}>
+              <Spinner size="large" color={colors.primary} />
+              <Text
+                mt={8}
+                fontFamily="Lato"
+                color={mode === "dark" ? "white" : "black"}
+              >
+                Memuat data...
+              </Text>
+            </VStack>
+          </VStack>
+          <Divider />
+          <HStack justifyContent="space-between" m={20} alignItems="center">
+            <VStack>
+              <Box
+                height={14}
+                width={120}
+                bgColor={colors.gray.light[300]}
+                borderRadius={6}
+              />
+              <Box
+                height={16}
+                width={160}
+                bgColor={colors.gray.light[300]}
+                borderRadius={6}
+                mt={8}
+              />
+            </VStack>
+            <Box
+              height={40}
+              width={120}
+              bgColor={colors.gray.light[300]}
+              borderRadius={10}
+            />
+          </HStack>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -305,7 +441,7 @@ const MetodeBayar = () => {
                     Saldo
                   </Text>
                 </HStack>
-                <RadioGroup value={selected}>
+                <RadioGroup value={selected ?? ""}>
                   <Radio
                     value="saldo"
                     size="md"
@@ -330,7 +466,7 @@ const MetodeBayar = () => {
           </Box>
 
           {/* Metode Transfer */}
-          {dataRekening.map((rek, index) => (
+          {dataRekening.map((rek: AnyObj, index: number) => (
             <Box
               key={index}
               borderRadius={10}
@@ -359,16 +495,17 @@ const MetodeBayar = () => {
                       Transfer {rek.nama_bank}
                     </Text>
                   </HStack>
-                  <RadioGroup value={selected}>
+                  <RadioGroup value={selected ?? ""}>
                     <Radio
-                      value={`transfer-${rek.nama_bank.toLowerCase()}`}
+                      value={`transfer-${(rek.nama_bank || "").toLowerCase()}`}
                       size="md"
                       isChecked={
-                        selected === `transfer-${rek.nama_bank.toLowerCase()}`
+                        selected ===
+                        `transfer-${(rek.nama_bank || "").toLowerCase()}`
                       }
                       onPress={() =>
                         handleRadioClick(
-                          `transfer-${rek.nama_bank.toLowerCase()}`,
+                          `transfer-${(rek.nama_bank || "").toLowerCase()}`,
                           rek
                         )
                       }
@@ -389,7 +526,7 @@ const MetodeBayar = () => {
           ))}
 
           {/* Metode VA */}
-          {vaChannels.map((channelItem, index) => (
+          {vaChannels.map((channelItem: AnyObj, index: number) => (
             <Box
               key={index}
               borderRadius={10}
@@ -421,7 +558,7 @@ const MetodeBayar = () => {
                       borderRadius={10}
                     />
                     <Text color={textColor} fontFamily="Lato" fontSize={14}>
-                      {channelItem.code.toUpperCase()} VA
+                      {String(channelItem.code || "").toUpperCase()} VA
                     </Text>
                   </HStack>
 
@@ -434,7 +571,7 @@ const MetodeBayar = () => {
                       ) || "0"}
                     </Text>
 
-                    <RadioGroup value={selected}>
+                    <RadioGroup value={selected ?? ""}>
                       <Radio
                         value={`${channelItem.code}-va`}
                         size="md"
@@ -456,29 +593,8 @@ const MetodeBayar = () => {
         </VStack>
 
         {/* Footer */}
-        <Divider />
-        <HStack justifyContent="space-between" m={20} alignItems="center">
-          <VStack>
-            <Text fontFamily="Lato">Total Transfer</Text>
-            <Text color={textColor} fontWeight="$semibold" fontFamily="Lato">
-              Rp.{" "}
-              {Number(totalNominal || dataInvoice?.nominal || 0).toLocaleString(
-                "id-ID"
-              )}
-            </Text>
-          </VStack>
-          <Button
-            bgColor={colors.primary}
-            borderRadius={10}
-            mt={4}
-            onPress={handleNext}
-          >
-            <Text color="white" fontFamily="Lato">
-              Selanjutnya
-            </Text>
-          </Button>
-        </HStack>
       </ScrollView>
+
       {showAlert && (
         <VStack mx={20} mt={20}>
           <AlertCustom
@@ -489,6 +605,29 @@ const MetodeBayar = () => {
           />
         </VStack>
       )}
+
+      <Divider />
+      <HStack justifyContent="space-between" m={20} alignItems="center">
+        <VStack>
+          <Text fontFamily="Lato">Total Transfer</Text>
+          <Text color={textColor} fontWeight="$semibold" fontFamily="Lato">
+            Rp.{" "}
+            {Number(totalNominal || dataInvoice?.nominal || 0).toLocaleString(
+              "id-ID"
+            )}
+          </Text>
+        </VStack>
+        <Button
+          bgColor={colors.primary}
+          borderRadius={10}
+          mt={4}
+          onPress={handleNext}
+        >
+          <Text color="white" fontFamily="Lato">
+            Selanjutnya
+          </Text>
+        </Button>
+      </HStack>
     </SafeAreaView>
   );
 };

@@ -40,6 +40,17 @@ export default {
     }
   },
 
+  tagihanDetail: async (id: any) => {
+    try {
+      const response: AxiosResponse = await axiosInstance.get(
+        PATH.API_DEV + `/v2/user/pembayaran-tagihan/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   myListTagihan: async (params: any) => {
     const query = new URLSearchParams(params).toString();
 

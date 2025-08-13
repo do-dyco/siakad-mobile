@@ -13,7 +13,7 @@
       "backgroundColor": "#FFFFFF"
     },
     "expo": {
-      "jsEngine": "hermes"
+      "plugins": ["react-native-reanimated"]
     },
     "ios": {
       "supportsTablet": true,
