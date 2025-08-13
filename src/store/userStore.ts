@@ -2,45 +2,65 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type User = {
-  id: string;
-  username: string;
-  email: string;
-  isActive: boolean;
-  groups: string[];
-};
-
-type AuthStore = {
-  user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  setAuth: (p: {
-    user: User;
-    accessToken: string;
-    refreshToken: string;
-  }) => void;
-  clearAuth: () => void;
-};
-
-export const useUserStore = create<AuthStore>()(
+export const useUserStore = create()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
-      setAuth: ({ user, accessToken, refreshToken }) =>
-        set({ user, accessToken, refreshToken }),
-      clearAuth: () =>
-        set({ user: null, accessToken: null, refreshToken: null }),
+
+      setAuth: (authData: {
+        user: any;
+        accessToken: any;
+        refreshToken: any;
+      }) => {
+        console.log("Setting auth data:", authData);
+        set({
+          user: authData.user,
+          accessToken: authData.accessToken,
+          refreshToken: authData.refreshToken,
+        });
+      },
+
+      clearAuth: () => {
+        console.log("Clearing auth data");
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+        });
+      },
+
+      updateUser: (userData: any) => {
+        set({ user: userData });
+      },
+
+      updateToken: (token: any) => {
+        set({ accessToken: token });
+      },
     }),
     {
-      name: "auth-storage",
+      name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
+      onRehydrateStorage: (state) => {
+        console.log("User store hydration started");
+        return (state, error) => {
+          if (error) {
+            console.error("User store hydration failed:", error);
+          } else {
+            console.log("User store hydrated successfully:", {
+              hasUser: !!state?.user,
+              hasAccessToken: !!state?.accessToken,
+              hasRefreshToken: !!state?.refreshToken,
+            });
+          }
+        };
+      },
     }
   )
 );

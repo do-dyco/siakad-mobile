@@ -119,7 +119,7 @@ export default {
         PATH.API_DEV + `/v2/user/pembayaran-tagihan/confirmation/${id}`,
         params
       );
-      return response.data;
+      return response;
     } catch (error) {
       throw error;
     }

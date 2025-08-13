@@ -135,22 +135,22 @@ const TransferNow = () => {
 
       if (type === "camera") {
         const result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ["images"], // ✅ pakai string literal
           allowsEditing: true,
           quality: 1,
         });
 
-        if (!result.canceled) {
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       } else if (type === "gallery") {
         const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ["images"], // ✅ pakai string literal
           allowsEditing: true,
           quality: 1,
         });
 
-        if (!result.canceled) {
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       } else if (type === "file") {
@@ -159,7 +159,8 @@ const TransferNow = () => {
           copyToCacheDirectory: true,
         });
 
-        if (!result.canceled) {
+        // DocumentPicker sekarang pakai result.assets juga di versi baru
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       }
@@ -171,7 +172,7 @@ const TransferNow = () => {
 
         setUploadedImage({
           uri: fileUri,
-          base64: base64,
+          base64,
         });
       }
     } catch (error) {
@@ -187,51 +188,23 @@ const TransferNow = () => {
   };
 
   const params = {
-    bukti: uploadedImage,
+    invoiceId: dataInvoice.id,
+    metode: "transfer",
+    rekeningSekolahId: no_rekening,
   };
 
   useEffect(() => {
     fetchDetail();
   }, []);
 
-  const handleSubmit = async () => {
-    // Wajib upload bukti transfer
-    if (!uploadedImage) {
-      // Pakai Toast gluestack
-      toast.show({
-        placement: "bottom",
-        render: ({ id }) => {
-          const toastId = "toast-" + id;
-          return (
-            <Toast nativeID={toastId} action="error" variant="solid" mb={50}>
-              <VStack space="xs">
-                <ToastTitle>Upload bukti transfer dulu</ToastTitle>
-                <ToastDescription>
-                  Silakan unggah bukti transfer sebelum melanjutkan.
-                </ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
-      });
-
-      return;
-    }
-
+  const handleSubmit = () => {
     setLoading(true);
     try {
-      const response = await apiService.confirmTransakasi(
-        { bukti: uploadedImage },
-        user.id
-      );
-
+      const response = apiService.payment(params);
       router.push({
         pathname: "/statusTransaksi",
         params: {
-          nama_bank,
-          no_rekening,
-          nama_rekening,
-          nominal,
+          nominal: nominal,
           no_invoice: dataInvoice.no_invoice,
         },
       });

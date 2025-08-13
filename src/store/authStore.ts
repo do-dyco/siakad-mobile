@@ -1,33 +1,48 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUserStore } from "./userStore";
 
-interface AuthState {
-  isLoggedIn: boolean;
-  hasHydrated: boolean;
-  login: () => void;
-  logout: () => void;
-  setHydrated: () => void;
-}
-
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create()(
   persist(
     (set, get) => ({
       isLoggedIn: false,
       hasHydrated: false,
-      login: () => set({ isLoggedIn: true }),
-      logout: () => set({ isLoggedIn: false }),
-      setHydrated: () => set({ hasHydrated: true }),
+
+      login: () => {
+        console.log("User logged in");
+        set({ isLoggedIn: true });
+      },
+
+      logout: () => {
+        console.log("User logged out");
+        set({ isLoggedIn: false });
+        (useUserStore.getState() as { clearAuth: () => void }).clearAuth();
+      },
+
+      setHydrated: () => {
+        set({ hasHydrated: true });
+      },
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      // dipanggil SEBELUM dan SESUDAH rehydrate; yang di dalam return ini jalan SESUDAH
-      onRehydrateStorage: () => (state, error) => {
-        // langsung mutasi flag agar pasti true walau action belum terpasang
-        if (state) state.hasHydrated = true;
-        // (opsional) log error kalau ada
-        if (error) console.warn("[persist] rehydrate error:", error);
+      partialize: (state) => ({
+        isLoggedIn: state.isLoggedIn,
+      }),
+      onRehydrateStorage: (state) => {
+        console.log("Auth store hydration started");
+        return (state, error) => {
+          if (error) {
+            console.error("Auth store hydration failed:", error);
+          } else {
+            console.log("Auth store hydrated successfully:", {
+              isLoggedIn: state?.isLoggedIn || false,
+            });
+            // Set hydrated flag
+            state?.setHydrated();
+          }
+        };
       },
     }
   )

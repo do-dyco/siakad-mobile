@@ -40,7 +40,7 @@ import {
   useToast,
 } from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -58,20 +58,22 @@ const TransferVa = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showModal, setShowModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(null);
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
-  const { nama_bank, no_rekening, nama_rekening, nominal, bank_code } =
+  const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice } =
     useLocalSearchParams();
   const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
+  const [dataInvoice, setDataInvoice] = useState<any>({});
 
   const handleClose = () => setShowActionsheet(false);
-  const amount = nominal;
-  const mainPart = amount?.slice(0, -3); // '100'
-  const lastThree = amount?.slice(-3);
-
+  const rawAmount =
+    (nominal && nominal !== "0" ? nominal : dataInvoice.nominal) || "0";
+  const amount = rawAmount.toString().replace(/\D/g, "").padStart(4, "0");
+  const mainPart = amount.slice(0, -3);
+  const lastThree = amount.slice(-3);
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
 
@@ -79,6 +81,17 @@ const TransferVa = () => {
     return new Intl.NumberFormat("id-ID").format(value);
   };
 
+  const fetchDetail = async () => {
+    try {
+      const response = await apiService.myInvoiceDetail(no_invoice);
+      setDataInvoice(response.data.invoice_tagihan);
+    } catch (error) {
+      setDataInvoice({});
+      console.error("Failed to fetch detail:", error);
+    }
+  };
+
+  // Function untuk copy ke clipboard dengan toast
   const copyToClipboard = async (text, label) => {
     try {
       await Clipboard.setStringAsync(text);
@@ -87,7 +100,7 @@ const TransferVa = () => {
         render: ({ id }) => {
           const toastId = "toast-" + id;
           return (
-            <Toast nativeID={toastId} action="success" variant="solid">
+            <Toast nativeID={toastId} action="success" variant="solid" mb={35}>
               <VStack space="xs">
                 <ToastTitle>Berhasil</ToastTitle>
                 <ToastDescription>
@@ -122,22 +135,22 @@ const TransferVa = () => {
 
       if (type === "camera") {
         const result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ["images"], // ✅ pakai string literal
           allowsEditing: true,
           quality: 1,
         });
 
-        if (!result.canceled) {
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       } else if (type === "gallery") {
         const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ["images"], // ✅ pakai string literal
           allowsEditing: true,
           quality: 1,
         });
 
-        if (!result.canceled) {
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       } else if (type === "file") {
@@ -146,7 +159,8 @@ const TransferVa = () => {
           copyToCacheDirectory: true,
         });
 
-        if (!result.canceled) {
+        // DocumentPicker sekarang pakai result.assets juga di versi baru
+        if (!result.canceled && result.assets?.length > 0) {
           fileUri = result.assets[0].uri;
         }
       }
@@ -158,7 +172,7 @@ const TransferVa = () => {
 
         setUploadedImage({
           uri: fileUri,
-          base64: base64,
+          base64,
         });
       }
     } catch (error) {
@@ -168,26 +182,30 @@ const TransferVa = () => {
     }
   };
 
+  // Function untuk delete gambar
   const handleDeleteImage = () => {
     setUploadedImage(null);
   };
 
   const params = {
-    bukti: uploadedImage,
+    invoiceId: dataInvoice.id,
+    metode: "transfer",
+    rekeningSekolahId: no_rekening,
   };
+
+  useEffect(() => {
+    fetchDetail();
+  }, []);
 
   const handleSubmit = () => {
     setLoading(true);
     try {
-      const response = apiService.confirmTransakasi(params, user.id);
-
+      const response = apiService.payment(params);
       router.push({
         pathname: "/statusTransaksi",
         params: {
-          nama_bank: nama_bank,
-          no_rekening: no_rekening,
-          nama_rekening: nama_rekening,
           nominal: nominal,
+          no_invoice: dataInvoice.no_invoice,
         },
       });
     } catch (error) {
@@ -238,17 +256,11 @@ const TransferVa = () => {
                   <Image
                     size="xs"
                     source={
-                      bank_code === "bca"
-                        ? require("@/assets/images/bank/bca.png")
-                        : bank_code === "bni"
-                        ? require("@/assets/images/bank/bni.png")
-                        : bank_code === "bri"
-                        ? require("@/assets/images/bank/bri.png")
-                        : bank_code === "bmi"
-                        ? require("@/assets/images/bank/bmi.png")
-                        : require("@/assets/images/bank/mandiri.png")
+                      nama_bank === "MANDIRI"
+                        ? require("@/assets/images/bank/mandiri.png")
+                        : require("@/assets/images/bank/bca.png")
                     }
-                    alt={bank_code}
+                    alt="bank"
                     borderRadius={10}
                   />
                   <VStack>
@@ -297,7 +309,7 @@ const TransferVa = () => {
                   >
                     <HStack spacing={0} alignItems="center">
                       <Text fontFamily="Lato" fontSize="$md" color={textColor}>
-                        Rp.{formatRupiah(mainPart)}.
+                        Rp.{formatRupiah(Number(mainPart) || 0)}.
                       </Text>
                       <Text
                         fontFamily="Lato"

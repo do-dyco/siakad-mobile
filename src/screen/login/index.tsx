@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   Image,
-  HStack,
   InputSlot,
   ScrollView,
   SafeAreaView,
@@ -23,7 +22,7 @@ import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
 import AlertCustom from "@/components/Alert";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "../../store/userStore";
+import { useUserStore } from "@/src/store/userStore";
 import { useAuthStore } from "@/src/store/authStore";
 
 export default function Login() {
@@ -38,11 +37,11 @@ export default function Login() {
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isHydrating, setIsHydrating] = useState(true);
 
-  const { isLoggedIn, hasHydrated } = useAuthStore();
-
+  const { isLoggedIn, hasHydrated, login: authLogin } = useAuthStore();
   const setAuth = useUserStore((state) => state.setAuth);
-  const user = useUserStore((state) => state.user);
+  const accessToken = useUserStore((state) => state.accessToken);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -54,12 +53,7 @@ export default function Login() {
       return;
     }
 
-    const param = {
-      login: login,
-      password: password,
-      kodeUnik: kodeUnik,
-      rememberMe: rememberMe,
-    };
+    const param = { login, password, kodeUnik, rememberMe };
 
     try {
       const res = await apiService.login(param);
@@ -76,7 +70,7 @@ export default function Login() {
           accessToken: res.data.access_token,
           refreshToken: res.data.refresh_token,
         });
-        useAuthStore.getState().login();
+        authLogin();
         router.replace("/(tabs)");
       } else {
         setShowAlert(true);
@@ -87,17 +81,127 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-    useAuthStore.getState().login();
   };
 
   useEffect(() => {
-    const { accessToken } = useUserStore.getState();
-    const { isLoggedIn, hasHydrated } = useAuthStore.getState();
+    let authUnsub, userUnsub;
+    let mounted = true;
 
-    if (hasHydrated && accessToken && isLoggedIn) {
-      router.replace("/(tabs)");
-    }
-  }, []);
+    const initializeStores = async () => {
+      try {
+        // Wait for both stores to hydrate
+        const authPromise = new Promise((resolve) => {
+          if (useAuthStore.persist.hasHydrated()) {
+            resolve();
+          } else {
+            authUnsub = useAuthStore.persist.onFinishHydration(resolve);
+          }
+        });
+
+        const userPromise = new Promise((resolve) => {
+          if (useUserStore.persist.hasHydrated()) {
+            resolve();
+          } else {
+            userUnsub = useUserStore.persist.onFinishHydration(resolve);
+          }
+        });
+
+        await Promise.all([authPromise, userPromise]);
+
+        if (!mounted) return;
+
+        // Get current state after hydration
+        const token = useUserStore.getState().accessToken;
+        const loggedIn = useAuthStore.getState().isLoggedIn;
+
+        console.log("Hydration complete:", {
+          token: !!token,
+          loggedIn,
+          hasToken: token !== null && token !== undefined,
+        });
+
+        setIsHydrating(false);
+
+        // Navigate if user is already authenticated
+        if (token && loggedIn) {
+          router.replace("/(tabs)");
+        }
+      } catch (error) {
+        console.error("Store hydration error:", error);
+        setIsHydrating(false);
+      }
+    };
+
+    initializeStores();
+
+    return () => {
+      mounted = false;
+      if (authUnsub) authUnsub();
+      if (userUnsub) userUnsub();
+    };
+  }, [router]);
+
+  // Additional effect to monitor store changes after hydration
+  useEffect(() => {
+    if (isHydrating) return;
+
+    const unsubUser = useUserStore.subscribe(
+      (state) => state.accessToken,
+      (token) => {
+        console.log("AccessToken changed:", !!token);
+      }
+    );
+
+    const unsubAuth = useAuthStore.subscribe(
+      (state) => state.isLoggedIn,
+      (isLoggedIn) => {
+        console.log("IsLoggedIn changed:", isLoggedIn);
+
+        // Check if user should be redirected
+        const token = useUserStore.getState().accessToken;
+        if (token && isLoggedIn) {
+          router.replace("/(tabs)");
+        }
+      }
+    );
+
+    return () => {
+      unsubUser();
+      unsubAuth();
+    };
+  }, [isHydrating, router]);
+
+  console.log("Login component rendered", {
+    accessToken: !!accessToken,
+    isLoggedIn,
+    hasHydrated,
+    isHydrating,
+  });
+
+  // Show loading screen while stores are hydrating
+  if (isHydrating) {
+    return (
+      <SafeAreaView
+        backgroundColor={mode === "dark" ? "black" : "white"}
+        height={screenHeight}
+      >
+        <Center flex={1}>
+          <Image
+            style={{ width: 80, height: 80, marginBottom: 20 }}
+            source={require("@/assets/images/LOGO.png")}
+            alt="logo"
+          />
+          <Text
+            fontSize={16}
+            fontFamily="Lato"
+            color={mode === "dark" ? "white" : colors.gray.light[900]}
+          >
+            Loading...
+          </Text>
+        </Center>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <ScrollView>
@@ -156,6 +260,8 @@ export default function Login() {
                 placeholder="Masukkan kode instansi"
                 value={kodeUnik}
                 onChangeText={setKodeUnik}
+                color={mode === "dark" ? "white" : "black"}
+                placeholderTextColor={mode === "dark" ? "white" : "#888"}
               />
             </Input>
 
@@ -165,6 +271,8 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChangeText={setPassword}
+                color={mode === "dark" ? "white" : "black"}
+                placeholderTextColor={mode === "dark" ? "white" : "#888"}
               />
               <InputSlot mx={10}>
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
