@@ -77,6 +77,8 @@ const TransferNow = () => {
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
 
+  // console.log("Data Invoice:", dataInvoice);
+
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
   };
@@ -185,6 +187,12 @@ const TransferNow = () => {
   // Function untuk delete gambar
   const handleDeleteImage = () => {
     setUploadedImage(null);
+  };
+
+  const handleBatalTransaksi = () => {
+    setShowModal(false);
+
+    router.push("/invoice");
   };
 
   const params = {
@@ -539,7 +547,7 @@ const TransferNow = () => {
               size="sm"
               action="secondary"
               mr="$3"
-              onPress={() => setShowModal(false)}
+              onPress={handleBatalTransaksi}
             >
               <Text fontFamily="Lato" color={textColor}>
                 Ya, Batalkan

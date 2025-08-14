@@ -6,10 +6,14 @@ export default {
   //auth
   login: async (param: any) => {
     try {
+      console.log("Mengirim request login dengan param:", PATH.API_DEV);
+
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + "/v2/auth/login",
         param
       );
+      console.log("Login response:", response);
+
       return response.data;
     } catch (error) {
       throw error;

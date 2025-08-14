@@ -152,10 +152,7 @@ const BayarSaldo = () => {
           <Header data={"Transfer Sekarang"} />
           <VStack space="md" flex={1} m={10}>
             <Text fontFamily="Lato" color={textColor} size="lg">
-              Transfer Bank
-            </Text>
-            <Text fontFamily="Lato" color={textColor}>
-              Please Transfer to AL-FUADIYAH Bank Account
+              Bayar Tagihan
             </Text>
 
             <Box

@@ -39,7 +39,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isHydrating, setIsHydrating] = useState(true);
 
-  const { isLoggedIn, hasHydrated, login: authLogin } = useAuthStore();
+  const { isLoggedIn, login: authLogin } = useAuthStore();
   const setAuth = useUserStore((state) => state.setAuth);
   const accessToken = useUserStore((state) => state.accessToken);
 
@@ -47,18 +47,26 @@ export default function Login() {
     setLoading(true);
     setShowAlert(false);
 
-    if (!login || !password || !kodeUnik) {
+    if (!login.trim() || !password.trim() || !kodeUnik.trim()) {
       setShowAlert(true);
       setLoading(false);
       return;
     }
 
-    const param = { login, password, kodeUnik, rememberMe };
+    const param = {
+      login: login.trim(),
+      password: password.trim(),
+      kode_unik: kodeUnik.trim(),
+      remember_me: rememberMe,
+    };
 
     try {
+      console.log("Mengirim request login dengan param:", param);
       const res = await apiService.login(param);
 
-      if (res?.meta.status_code === 200) {
+      console.log("Login response:", res);
+
+      if (res?.meta?.status_code === 200) {
         setAuth({
           user: {
             id: res.data.id,
@@ -83,26 +91,27 @@ export default function Login() {
     }
   };
 
+  // Hidrasi kedua store sebelum render UI
   useEffect(() => {
-    let authUnsub, userUnsub;
     let mounted = true;
+    let authUnsub: any;
+    let userUnsub: any;
 
-    const initializeStores = async () => {
+    const hydrateStores = async () => {
       try {
-        // Wait for both stores to hydrate
-        const authPromise = new Promise((resolve) => {
+        const authPromise = new Promise<void>((resolve) => {
           if (useAuthStore.persist.hasHydrated()) {
             resolve();
           } else {
-            authUnsub = useAuthStore.persist.onFinishHydration(resolve);
+            authUnsub = useAuthStore.persist.onFinishHydration(() => resolve());
           }
         });
 
-        const userPromise = new Promise((resolve) => {
+        const userPromise = new Promise<void>((resolve) => {
           if (useUserStore.persist.hasHydrated()) {
             resolve();
           } else {
-            userUnsub = useUserStore.persist.onFinishHydration(resolve);
+            userUnsub = useUserStore.persist.onFinishHydration(() => resolve());
           }
         });
 
@@ -110,29 +119,23 @@ export default function Login() {
 
         if (!mounted) return;
 
-        // Get current state after hydration
-        const token = useUserStore.getState().accessToken;
-        const loggedIn = useAuthStore.getState().isLoggedIn;
-
-        console.log("Hydration complete:", {
-          token: !!token,
-          loggedIn,
-          hasToken: token !== null && token !== undefined,
-        });
+        const token = (useUserStore.getState() as { accessToken: string })
+          .accessToken;
+        const loggedIn = (useAuthStore.getState() as { isLoggedIn: boolean })
+          .isLoggedIn;
 
         setIsHydrating(false);
 
-        // Navigate if user is already authenticated
         if (token && loggedIn) {
           router.replace("/(tabs)");
         }
-      } catch (error) {
-        console.error("Store hydration error:", error);
+      } catch (err) {
+        console.error("Store hydration error:", err);
         setIsHydrating(false);
       }
     };
 
-    initializeStores();
+    hydrateStores();
 
     return () => {
       mounted = false;
@@ -141,44 +144,6 @@ export default function Login() {
     };
   }, [router]);
 
-  // Additional effect to monitor store changes after hydration
-  useEffect(() => {
-    if (isHydrating) return;
-
-    const unsubUser = useUserStore.subscribe(
-      (state) => state.accessToken,
-      (token) => {
-        console.log("AccessToken changed:", !!token);
-      }
-    );
-
-    const unsubAuth = useAuthStore.subscribe(
-      (state) => state.isLoggedIn,
-      (isLoggedIn) => {
-        console.log("IsLoggedIn changed:", isLoggedIn);
-
-        // Check if user should be redirected
-        const token = useUserStore.getState().accessToken;
-        if (token && isLoggedIn) {
-          router.replace("/(tabs)");
-        }
-      }
-    );
-
-    return () => {
-      unsubUser();
-      unsubAuth();
-    };
-  }, [isHydrating, router]);
-
-  console.log("Login component rendered", {
-    accessToken: !!accessToken,
-    isLoggedIn,
-    hasHydrated,
-    isHydrating,
-  });
-
-  // Show loading screen while stores are hydrating
   if (isHydrating) {
     return (
       <SafeAreaView

@@ -59,6 +59,8 @@ const StatusTransaksi = () => {
   const toast = useToast();
   const insets = useSafeAreaInsets();
 
+  console.log("Data Invoice:", dataInvoice);
+
   const dividerColor = isDark ? "#2A2F37" : "#E5E7EB";
   const activeAvatarBg = isDark ? "#065F46" : "#ffffff";
   const activeIconColor = isDark ? "#FFFFFF" : "#10B981";
@@ -237,9 +239,16 @@ const StatusTransaksi = () => {
                   borderRadius={10}
                 />
                 <VStack>
-                  <Text fontFamily="Lato" color={textColor}>
-                    Bank {nama_bank}
+                  <Text fontFamily="Lato" color={textColor} mt={10}>
+                    Bank{" "}
+                    {(
+                      nama_bank ||
+                      dataInvoice?.pembayaran?.nama_bank ||
+                      ""
+                    ).toUpperCase()}{" "}
+                    {(dataInvoice?.pembayaran?.metode || "").toUpperCase()}
                   </Text>
+
                   <Text fontFamily="Lato" color={textColor}>
                     {nama_rekening}
                   </Text>
@@ -489,21 +498,23 @@ const StatusTransaksi = () => {
 
           <HStack justifyContent="space-between" m={10} w="100%">
             <Text color={textColor} size="xs" fontFamily="Lato">
-              Bank {dataInvoice?.pembayaran?.nama_bank || ""}
+              Bank {(dataInvoice?.pembayaran?.nama_bank || "").toUpperCase()}
             </Text>
             <Text color={textColor} size="xs" fontFamily="Lato">
-              {dataInvoice?.pembayaran?.metode || ""}
+              {(dataInvoice?.pembayaran?.metode || "").toUpperCase()}
             </Text>
           </HStack>
 
-          <HStack justifyContent="space-between" m={10} w="100%">
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Kode Unik
-            </Text>
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Rp.122
-            </Text>
-          </HStack>
+          {dataInvoice?.pembayaran?.metode !== "va" && (
+            <HStack justifyContent="space-between" m={10} w="100%">
+              <Text color={textColor} size="xs" fontFamily="Lato">
+                Kode Unik
+              </Text>
+              <Text color={textColor} size="xs" fontFamily="Lato">
+                Rp.122
+              </Text>
+            </HStack>
+          )}
 
           <HStack justifyContent="space-between" m={10} w="100%">
             <Text color={textColor} size="xs" fontFamily="Lato">

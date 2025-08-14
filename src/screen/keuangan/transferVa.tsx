@@ -2,11 +2,7 @@ import CustomBadge from "@/components/CustomBadge";
 import DashedDivider from "@/components/dashedDivider";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
-import {
-  EvilIcons,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   SafeAreaView,
   ScrollView,
@@ -14,7 +10,6 @@ import {
   Text,
   Box,
   HStack,
-  Badge,
   Center,
   Image,
   Divider,
@@ -27,13 +22,6 @@ import {
   ModalBody,
   ModalFooter,
   ButtonText,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
   Toast,
   ToastTitle,
   ToastDescription,
@@ -59,8 +47,6 @@ const TransferVa = () => {
   const screenHeight = Dimensions.get("window").height;
   const [showModal, setShowModal] = useState(false);
   const ref = useRef(null);
-  const [showActionsheet, setShowActionsheet] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
   const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice } =
     useLocalSearchParams();
@@ -89,6 +75,12 @@ const TransferVa = () => {
       setDataInvoice({});
       console.error("Failed to fetch detail:", error);
     }
+  };
+
+  const handleBatalTransaksi = () => {
+    setShowModal(false);
+
+    router.push("/invoice");
   };
 
   // Function untuk copy ke clipboard dengan toast
@@ -127,64 +119,6 @@ const TransferVa = () => {
         },
       });
     }
-  };
-
-  const handleImageUpload = async (type: "camera" | "gallery" | "file") => {
-    try {
-      let fileUri = "";
-
-      if (type === "camera") {
-        const result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ["images"], // ✅ pakai string literal
-          allowsEditing: true,
-          quality: 1,
-        });
-
-        if (!result.canceled && result.assets?.length > 0) {
-          fileUri = result.assets[0].uri;
-        }
-      } else if (type === "gallery") {
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ["images"], // ✅ pakai string literal
-          allowsEditing: true,
-          quality: 1,
-        });
-
-        if (!result.canceled && result.assets?.length > 0) {
-          fileUri = result.assets[0].uri;
-        }
-      } else if (type === "file") {
-        const result = await DocumentPicker.getDocumentAsync({
-          type: ["image/*", "application/pdf"],
-          copyToCacheDirectory: true,
-        });
-
-        // DocumentPicker sekarang pakai result.assets juga di versi baru
-        if (!result.canceled && result.assets?.length > 0) {
-          fileUri = result.assets[0].uri;
-        }
-      }
-
-      if (fileUri) {
-        const base64 = await FileSystem.readAsStringAsync(fileUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        setUploadedImage({
-          uri: fileUri,
-          base64,
-        });
-      }
-    } catch (error) {
-      console.error("Gagal memilih file:", error);
-    } finally {
-      handleClose();
-    }
-  };
-
-  // Function untuk delete gambar
-  const handleDeleteImage = () => {
-    setUploadedImage(null);
   };
 
   const params = {
@@ -265,7 +199,7 @@ const TransferVa = () => {
                   />
                   <VStack>
                     <Text fontFamily="Lato" color={textColor}>
-                      Bank {nama_bank}
+                      Bank {nama_bank} VA
                     </Text>
                     <Text fontFamily="Lato" color={textColor}>
                       {nama_rekening}
@@ -337,18 +271,6 @@ const TransferVa = () => {
                     </TouchableOpacity>
                   </HStack>
                 </Box>
-
-                <HStack space="md" mt={10}>
-                  <Ionicons
-                    name="warning"
-                    color="yellow"
-                    size={14}
-                    style={{ marginTop: 2 }}
-                  />
-                  <Text fontFamily="Lato" color={textColor} size="xs">
-                    Pastikan jumlahnya benar untuk 3 angka terakhir
-                  </Text>
-                </HStack>
               </VStack>
             </Box>
 
@@ -358,125 +280,7 @@ const TransferVa = () => {
               borderColor={
                 mode === "dark" ? colors.gray.dark[700] : colors.gray.light[200]
               }
-            >
-              <VStack m={10} space="md">
-                <Text
-                  fontFamily="Lato"
-                  color={textColor}
-                  fontWeight={"$semibold"}
-                >
-                  Upload bukti transfer (Optional)
-                </Text>
-                <Text fontFamily="Lato" color={textColor} size="xs">
-                  Untuk mempercepat proses pengecekan silahkan upload bukti
-                  transfer disini.
-                </Text>
-
-                {/* Conditional rendering berdasarkan apakah ada gambar yang diupload */}
-                {uploadedImage ? (
-                  // Tampilan ketika ada gambar yang diupload
-                  <Box position="relative">
-                    <Box
-                      borderRadius={16}
-                      overflow="hidden"
-                      borderWidth={1}
-                      borderColor={
-                        mode === "dark"
-                          ? colors.gray.dark[600]
-                          : colors.gray.light[300]
-                      }
-                    >
-                      <Image
-                        source={{ uri: uploadedImage.uri }}
-                        alt="Bukti Transfer"
-                        width="100%"
-                        height={200}
-                        resizeMode="cover"
-                      />
-                    </Box>
-
-                    {/* Delete button */}
-                    <TouchableOpacity
-                      onPress={handleDeleteImage}
-                      style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        backgroundColor: "#1F2937",
-                        borderRadius: 20,
-                        padding: 8,
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name="delete"
-                        size={20}
-                        color="white"
-                      />
-                    </TouchableOpacity>
-                  </Box>
-                ) : (
-                  // Tampilan default untuk upload
-                  <TouchableOpacity onPress={() => setShowActionsheet(true)}>
-                    <Box
-                      borderWidth={1}
-                      borderRadius={16}
-                      borderColor="transparent"
-                    >
-                      <HStack justifyContent="space-between" m={5}>
-                        <HStack mx={10} alignItems="center">
-                          <EvilIcons name="image" size={20} color={textColor} />
-                          <Text fontFamily="Lato" mx={20} color={textColor}>
-                            Upload Bukti Transfer
-                          </Text>
-                        </HStack>
-                        <MaterialCommunityIcons
-                          name="chevron-right"
-                          size={20}
-                          color={textColor}
-                        />
-                      </HStack>
-                    </Box>
-                  </TouchableOpacity>
-                )}
-
-                <Actionsheet
-                  isOpen={showActionsheet}
-                  onClose={handleClose}
-                  zIndex={999}
-                >
-                  <ActionsheetBackdrop />
-                  <ActionsheetContent h="$72" zIndex={999}>
-                    <ActionsheetDragIndicatorWrapper>
-                      <ActionsheetDragIndicator />
-                    </ActionsheetDragIndicatorWrapper>
-
-                    <ActionsheetItem
-                      onPress={() => handleImageUpload("camera")}
-                    >
-                      <ActionsheetItemText>Ambil Foto</ActionsheetItemText>
-                    </ActionsheetItem>
-
-                    <ActionsheetItem
-                      onPress={() => handleImageUpload("gallery")}
-                    >
-                      <ActionsheetItemText>
-                        Pilih dari Galeri
-                      </ActionsheetItemText>
-                    </ActionsheetItem>
-
-                    <ActionsheetItem onPress={() => handleImageUpload("file")}>
-                      <ActionsheetItemText>Pilih File</ActionsheetItemText>
-                    </ActionsheetItem>
-
-                    <ActionsheetItem onPress={handleClose}>
-                      <ActionsheetItemText color="$red500">
-                        Batal
-                      </ActionsheetItemText>
-                    </ActionsheetItem>
-                  </ActionsheetContent>
-                </Actionsheet>
-              </VStack>
-            </Box>
+            ></Box>
           </VStack>
         </ScrollView>
 
@@ -539,7 +343,7 @@ const TransferVa = () => {
               size="sm"
               action="secondary"
               mr="$3"
-              onPress={() => setShowModal(false)}
+              onPress={handleBatalTransaksi}
             >
               <Text fontFamily="Lato" color={textColor}>
                 Ya, Batalkan
