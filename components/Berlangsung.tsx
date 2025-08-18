@@ -16,14 +16,23 @@ import {
   ToastTitle,
   ToastDescription,
   useToast,
+  Spinner,
+  Center,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { Dimensions, useColorScheme, SafeAreaView } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Dimensions,
+  useColorScheme,
+  SafeAreaView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from "react-native";
 import CustomBadge from "./CustomBadge";
 import NoData from "./NoData";
 import { useTagihanStore } from "@/src/store/tagihanStore";
 import apiService from "@/src/service/apiService";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ItemType = {
   id: string;
@@ -54,18 +63,42 @@ type InvoiceTagihan = {
 
 type Props = {
   data?: ItemType[];
-  onReload?: () => Promise<void> | void; // dipanggil setelah create invoice
+  onReload?: () => Promise<void> | void;
+  onLoadMore?: () => Promise<void> | void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  isRefreshing?: boolean;
+  initialScrollOffset?: number;
+  onScrollPositionChange?: (offset: number) => void;
 };
 
-const Berlangsung = ({ data = [], onReload }: Props) => {
+const Berlangsung = ({
+  data = [],
+  onReload,
+  onLoadMore,
+  hasMore = false,
+  isLoadingMore = false,
+  isRefreshing = false,
+  initialScrollOffset = 0,
+  onScrollPositionChange,
+}: Props) => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const toast = useToast();
+  const insets = useSafeAreaInsets();
 
   const [checkedValue, setCheckedValue] = useState<string[]>([]);
   const { setSelectedTagihan } = useTagihanStore();
-  const [refreshing, setRefreshing] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
+
+  const flatListRef = useRef<FlatList<ItemType>>(null);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
+
+  // Reset checkbox saat data berubah
+  useEffect(() => {
+    setCheckedValue([]);
+  }, [data.length, data]);
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -80,15 +113,28 @@ const Berlangsung = ({ data = [], onReload }: Props) => {
 
   const handleRefresh = async () => {
     if (!onReload) return;
-    try {
-      setRefreshing(true);
-      await onReload();
-    } finally {
-      setRefreshing(false);
+    await onReload();
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore && !isLoadingMore && onLoadMore && scrollDirection === "down") {
+      onLoadMore();
     }
   };
 
-  // Create invoice + toast + refresh
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    onScrollPositionChange?.(currentScrollY);
+
+    if (currentScrollY > lastScrollY && currentScrollY > 0) {
+      setScrollDirection("down");
+    } else if (currentScrollY < lastScrollY) {
+      setScrollDirection("up");
+    }
+
+    setLastScrollY(currentScrollY);
+  };
+
   const handleSubmit = async () => {
     if (checkedValue.length === 0) {
       toast.show({
@@ -109,22 +155,17 @@ const Berlangsung = ({ data = [], onReload }: Props) => {
 
     try {
       setLoadingCreate(true);
-
-      // kalau masih mau dipakai di screen lain, simpan ke store juga
       const selectedData = data.filter((item) =>
         checkedValue.includes(item.id)
       );
       setSelectedTagihan(selectedData);
 
-      const payload = { tagihanUserIds: checkedValue }; // array id string
+      const payload = { tagihanUserIds: checkedValue };
       const response = await apiService.createInvoiceNumber(payload);
       const inv: InvoiceTagihan = response?.data?.invoice_tagihan ?? {};
 
-      if (!inv?.no_invoice) {
-        throw new Error("Nomor invoice tidak tersedia");
-      }
+      if (!inv?.no_invoice) throw new Error("Nomor invoice tidak tersedia");
 
-      // Toast sukses
       toast.show({
         placement: "bottom",
         render: ({ id }) => (
@@ -139,16 +180,8 @@ const Berlangsung = ({ data = [], onReload }: Props) => {
         ),
       });
 
-      // Refresh data list
       if (onReload) await onReload();
-
-      // Reset pilihan
       setCheckedValue([]);
-
-      // (Opsional) langsung ke detail/metode bayar:
-      // router.push({ pathname: "/detailTagihan", params: { no_invoice: inv.no_invoice } });
-      // atau:
-      // router.push({ pathname: "/metodeBayar", params: { invoice: inv.no_invoice } });
     } catch (error) {
       console.error("Failed to create invoice:", error);
       toast.show({
@@ -169,11 +202,50 @@ const Berlangsung = ({ data = [], onReload }: Props) => {
     }
   };
 
-  if (!data.length) {
+  const renderFooter = () => {
+    if (isLoadingMore && hasMore) {
+      return (
+        <Center py={30}>
+          <Spinner size="large" color={colors.primary} />
+          <Text
+            color={mode === "dark" ? "white" : "black"}
+            fontSize={14}
+            mt={12}
+            fontFamily="Lato"
+            fontWeight="$medium"
+          >
+            Memuat tagihan lainnya...
+          </Text>
+        </Center>
+      );
+    }
+
+    if (!hasMore && data.length > 0) {
+      return (
+        <Center py={20}>
+          <Text
+            color={
+              mode === "dark"
+                ? "rgba(255, 255, 255, 0.6)"
+                : "rgba(0, 0, 0, 0.6)"
+            }
+            fontSize={12}
+            fontFamily="Lato"
+          >
+            Semua data sudah dimuat
+          </Text>
+        </Center>
+      );
+    }
+
+    return null;
+  };
+
+  if (!data || data.length === 0) {
     return (
       <NoData
-        title="Belum ada tagihan"
-        desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
+        title="Belum ada tagihan berlangsung"
+        desc="Tagihan yang sedang berlangsung akan muncul di sini"
       />
     );
   }
@@ -184,15 +256,22 @@ const Berlangsung = ({ data = [], onReload }: Props) => {
       height={screenHeight + 16}
     >
       <FlatList
+        ref={flatListRef}
         data={data}
-        keyExtractor={(item) => String(item.id)}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.1}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        keyExtractor={(item) => `berlangsung-${item.id}`}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 20,
           paddingBottom: 100,
+          flexGrow: 1,
         }}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
+        ListFooterComponent={renderFooter}
         renderItem={({ item }) => {
           const [tanggal, jam] = item.expire_at?.split(" ") ?? ["-", "-"];
           return (

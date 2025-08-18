@@ -9,7 +9,7 @@ const NoData = (props: any) => {
   const icon = props.icon;
 
   return (
-    <Box justifyContent="center" mt={screenHeight / 3}>
+    <Box justifyContent="center" mt={screenHeight / 10}>
       <Center>
         {props.icon === "" ? (
           <Octicons

@@ -34,13 +34,16 @@ const MenuHome = () => {
         mt={20}
       >
         <VStack space="xl">
-          <HStack justifyContent="space-between" m={20}>
-            <VStack alignItems="center">
+          {/* Baris Atas */}
+          <HStack flexWrap="wrap" justifyContent="flex-start" m={20}>
+            <VStack alignItems="center" width="25%">
+              {/* Absensi */}
               <TouchableOpacity onPress={() => router.push("/absensi")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="clipboard-check-outline"
@@ -53,20 +56,22 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Absensi
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center">
+            <VStack alignItems="center" width="25%">
+              {/* Tagihan */}
               <TouchableOpacity onPress={() => router.push("/tagihan")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="sack-percent"
@@ -76,23 +81,25 @@ const MenuHome = () => {
                   />
                 </Box>
                 <Text
+                  mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  mt={8}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Tagihan
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center">
+            <VStack alignItems="center" width="25%">
+              {/* Invoice */}
               <TouchableOpacity onPress={() => router.push("/invoice")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="script-text-outline"
@@ -105,43 +112,22 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Invoice
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            {/* <VStack alignItems="center">
-              <Box
-                backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                p={3}
-                borderRadius={8}
-              >
-                <MaterialCommunityIcons
-                  name="credit-card-outline"
-                  size={20}
-                  color={mode === "dark" ? "white" : "black"}
-                  style={{ padding: 8 }}
-                />
-              </Box>
-              <Text
-                mt={8}
-                fontFamily="Lato-Bold"
-                fontSize={12}
-                color={mode === "dark" ? "white" : "black"}
-                textAlign="center"
-              >
-                Pengeluaran
-              </Text>
-            </VStack> */}
-            <VStack alignItems="center">
+            <VStack alignItems="center" width="25%">
+              {/* Hafalan */}
               <TouchableOpacity onPress={() => router.push("/hafalan")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="clipboard-check-outline"
@@ -154,16 +140,16 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Hafalan
                 </Text>
                 <Text
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Al-Quran
                 </Text>
@@ -171,14 +157,15 @@ const MenuHome = () => {
             </VStack>
           </HStack>
 
-          <HStack space="4xl" m={20} mt={-10}>
-            <VStack alignItems="center">
+          {/* Baris Bawah */}
+          <HStack flexWrap="wrap" justifyContent="flex-start" m={20} mt={-10}>
+            <VStack alignItems="center" width="25%">
+              {/* Jadwal */}
               <TouchableOpacity onPress={() => router.push("/jadwalPelajaran")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
-                  justifyContent="center"
                   alignItems="center"
                 >
                   <MaterialCommunityIcons
@@ -192,28 +179,30 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Jadwal
                 </Text>
                 <Text
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Pelajaran
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center">
+            <VStack alignItems="center" width="25%">
+              {/* Rangking */}
               <TouchableOpacity onPress={() => router.push("/rangking")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="transfer-up"
@@ -226,21 +215,22 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Rangking
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center">
+            <VStack alignItems="center" width="25%">
+              {/* Lihat Semua */}
               <TouchableOpacity onPress={handleClose}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                  ml={10}
                   p={3}
                   borderRadius={8}
+                  alignItems="center"
                 >
                   <MaterialCommunityIcons
                     name="dock-window"
@@ -253,13 +243,16 @@ const MenuHome = () => {
                   mt={8}
                   fontFamily="Lato-Bold"
                   fontSize={12}
-                  color={mode === "dark" ? "white" : "black"}
                   textAlign="center"
+                  color={mode === "dark" ? "white" : "black"}
                 >
                   Lihat Semua
                 </Text>
               </TouchableOpacity>
             </VStack>
+
+            {/* Placeholder kosong biar sejajar */}
+            <VStack alignItems="center" width="25%" />
           </HStack>
         </VStack>
       </Box>

@@ -3,7 +3,6 @@ import {
   InputField,
   VStack,
   Text,
-  Button,
   Center,
   SafeAreaView,
   ScrollView,
@@ -25,47 +24,39 @@ import {
   Box,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Dimensions, Pressable, useColorScheme } from "react-native";
 import { useState } from "react";
-import Header from "@/components/Header";
 import NoData from "@/components/NoData";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function akademik() {
+export default function Akademik() {
   const router = useRouter();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
-  const [selectedKelas, setSelectedKelas] = useState("1"); // Default selected class
+  const insets = useSafeAreaInsets();
+
+  const [selectedKelas, setSelectedKelas] = useState("1");
   const dataKelas = [
-    {
-      id: "1",
-      kelas: "X - IPA 1",
-    },
-    {
-      id: "2",
-      kelas: "VII - C",
-    },
-    {
-      id: "3",
-      kelas: "VIII - D",
-    },
-    {
-      id: "4",
-      kelas: "IX - G",
-    },
-    {
-      id: "5",
-      kelas: "XIII - B",
-    },
+    { id: "1", kelas: "X - IPA 1" },
+    { id: "2", kelas: "VII - C" },
+    { id: "3", kelas: "VIII - D" },
+    { id: "4", kelas: "IX - G" },
+    { id: "5", kelas: "XIII - B" },
   ];
+
   return (
     <SafeAreaView
       backgroundColor={mode === "dark" ? "black" : "white"}
-      height={screenHeight}
+      flex={1}
     >
-      <ScrollView>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 40, // ✅ beri jarak aman di bawah
+        }}
+      >
         <Center position="relative">
           <Image
             style={{
@@ -84,7 +75,7 @@ export default function akademik() {
             }
           />
 
-          {/* Text di atas gambar */}
+          {/* Title */}
           <Text
             color={mode === "dark" ? "white" : "black"}
             mt={40}
@@ -94,19 +85,20 @@ export default function akademik() {
           </Text>
         </Center>
 
-        <VStack space="md" mx={10} mt={40} mb={20}>
+        <VStack space="lg" mx={10} mt={40}>
+          {/* Pilih kelas */}
           <Text>Kelas saat ini</Text>
           <ScrollView
-            horizontal={true}
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 5 }}
           >
             <HStack space="sm">
-              {dataKelas.map((item, index) => {
+              {dataKelas.map((item) => {
                 const isSelected = selectedKelas === item.id;
                 return (
                   <Pressable
-                    key={item.id || index}
+                    key={item.id}
                     onPress={() => setSelectedKelas(item.id)}
                   >
                     <Badge
@@ -148,9 +140,11 @@ export default function akademik() {
               })}
             </HStack>
           </ScrollView>
+
+          {/* Semester Select */}
           <Select>
             <SelectTrigger variant="rounded" size="md">
-              <SelectInput placeholder="Select option" />
+              <SelectInput placeholder="Pilih semester" />
               <SelectIcon>
                 <Icon as={ChevronDownIcon} style={{ marginRight: 3 }} />
               </SelectIcon>
@@ -167,7 +161,8 @@ export default function akademik() {
             </SelectPortal>
           </Select>
 
-          <HStack justifyContent="space-between" mb={-150}>
+          {/* Ranking */}
+          <HStack justifyContent="space-between" mt={10}>
             <Text color={mode === "dark" ? "white" : "black"}>Rangking</Text>
             <Text>Lihat Detail</Text>
           </HStack>
@@ -183,7 +178,8 @@ export default function akademik() {
             }
           />
 
-          <HStack justifyContent="space-between" mt={20} mb={-150}>
+          {/* Hafalan */}
+          <HStack justifyContent="space-between" mt={20}>
             <Text color={mode === "dark" ? "white" : "black"}>
               Hafalan Al-Qur'an
             </Text>
@@ -201,7 +197,8 @@ export default function akademik() {
             }
           />
 
-          <HStack justifyContent="space-between" mt={20} mb={-150}>
+          {/* Nilai */}
+          <HStack justifyContent="space-between" mt={20}>
             <Text color={mode === "dark" ? "white" : "black"}>
               Nilai Rata - Rata
             </Text>
@@ -209,7 +206,7 @@ export default function akademik() {
           </HStack>
           <NoData
             title="Belum ada Nilai"
-            desc="Nila Rata - Rata akan muncul disini, ketika anda sudah mempunyai nilai"
+            desc="Nilai Rata - Rata akan muncul disini, ketika anda sudah mempunyai nilai"
             icon={
               <MaterialCommunityIcons
                 name="clipboard-text-outline"

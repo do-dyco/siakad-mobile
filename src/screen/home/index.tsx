@@ -44,6 +44,12 @@ const Home = () => {
     } catch (error) {
       setSaldoData(0);
       console.error("Failed to fetch saldo:", error);
+
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        useUserStore.getState().clearAuth();
+        router.replace("/login");
+      }
     }
   };
 
@@ -76,7 +82,7 @@ const Home = () => {
       <SafeAreaView height={screenHeight}>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 48 }}
           showsVerticalScrollIndicator={false}
         >
           <VStack mt={40} mx={16} space="md" mb={24}>

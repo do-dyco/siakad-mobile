@@ -11,9 +11,16 @@ import {
   ToastTitle,
   ToastDescription,
   useToast,
+  Spinner,
+  Center,
 } from "@gluestack-ui/themed";
-import React, { useState } from "react";
-import { TouchableOpacity, useColorScheme } from "react-native";
+import React from "react";
+import {
+  TouchableOpacity,
+  useColorScheme,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from "react-native";
 import CustomBadge from "./CustomBadge";
 import NoData from "./NoData";
 import * as Clipboard from "expo-clipboard";
@@ -36,47 +43,54 @@ type ItemType = {
 type Props = {
   data?: ItemType[];
   onReload?: () => Promise<void> | void;
+  onLoadMore?: () => Promise<void> | void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  isRefreshing?: boolean;
+  onScrollPositionChange?: (offset: number) => void;
+  initialScrollOffset?: number; // 👈 tambahkan
 };
 
-const Proses = ({ data = [], onReload }: Props) => {
+const Proses = ({
+  data = [],
+  onReload,
+  onLoadMore,
+  hasMore = false,
+  isLoadingMore = false,
+  isRefreshing = false,
+  onScrollPositionChange,
+}: Props) => {
   const mode = useColorScheme();
   const toast = useToast();
   const insets = useSafeAreaInsets();
-  const [refreshing, setRefreshing] = useState(false);
 
-  const copyToClipboard = async (text, label) => {
+  const copyToClipboard = async (text: string, label: string) => {
     try {
       await Clipboard.setStringAsync(text);
       toast.show({
         placement: "bottom",
-        render: ({ id }) => {
-          const toastId = "toast-" + id;
-          return (
-            <Toast nativeID={toastId} action="success" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Berhasil</ToastTitle>
-                <ToastDescription>
-                  {label} telah disalin ke clipboard
-                </ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="success" variant="solid">
+            <VStack space="xs">
+              <ToastTitle>Berhasil</ToastTitle>
+              <ToastDescription>
+                {label} telah disalin ke clipboard
+              </ToastDescription>
+            </VStack>
+          </Toast>
+        ),
       });
     } catch (error) {
       toast.show({
         placement: "bottom",
-        render: ({ id }) => {
-          const toastId = "toast-" + id;
-          return (
-            <Toast nativeID={toastId} action="error" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Error</ToastTitle>
-                <ToastDescription>Gagal menyalin ke clipboard</ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="error" variant="solid">
+            <VStack space="xs">
+              <ToastTitle>Error</ToastTitle>
+              <ToastDescription>Gagal menyalin ke clipboard</ToastDescription>
+            </VStack>
+          </Toast>
+        ),
       });
     }
   };
@@ -84,38 +98,86 @@ const Proses = ({ data = [], onReload }: Props) => {
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
 
-  const formatTime = (timestamp: string) => {
-    if (!timestamp) return "-";
-    const [, time] = timestamp.split(" ");
-    return time || "-";
-  };
-
   const handleRefresh = async () => {
     if (!onReload) return;
-    try {
-      setRefreshing(true);
-      await onReload();
-    } finally {
-      setRefreshing(false);
+    await onReload();
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore && !isLoadingMore && onLoadMore) {
+      onLoadMore();
     }
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    onScrollPositionChange?.(currentScrollY);
+  };
+
+  const renderFooter = () => {
+    if (isLoadingMore && hasMore) {
+      return (
+        <Center py={30}>
+          <Spinner size="large" color={colors.primary} />
+          <Text
+            color={mode === "dark" ? "white" : "black"}
+            fontSize={14}
+            mt={12}
+            fontFamily="Lato"
+            fontWeight="$medium"
+          >
+            Memuat tagihan lainnya...
+          </Text>
+        </Center>
+      );
+    }
+
+    if (!hasMore && data.length > 0) {
+      return (
+        <Center py={20}>
+          <Text
+            color={
+              mode === "dark"
+                ? "rgba(255, 255, 255, 0.6)"
+                : "rgba(0, 0, 0, 0.6)"
+            }
+            fontSize={12}
+            fontFamily="Lato"
+          >
+            Semua data sudah dimuat
+          </Text>
+        </Center>
+      );
+    }
+
+    return null;
   };
 
   if (!data || data.length === 0) {
     return (
       <NoData
-        title="Belum ada tagihan"
-        desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
+        title="Belum ada tagihan dalam proses"
+        desc="Tagihan yang sedang dalam proses akan muncul di sini"
       />
     );
   }
 
   return (
     <FlatList
-      contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
+      contentContainerStyle={{
+        padding: 16,
+        paddingBottom: insets.bottom + 48,
+        flexGrow: 1,
+      }}
       data={data}
-      refreshing={refreshing}
+      refreshing={isRefreshing}
       onRefresh={handleRefresh}
-      keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.1}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      keyExtractor={(item) => item.id.toString()}
+      ListFooterComponent={renderFooter}
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() =>
@@ -163,7 +225,7 @@ const Proses = ({ data = [], onReload }: Props) => {
                     fontFamily="Lato"
                     fontWeight="$semibold"
                   >
-                    Tagihan
+                    Invoice
                   </Text>
                 </HStack>
                 <Text
@@ -172,12 +234,12 @@ const Proses = ({ data = [], onReload }: Props) => {
                   fontFamily="Lato"
                   fontWeight="$semibold"
                 >
-                  {item.no_tagihan}
+                  {item.no_invoice}
                 </Text>
               </HStack>
             </Box>
 
-            {/* Info */}
+            {/* Body */}
             <HStack justifyContent="space-between" mt={10} m={10}>
               <VStack space="md">
                 <Text
@@ -186,29 +248,11 @@ const Proses = ({ data = [], onReload }: Props) => {
                   fontFamily="Lato"
                   fontWeight="$semibold"
                 >
-                  Invoice Number
+                  Nama Tagihan
                 </Text>
-                <HStack space="xs">
-                  <Text
-                    color={colors.primary}
-                    fontSize={14}
-                    fontFamily="Lato"
-                    fontWeight="$semibold"
-                  >
-                    {item.no_invoice}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() =>
-                      copyToClipboard(item.no_invoice, "Invoice Number")
-                    }
-                  >
-                    <Ionicons
-                      name="copy-outline"
-                      size={20}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </HStack>
+                <Text fontSize={14} fontFamily="Lato" fontWeight="$semibold">
+                  {item.master_tagihan?.nama ?? "-"}
+                </Text>
               </VStack>
               <CustomBadge variant="warning" label="Dalam Proses" />
             </HStack>
@@ -223,26 +267,7 @@ const Proses = ({ data = [], onReload }: Props) => {
                   fontFamily="Lato"
                   fontWeight="$semibold"
                 >
-                  Nama Tagihan
-                </Text>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  fontSize={14}
-                  fontFamily="Lato"
-                  fontWeight="$semibold"
-                >
-                  {item.master_tagihan?.nama ?? "-"}
-                </Text>
-              </HStack>
-
-              <HStack justifyContent="space-between" mt={10}>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  fontSize={14}
-                  fontFamily="Lato"
-                  fontWeight="$semibold"
-                >
-                  Nominal Tertagih
+                  Nominal
                 </Text>
                 <Text
                   color={mode === "dark" ? "white" : "black"}

@@ -274,13 +274,17 @@ export default function Keuangan() {
     <SafeAreaView
       backgroundColor={mode === "dark" ? "black" : "white"}
       height={screenHeight}
+      style={{ flex: 1, paddingBottom: 20 }} // ✅ padding bawah
     >
-      <ScrollView>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 40 }} // ✅ konsisten di semua device
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header dengan Background Melengkung */}
         <Box
           position="relative"
           width={screenWidth}
-          height={screenHeight / 3 - 30}
+          height={screenHeight / 3}
           borderBottomLeftRadius={20}
           borderBottomRightRadius={20}
           overflow="hidden"
@@ -458,7 +462,7 @@ export default function Keuangan() {
           </Text>
         </HStack>
 
-        <VStack space="md" mb={20} mx={10}>
+        <VStack space="md" mx={10}>
           {loading ? (
             <SkeletonList />
           ) : riwayatTransaksi.length === 0 ? (
