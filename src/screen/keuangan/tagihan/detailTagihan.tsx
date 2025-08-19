@@ -85,7 +85,10 @@ const DetailInvoice = () => {
   useEffect(() => {
     if (typeof no_invoice === "string" && no_invoice.trim().length > 0) {
       fetchDetail(no_invoice);
-      return;
+      router.push({
+        pathname: "/detailInvoice",
+        params: { noInvoice: no_invoice },
+      });
     }
     if ((selectedTagihan || []).length > 0) {
       createInvoice();

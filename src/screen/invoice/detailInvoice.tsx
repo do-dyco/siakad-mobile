@@ -33,7 +33,7 @@ const DetailInvoice = () => {
   const { noInvoice } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState({});
 
-  console.log("noInvoice", dataInvoice);
+  console.log("noInvoice", noInvoice);
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -79,7 +79,7 @@ const DetailInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Transaksi"} />
+        <Header data={"Detail Transaksi"} backTo="/invoice" />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
             <Text

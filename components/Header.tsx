@@ -1,27 +1,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable prettier/prettier */
+import React from "react";
 import {
   Box,
   Center,
   Divider,
   HStack,
-  Heading,
   StatusBar,
   Text,
   View,
-  VStack,
 } from "@gluestack-ui/themed";
-import React from "react";
-import { Platform, StyleSheet, TouchableOpacity } from "react-native";
-
-import { useColorScheme } from "react-native";
+import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 
-function Header({ data }: any) {
+type HeaderProps = {
+  data?: string;
+  backTo?: string;
+  replace?: boolean;
+};
+
+export default function Header({ data, backTo, replace }: HeaderProps) {
   const theme = useColorScheme();
+  const router = useRouter();
+
+  const handleBack = () => {
+    if (backTo) {
+      if (replace) {
+        router.replace(backTo);
+      } else {
+        router.push(backTo as any);
+      }
+    } else {
+      router.back();
+    }
+  };
 
   return (
     <>
@@ -35,8 +48,9 @@ function Header({ data }: any) {
           backgroundColor={theme === "dark" ? "black" : "white"}
         />
       </View>
+
       <Box backgroundColor={theme === "dark" ? "black" : "white"} mt={30}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={handleBack}>
           <HStack m={5}>
             <MaterialIcons
               name="chevron-left"
@@ -48,12 +62,14 @@ function Header({ data }: any) {
                 color={theme === "dark" ? "white" : "black"}
                 size="sm"
                 mr={20}
+                numberOfLines={1}
               >
                 {data}
               </Text>
             </Center>
           </HStack>
         </TouchableOpacity>
+
         <Divider mt={10} bgColor="transparent" />
       </Box>
     </>
@@ -65,5 +81,3 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
 });
-
-export default Header;

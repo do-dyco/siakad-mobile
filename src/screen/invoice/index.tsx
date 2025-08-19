@@ -121,7 +121,7 @@ const Invoice = () => {
       >
         <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
           {/* Header */}
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.push("/(tabs)")}>
             <HStack m={5}>
               <MaterialIcons
                 name="chevron-left"

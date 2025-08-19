@@ -18,6 +18,7 @@ import {
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   TouchableOpacity,
   useColorScheme,
@@ -48,6 +49,8 @@ const Tagihan = () => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const [isLoading, setIsLoading] = useState(true);
 
   // Pagination state
   const [ongoingPage, setOngoingPage] = useState(1);
@@ -85,6 +88,8 @@ const Tagihan = () => {
     isLoadMore: boolean
   ) => {
     try {
+      if (!isLoadMore) setIsLoading(true); // mulai loading saat fetch awal
+
       if (status === "UNPAID" && isLoadMore) setIsLoadingMoreOngoing(true);
       if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(true);
 
@@ -144,6 +149,8 @@ const Tagihan = () => {
     } finally {
       if (status === "UNPAID" && isLoadMore) setIsLoadingMoreOngoing(false);
       if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(false);
+
+      if (!isLoadMore) setIsLoading(false); // selesai loading fetch awal
     }
   };
 
@@ -188,8 +195,17 @@ const Tagihan = () => {
     setProsesPage(1);
     setOngoingHasMore(true);
     setProsesHasMore(true);
-    fetchData("UNPAID", 1, false);
-    fetchData("PAID", 1, false);
+
+    const loadAll = async () => {
+      setIsLoading(true);
+      await Promise.all([
+        fetchData("UNPAID", 1, false),
+        fetchData("PAID", 1, false),
+      ]);
+      setIsLoading(false);
+    };
+
+    loadAll();
   }, [params]);
 
   // Scroll position update
@@ -306,9 +322,19 @@ const Tagihan = () => {
 
       {/* Content */}
       <VStack flex={1} m={5}>
-        {ongoingData.length === 0 &&
-        prosesData.length === 0 &&
-        !isRefreshing ? (
+        {isLoading ? (
+          <Center flex={1}>
+            <ActivityIndicator
+              size="large"
+              color={mode === "dark" ? "white" : "black"}
+            />
+            <Text mt={10} color={mode === "dark" ? "white" : "black"}>
+              Memuat data...
+            </Text>
+          </Center>
+        ) : ongoingData.length === 0 &&
+          prosesData.length === 0 &&
+          !isRefreshing ? (
           <NoData
             title="Belum ada tagihan"
             desc="Jika anda memiliki tagihan, tagihan anda akan muncul disini"
