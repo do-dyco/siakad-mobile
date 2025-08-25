@@ -3,6 +3,7 @@ import NoData from "@/components/NoData";
 import Proses from "@/components/Proses";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
+import { useUserStore } from "@/src/store/userStore";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   Box,
@@ -16,7 +17,7 @@ import {
   VStack,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -24,7 +25,7 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import { TabBar, TabView } from "react-native-tab-view";
 
 type ItemType = {
   id: string;
@@ -34,7 +35,7 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
-  status?: "UNPAID" | "PAID" | string;
+  status?: "IN_PROGRESS" | "PAID" | string;
   master_tagihan?: { nama?: string };
 };
 
@@ -49,10 +50,12 @@ const Tagihan = () => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [tahun, setTahun] = useState("");
+  const user = useUserStore((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Pagination state
+  // Pagination
   const [ongoingPage, setOngoingPage] = useState(1);
   const [prosesPage, setProsesPage] = useState(1);
   const [ongoingHasMore, setOngoingHasMore] = useState(true);
@@ -61,14 +64,20 @@ const Tagihan = () => {
   const [isLoadingMoreProses, setIsLoadingMoreProses] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Data state
+  // Data
   const [ongoingData, setOngoingData] = useState<ItemType[]>([]);
   const [prosesData, setProsesData] = useState<ItemType[]>([]);
 
-  // Scroll position
+  // Scroll positions
   const [scrollPositions, setScrollPositions] = useState({
     ongoing: 0,
     proses: 0,
+  });
+
+  // Lock fetch per tab biar tidak dobel
+  const fetchingRef = useRef<{ IN_PROGRESS: boolean; PAID: boolean }>({
+    IN_PROGRESS: false,
+    PAID: false,
   });
 
   const params = useMemo(
@@ -77,120 +86,130 @@ const Tagihan = () => {
       startDate,
       endDate,
       limit: LIMIT,
+      tahun,
+      start: 1,
+      userId: Number(user?.id),
     }),
-    [search, startDate, endDate]
+    [search, startDate, endDate, tahun, user?.id]
   );
 
-  // 🔧 reusable fetch function
+  const mergeUnique = (prev: ItemType[], incoming: ItemType[]) => {
+    const map = new Map<string, ItemType>();
+    prev.forEach((it) => map.set(it.id, it));
+    incoming.forEach((it) => {
+      if (!map.has(it.id)) map.set(it.id, it);
+    });
+    return Array.from(map.values());
+  };
+
   const fetchData = async (
-    status: "UNPAID" | "PAID",
+    status: "IN_PROGRESS" | "PAID",
     pageNumber: number,
     isLoadMore: boolean
   ) => {
-    try {
-      if (!isLoadMore) setIsLoading(true); // mulai loading saat fetch awal
+    if (fetchingRef.current[status]) return;
+    fetchingRef.current[status] = true;
 
-      if (status === "UNPAID" && isLoadMore) setIsLoadingMoreOngoing(true);
+    try {
+      if (!isLoadMore) setIsLoading(true);
+      if (status === "IN_PROGRESS" && isLoadMore) setIsLoadingMoreOngoing(true);
       if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(true);
 
+      // ✅ Sesuai Postman
       const fetchParams = {
-        ...params,
-        status,
-        page: pageNumber,
+        search,
+        start: pageNumber, // ini integer (page index)
+        length: LIMIT, // jumlah record per page
+        userId: user?.id,
+        orderBy: [
+          { column: -48898829, asc: true },
+          { column: -88908730, asc: false },
+        ],
+        status: status ? status : "",
+        startDate,
+        endDate,
+        tahun,
       };
 
       const response = await apiService.myListTagihan(fetchParams);
       const newData: ItemType[] = response?.data?.tagihan_users ?? [];
       const totalRecords = response?.data?.records_total ?? 0;
 
-      if (status === "UNPAID") {
+      if (status === "IN_PROGRESS") {
         if (isLoadMore) {
-          const filteredData = newData.filter(
-            (newItem) => !ongoingData.some((item) => item.id === newItem.id)
-          );
-          if (filteredData.length > 0) {
-            setOngoingData((prev) => [...prev, ...filteredData]);
-          }
+          setOngoingData((prev) => {
+            const merged = [...prev, ...newData];
+            setOngoingHasMore(merged.length < totalRecords);
+            return merged;
+          });
         } else {
           setOngoingData(newData);
+          setOngoingHasMore(newData.length < totalRecords);
         }
-        const currentTotal = isLoadMore
-          ? ongoingData.length + newData.length
-          : newData.length;
-        setOngoingHasMore(currentTotal < totalRecords);
-      }
-
-      if (status === "PAID") {
+      } else {
         if (isLoadMore) {
-          const filteredData = newData.filter(
-            (newItem) => !prosesData.some((item) => item.id === newItem.id)
-          );
-          if (filteredData.length > 0) {
-            setProsesData((prev) => [...prev, ...filteredData]);
-          }
+          setProsesData((prev) => {
+            const merged = [...prev, ...newData];
+            // kalau API sudah nggak kirim data baru → habis
+            if (newData.length === 0) {
+              setProsesHasMore(false);
+            } else {
+              setProsesHasMore(merged.length < totalRecords);
+            }
+            return merged;
+          });
         } else {
           setProsesData(newData);
+          setProsesHasMore(newData.length < totalRecords);
         }
-        const currentTotal = isLoadMore
-          ? prosesData.length + newData.length
-          : newData.length;
-        setProsesHasMore(currentTotal < totalRecords);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      if (status === "UNPAID" && !isLoadMore) {
-        setOngoingData([]);
-        setOngoingHasMore(false);
-      }
-      if (status === "PAID" && !isLoadMore) {
-        setProsesData([]);
-        setProsesHasMore(false);
-      }
     } finally {
-      if (status === "UNPAID" && isLoadMore) setIsLoadingMoreOngoing(false);
+      if (status === "IN_PROGRESS" && isLoadMore)
+        setIsLoadingMoreOngoing(false);
       if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(false);
-
-      if (!isLoadMore) setIsLoading(false); // selesai loading fetch awal
+      if (!isLoadMore) setIsLoading(false);
+      fetchingRef.current[status] = false;
     }
   };
 
-  // Load more
+  // Load more — naikkan page 1 per kali
   const loadMoreOngoing = async () => {
     if (!ongoingHasMore || isLoadingMoreOngoing) return;
-    const nextPage = LIMIT + 10;
+    const nextPage = ongoingPage + 1; // start naik 1
     setOngoingPage(nextPage);
-    await fetchData("UNPAID", nextPage, true);
+    await fetchData("IN_PROGRESS", nextPage, true);
   };
 
   const loadMoreProses = async () => {
     if (!prosesHasMore || isLoadingMoreProses) return;
-    const nextPage = LIMIT + 10;
+    const nextPage = prosesPage + 1;
     setProsesPage(nextPage);
     await fetchData("PAID", nextPage, true);
   };
 
   // Refresh
   const handleRefresh = async () => {
+    if (isRefreshing) return;
     setIsRefreshing(true);
     setOngoingPage(1);
     setProsesPage(1);
     setOngoingHasMore(true);
     setProsesHasMore(true);
-
     try {
       await Promise.all([
-        fetchData("UNPAID", 1, false),
+        fetchData("IN_PROGRESS", 1, false),
         fetchData("PAID", 1, false),
       ]);
-    } catch (error) {
-      console.error("Error refreshing:", error);
     } finally {
       setIsRefreshing(false);
     }
   };
 
-  // Initial load & when params change
+  // Initial load & saat filter berubah
   useEffect(() => {
+    // reset
     setOngoingPage(1);
     setProsesPage(1);
     setOngoingHasMore(true);
@@ -199,52 +218,19 @@ const Tagihan = () => {
     const loadAll = async () => {
       setIsLoading(true);
       await Promise.all([
-        fetchData("UNPAID", 1, false),
+        fetchData("IN_PROGRESS", 1, false),
         fetchData("PAID", 1, false),
       ]);
       setIsLoading(false);
     };
-
     loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  // Scroll position update
+  // Scroll position
   const updateScrollPosition = (tab: "ongoing" | "proses", offset: number) => {
-    setScrollPositions((prev) => ({
-      ...prev,
-      [tab]: offset,
-    }));
+    setScrollPositions((prev) => ({ ...prev, [tab]: offset }));
   };
-
-  const FirstRoute = () => (
-    <Berlangsung
-      data={ongoingData}
-      onReload={handleRefresh}
-      onLoadMore={loadMoreOngoing}
-      hasMore={ongoingHasMore}
-      isLoadingMore={isLoadingMoreOngoing}
-      isRefreshing={isRefreshing}
-      initialScrollOffset={scrollPositions.ongoing}
-      onScrollPositionChange={(offset) =>
-        updateScrollPosition("ongoing", offset)
-      }
-    />
-  );
-
-  const SecondRoute = () => (
-    <Proses
-      data={prosesData}
-      onReload={handleRefresh}
-      onLoadMore={loadMoreProses}
-      hasMore={prosesHasMore}
-      isLoadingMore={isLoadingMoreProses}
-      isRefreshing={isRefreshing}
-      initialScrollOffset={scrollPositions.proses}
-      onScrollPositionChange={(offset) =>
-        updateScrollPosition("proses", offset)
-      }
-    />
-  );
 
   const routes = useMemo(
     () => [
@@ -317,7 +303,10 @@ const Tagihan = () => {
           </TouchableOpacity>
         </HStack>
 
-        <Divider mt={20} bgColor="#3a3a3b" />
+        <Divider
+          mt={20}
+          bgColor={mode === "dark" ? "#3a3a3b" : colors.gray.light[200]}
+        />
       </Box>
 
       {/* Content */}

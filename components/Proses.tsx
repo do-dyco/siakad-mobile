@@ -1,6 +1,6 @@
 import DashedDivider from "@/components/dashedDivider";
 import colors from "@/src/config/colors";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   VStack,
   Box,
@@ -14,7 +14,7 @@ import {
   Spinner,
   Center,
 } from "@gluestack-ui/themed";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   TouchableOpacity,
   useColorScheme,
@@ -35,9 +35,7 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
-  master_tagihan?: {
-    nama?: string;
-  };
+  master_tagihan?: { nama?: string };
 };
 
 type Props = {
@@ -48,7 +46,7 @@ type Props = {
   isLoadingMore?: boolean;
   isRefreshing?: boolean;
   onScrollPositionChange?: (offset: number) => void;
-  initialScrollOffset?: number; // 👈 tambahkan
+  initialScrollOffset?: number;
 };
 
 const Proses = ({
@@ -63,6 +61,19 @@ const Proses = ({
   const mode = useColorScheme();
   const toast = useToast();
   const insets = useSafeAreaInsets();
+
+  // ✅ Dedup data
+  const uniqueData = useMemo(() => {
+    const seen = new Set<string>();
+    const filtered = data.filter((item) => {
+      const key = `${item.id}-${item.no_invoice}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return filtered;
+  }, [data]);
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
@@ -80,7 +91,7 @@ const Proses = ({
           </Toast>
         ),
       });
-    } catch (error) {
+    } catch {
       toast.show({
         placement: "bottom",
         render: ({ id }) => (
@@ -99,13 +110,18 @@ const Proses = ({
     new Intl.NumberFormat("id-ID").format(value);
 
   const handleRefresh = async () => {
-    if (!onReload) return;
-    await onReload();
+    if (onReload) await onReload();
   };
 
-  const handleLoadMore = () => {
-    if (hasMore && !isLoadingMore && onLoadMore) {
-      onLoadMore();
+  const loadingRef = React.useRef(false);
+
+  const handleLoadMore = async () => {
+    if (!hasMore || isLoadingMore || loadingRef.current) return;
+    loadingRef.current = true;
+    try {
+      await onLoadMore?.();
+    } finally {
+      loadingRef.current = false;
     }
   };
 
@@ -114,6 +130,7 @@ const Proses = ({
     onScrollPositionChange?.(currentScrollY);
   };
 
+  // ✅ Footer Loader & Info
   const renderFooter = () => {
     if (isLoadingMore && hasMore) {
       return (
@@ -132,17 +149,15 @@ const Proses = ({
       );
     }
 
-    if (!hasMore && data.length > 0) {
+    if (!hasMore && uniqueData.length > 0) {
       return (
         <Center py={20}>
           <Text
-            color={
-              mode === "dark"
-                ? "rgba(255, 255, 255, 0.6)"
-                : "rgba(0, 0, 0, 0.6)"
-            }
             fontSize={12}
             fontFamily="Lato"
+            color={
+              mode === "dark" ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)"
+            }
           >
             Semua data sudah dimuat
           </Text>
@@ -153,7 +168,7 @@ const Proses = ({
     return null;
   };
 
-  if (!data || data.length === 0) {
+  if (!uniqueData || uniqueData.length === 0) {
     return (
       <NoData
         title="Belum ada tagihan dalam proses"
@@ -169,14 +184,16 @@ const Proses = ({
         paddingBottom: insets.bottom + 48,
         flexGrow: 1,
       }}
-      data={data}
+      data={uniqueData}
       refreshing={isRefreshing}
       onRefresh={handleRefresh}
       onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.1}
+      onEndReachedThreshold={0.2}
       onScroll={handleScroll}
       scrollEventThrottle={16}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item, index) =>
+        `${item.id || "noid"}-${item.no_invoice || "noinv"}-${index}`
+      }
       ListFooterComponent={renderFooter}
       renderItem={({ item }) => (
         <TouchableOpacity
@@ -186,6 +203,7 @@ const Proses = ({
               params: { no_invoice: String(item.no_invoice) },
             })
           }
+          onLongPress={() => copyToClipboard(item.no_invoice, "Nomor Invoice")}
         >
           <Box
             borderWidth={1}
@@ -216,7 +234,7 @@ const Proses = ({
                     <MaterialCommunityIcons
                       name="text-box-outline"
                       size={20}
-                      color={"white"}
+                      color="white"
                     />
                   </Box>
                   <Text

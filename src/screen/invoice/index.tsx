@@ -18,31 +18,37 @@ import {
   InputField,
   SafeAreaView,
   ScrollView,
+  Spinner, // ⟵ tambah ini
   Text,
   VStack,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Dimensions,
   RefreshControl,
   TouchableOpacity,
   useColorScheme,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 
 const Invoice = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const user = useUserStore((state) => state.user);
   const [length, setLength] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
 
-  const params = {
+  // Hindari memproses event scroll berulang-ulang saat sudah dekat bawah
+  const reachedEndRef = useRef(false);
+
+  const baseParams = {
     search: "",
     start: 1,
-    length: length,
+    length, // gunakan state
     startDate: "",
     endDate: "",
     orderBy: [
@@ -53,26 +59,36 @@ const Invoice = () => {
     ],
   };
 
-  const handleScroll = ({ nativeEvent }: { nativeEvent: any }) => {
+  const handleScroll = ({
+    nativeEvent,
+  }: {
+    nativeEvent: NativeSyntheticEvent<NativeScrollEvent>["nativeEvent"];
+  }) => {
     const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
     const isCloseToBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 
-    if (isCloseToBottom && !isLoading) {
+    if (isCloseToBottom && !isLoading && !reachedEndRef.current) {
+      reachedEndRef.current = true; // lock sementara sampai fetch selesai
       setLength((prev) => prev + 10);
+    }
+    if (!isCloseToBottom) {
+      // reset lock ketika tidak lagi di bawah
+      reachedEndRef.current = false;
     }
   };
 
   const handleRefresh = async () => {
+    if (isLoading) return;
     setIsLoading(true);
     try {
       const newParams = {
-        ...params,
-        length: 10,
+        ...baseParams,
+        length: 10, // reset pagination
       };
       const response = await apiService.myInvoice(newParams);
-      setData(response.data.invoice_tagihans || []);
-      setLength(10); // reset pagination
+      setData(response.data?.invoice_tagihans || []);
+      setLength(10); // kembali ke 10
     } catch (error) {
       console.error("Refresh error:", error);
     } finally {
@@ -82,12 +98,17 @@ const Invoice = () => {
 
   const fetchData = async () => {
     if (isLoading) return;
-
     setIsLoading(true);
     try {
-      const response = await apiService.myInvoice(params);
-      const newData = response.data.invoice_tagihans || [];
-      setData((prev) => [...prev, ...newData]);
+      // kirim length terbaru
+      const newParams = { ...baseParams, length };
+      const response = await apiService.myInvoice(newParams);
+      const newData = response.data?.invoice_tagihans || [];
+
+      // Jika API mengembalikan data kumulatif (1..length), cukup replace
+      // Kalau API mengembalikan hanya batch terbaru, bisa di-append.
+      // Di sini aman pakai replace untuk cegah duplikasi.
+      setData(newData);
     } catch (error) {
       console.error(error);
     } finally {
@@ -101,11 +122,12 @@ const Invoice = () => {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-    }).format(number);
+    }).format(number || 0);
   };
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [length]);
 
   return (
@@ -114,7 +136,8 @@ const Invoice = () => {
         backgroundColor={mode === "dark" ? "black" : "white"}
         height={screenHeight}
         onScroll={handleScroll}
-        scrollEventThrottle={400}
+        scrollEventThrottle={16} // ⟵ lebih responsif
+        contentContainerStyle={{ paddingBottom: 48 }} // ⟵ jarak bawah +48
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
         }
@@ -178,15 +201,15 @@ const Invoice = () => {
 
         {/* Invoice List */}
         <VStack mx={10}>
-          {!data ? (
+          {!data || data.length === 0 ? (
             <NoData
               title="Belum ada data Invoice"
               desc="Jika anda sudah memiliki Invoice, invoice tersebut akan muncul disini."
               icon=""
             />
           ) : (
-            data.map((item, index) => (
-              <React.Fragment key={index}>
+            data.map((item: any, index: number) => (
+              <React.Fragment key={item.no_invoice ?? index}>
                 <TouchableOpacity
                   onPress={() =>
                     router.push({
@@ -299,6 +322,16 @@ const Invoice = () => {
                 </TouchableOpacity>
               </React.Fragment>
             ))
+          )}
+
+          {/* Footer Loader saat hit API */}
+          {isLoading && (
+            <Center my={16}>
+              <Spinner size="large" />
+              <Text mt="$2" color={mode === "dark" ? "white" : "black"}>
+                Memuat data...
+              </Text>
+            </Center>
           )}
         </VStack>
       </ScrollView>

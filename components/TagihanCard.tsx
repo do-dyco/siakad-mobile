@@ -38,7 +38,9 @@ export default function TagihanCard({ data = [] }: Props) {
 
   // Format angka menjadi rupiah
   const formatRupiah = (value: number | string) => {
+    if (value === null || value === undefined || value === "") return "0";
     const numericValue = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(numericValue)) return "0";
     return new Intl.NumberFormat("id-ID").format(numericValue);
   };
 

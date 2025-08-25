@@ -19,8 +19,7 @@ import {
   Spinner,
   Center,
 } from "@gluestack-ui/themed";
-import { router } from "expo-router";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Dimensions,
   useColorScheme,
@@ -28,11 +27,11 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomBadge from "./CustomBadge";
 import NoData from "./NoData";
 import { useTagihanStore } from "@/src/store/tagihanStore";
 import apiService from "@/src/service/apiService";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ItemType = {
   id: string;
@@ -87,22 +86,38 @@ const Berlangsung = ({
   const toast = useToast();
   const insets = useSafeAreaInsets();
 
-  const [checkedValue, setCheckedValue] = useState<string[]>([]);
-  const { setSelectedTagihan } = useTagihanStore();
-  const [loadingCreate, setLoadingCreate] = useState(false);
-
   const flatListRef = useRef<FlatList<ItemType>>(null);
+
+  const [checkedValue, setCheckedValue] = useState<string[]>([]);
+  const [loadingCreate, setLoadingCreate] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
+
+  const { setSelectedTagihan } = useTagihanStore();
+
+  // ✅ Dedup data biar key FlatList unik
+  const uniqueData = useMemo(() => {
+    const seen = new Set<string>();
+    const filtered = data.filter((item) => {
+      const key = `${item.id}-${item.no_tagihan}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return filtered;
+  }, [data]);
 
   // Reset checkbox saat data berubah
   useEffect(() => {
     setCheckedValue([]);
-  }, [data.length, data]);
+  }, [uniqueData]);
 
+  // Utils
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
 
+  // Checkbox handler
   const handleCheckboxChange = (value: string) => {
     setCheckedValue((prev) =>
       prev.includes(value)
@@ -111,17 +126,19 @@ const Berlangsung = ({
     );
   };
 
+  // Refresh handler
   const handleRefresh = async () => {
-    if (!onReload) return;
-    await onReload();
+    if (onReload) await onReload();
   };
 
+  // Infinite scroll handler
   const handleLoadMore = () => {
     if (hasMore && !isLoadingMore && onLoadMore && scrollDirection === "down") {
       onLoadMore();
     }
   };
 
+  // Scroll tracking
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
     onScrollPositionChange?.(currentScrollY);
@@ -135,6 +152,7 @@ const Berlangsung = ({
     setLastScrollY(currentScrollY);
   };
 
+  // Submit invoice handler
   const handleSubmit = async () => {
     if (checkedValue.length === 0) {
       toast.show({
@@ -155,11 +173,14 @@ const Berlangsung = ({
 
     try {
       setLoadingCreate(true);
-      const selectedData = data.filter((item) =>
+
+      // Simpan tagihan terpilih di store
+      const selectedData = uniqueData.filter((item) =>
         checkedValue.includes(item.id)
       );
       setSelectedTagihan(selectedData);
 
+      // Hit API create invoice
       const payload = { tagihanUserIds: checkedValue };
       const response = await apiService.createInvoiceNumber(payload);
       const inv: InvoiceTagihan = response?.data?.invoice_tagihan ?? {};
@@ -202,17 +223,18 @@ const Berlangsung = ({
     }
   };
 
+  // Footer loader / info
   const renderFooter = () => {
     if (isLoadingMore && hasMore) {
       return (
         <Center py={30}>
           <Spinner size="large" color={colors.primary} />
           <Text
-            color={mode === "dark" ? "white" : "black"}
-            fontSize={14}
             mt={12}
+            fontSize={14}
             fontFamily="Lato"
             fontWeight="$medium"
+            color={mode === "dark" ? "white" : "black"}
           >
             Memuat tagihan lainnya...
           </Text>
@@ -220,17 +242,15 @@ const Berlangsung = ({
       );
     }
 
-    if (!hasMore && data.length > 0) {
+    if (!hasMore && uniqueData.length > 0) {
       return (
         <Center py={20}>
           <Text
-            color={
-              mode === "dark"
-                ? "rgba(255, 255, 255, 0.6)"
-                : "rgba(0, 0, 0, 0.6)"
-            }
             fontSize={12}
             fontFamily="Lato"
+            color={
+              mode === "dark" ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)"
+            }
           >
             Semua data sudah dimuat
           </Text>
@@ -241,7 +261,8 @@ const Berlangsung = ({
     return null;
   };
 
-  if (!data || data.length === 0) {
+  // Early return jika kosong
+  if (!uniqueData || uniqueData.length === 0) {
     return (
       <NoData
         title="Belum ada tagihan berlangsung"
@@ -251,20 +272,19 @@ const Berlangsung = ({
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, position: "relative" }}
-      height={screenHeight + 16}
-    >
+    <SafeAreaView style={{ flex: 1, position: "relative" }}>
       <FlatList
         ref={flatListRef}
-        data={data}
+        data={uniqueData}
+        keyExtractor={(item, index) =>
+          `${item.id || "noid"}-${item.no_tagihan || "notag"}-${index}`
+        }
         refreshing={isRefreshing}
         onRefresh={handleRefresh}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        keyExtractor={(item) => `berlangsung-${item.id}`}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 20,
@@ -274,15 +294,17 @@ const Berlangsung = ({
         ListFooterComponent={renderFooter}
         renderItem={({ item }) => {
           const [tanggal, jam] = item.expire_at?.split(" ") ?? ["-", "-"];
+
           return (
             <Box
+              mb={20}
               borderWidth={1}
               borderRadius={10}
               borderColor={
                 mode === "dark" ? colors.border : colors.gray.light[200]
               }
-              mb={20}
             >
+              {/* Header box */}
               <Box
                 borderTopRightRadius={10}
                 borderTopLeftRadius={10}
@@ -290,6 +312,7 @@ const Berlangsung = ({
               >
                 <HStack justifyContent="space-between" m={10}>
                   <HStack space="md">
+                    {/* Checkbox */}
                     <Checkbox
                       size="md"
                       value={item.id}
@@ -315,6 +338,8 @@ const Berlangsung = ({
                         />
                       </CheckboxIndicator>
                     </Checkbox>
+
+                    {/* Icon */}
                     <Box
                       borderRadius={8}
                       borderWidth={1}
@@ -328,36 +353,39 @@ const Berlangsung = ({
                       <MaterialCommunityIcons
                         name="text-box-outline"
                         size={20}
-                        color={"white"}
+                        color="white"
                       />
                     </Box>
+
                     <Text
-                      color={mode === "dark" ? "white" : "black"}
                       fontSize={14}
                       fontFamily="Lato"
                       fontWeight="$semibold"
+                      color={mode === "dark" ? "white" : "black"}
                     >
                       Tagihan
                     </Text>
                   </HStack>
+
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     {item.no_tagihan}
                   </Text>
                 </HStack>
               </Box>
 
+              {/* Body */}
               <HStack justifyContent="space-between" mt={10} m={10}>
                 <VStack space="md">
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     Bayar Sebelum
                   </Text>
@@ -373,18 +401,18 @@ const Berlangsung = ({
               <VStack mx={10} mt={10} mb={10}>
                 <HStack justifyContent="space-between">
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     Nama Tagihan
                   </Text>
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     {item.master_tagihan?.nama ?? "-"}
                   </Text>
@@ -392,18 +420,18 @@ const Berlangsung = ({
 
                 <HStack justifyContent="space-between" mt={10}>
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     Nominal Tertagih
                   </Text>
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
                     fontSize={14}
                     fontFamily="Lato"
                     fontWeight="$semibold"
+                    color={mode === "dark" ? "white" : "black"}
                   >
                     Rp {formatRupiah(item.nominal)}
                   </Text>
@@ -420,10 +448,8 @@ const Berlangsung = ({
         bottom={0}
         left={0}
         right={0}
-        backgroundColor={"transparent"}
         padding={16}
-        borderTopWidth={1}
-        borderColor={"transparent"}
+        backgroundColor="transparent"
       >
         <Button
           bgColor={colors.primary}

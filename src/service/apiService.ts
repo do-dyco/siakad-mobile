@@ -59,8 +59,9 @@ export default {
     const query = new URLSearchParams(params).toString();
 
     try {
-      const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + `/v2/user/tagihan?${query}`
+      const response: AxiosResponse = await axiosInstance.post(
+        PATH.API_DEV + `/v2/user/tagihan/datatable`,
+        params
       );
 
       return response.data;
