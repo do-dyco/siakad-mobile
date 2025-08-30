@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Feather,
   Ionicons,
@@ -11,7 +12,6 @@ import {
 } from "@expo/vector-icons";
 import {
   Box,
-  SafeAreaView,
   ScrollView,
   VStack,
   Text,
@@ -121,7 +121,7 @@ const BayarInvoice = () => {
 
   return (
     <SafeAreaView
-      backgroundColor={mode === "dark" ? "black" : "white"}
+      style={{ flex: 1, backgroundColor: bgColor }}
       height={screenHeight}
     >
       <ScrollView>
@@ -245,7 +245,10 @@ const BayarInvoice = () => {
                     <Feather name="download" size={20} color={colors.primary} />
                     <Text color={colors.primary}> Unduh</Text>
                   </HStack>
-                  <Text> | </Text>
+                  <Text color={mode === "light" ? "#E9EAEB" : "#373A41"}>
+                    {" "}
+                    |{" "}
+                  </Text>
                   <HStack space="md">
                     <Octicons
                       name="share-android"
@@ -263,9 +266,11 @@ const BayarInvoice = () => {
             <Box
               borderRadius={10}
               borderWidth={1}
-              borderColor="transparent"
+              borderColor={
+                mode === "dark" ? colors.border : colors.gray.light[200]
+              }
               bgColor={
-                mode === "dark" ? colors.gray.dark[900] : colors.gray.light[100]
+                mode === "dark" ? colors.gray.dark[900] : colors.gray.light[25]
               }
             >
               <HStack justifyContent="space-between" m={10}>
@@ -297,9 +302,11 @@ const BayarInvoice = () => {
           <Box
             borderRadius={10}
             borderWidth={1}
-            borderColor="transparent"
+            borderColor={
+              mode === "dark" ? colors.border : colors.gray.light[200]
+            }
             bgColor={
-              mode === "dark" ? colors.gray.dark[900] : colors.gray.light[100]
+              mode === "dark" ? colors.gray.dark[900] : colors.gray.light[25]
             }
           >
             <HStack justifyContent="space-between" m={10}>
