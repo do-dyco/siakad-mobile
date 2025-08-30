@@ -73,7 +73,7 @@ const Rangking = () => {
 
   return (
     <>
-      <Box position="relative" width="100%" height="30%">
+      <Box position="relative" width="100%" height={screenHeight * 0.3}>
         <Image
           width="100%"
           height="100%"
@@ -89,7 +89,12 @@ const Rangking = () => {
                 size={30}
               />
             </TouchableOpacity>
-            <Text color="white" fontSize={18} fontWeight="$bold" fontFamily="Lato">
+            <Text
+              color="white"
+              fontSize={18}
+              fontWeight="$bold"
+              fontFamily="Lato"
+            >
               Rangking
             </Text>
             <Box width={30} />
@@ -110,7 +115,12 @@ const Rangking = () => {
             overflow="hidden"
           >
             <VStack space="md" m={10}>
-              <Text color={mode === "dark" ? "$white" : "$black"} fontWeight="$bold" fontFamily="Lato" fontSize={18}>
+              <Text
+                color={mode === "dark" ? "$white" : "$black"}
+                fontWeight="$bold"
+                fontFamily="Lato"
+                fontSize={18}
+              >
                 List Rangking
               </Text>
             </VStack>
@@ -140,7 +150,11 @@ const Rangking = () => {
                       backgroundColor={mode === "dark" ? colors.box : "white"}
                       m={4}
                     >
-                      <HStack justifyContent="space-between" m={4} alignItems="center">
+                      <HStack
+                        justifyContent="space-between"
+                        m={4}
+                        alignItems="center"
+                      >
                         <HStack space="md" alignItems="center">
                           {Number(data.peringkat) <= 3 ? (
                             <Image
@@ -150,15 +164,41 @@ const Rangking = () => {
                               alt="rank"
                             />
                           ) : (
-                            <Text size="2xl" fontFamily="Lato">#{data.peringkat}</Text>
+                            <Text size="2xl" fontFamily="Lato">
+                              #{data.peringkat}
+                            </Text>
                           )}
                           <VStack space="xs">
-                            <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={16}>Kelas {data.kelas}</Text>
-                            <Text  fontFamily="Lato" fontSize={12}>{data.kelas_detail}</Text>
+                            <Text
+                              color={mode === "dark" ? "white" : "black"}
+                              fontFamily="Lato"
+                              fontSize={16}
+                            >
+                              Kelas {data.kelas}
+                            </Text>
+                            <Text fontFamily="Lato" fontSize={12}>
+                              {data.kelas_detail}
+                            </Text>
                           </VStack>
                         </HStack>
                         <Text textAlign="right" fontFamily="Lato" fontSize={10}>
-                          Peringkat <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.peringkat}</Text> dari <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.total_siswa}</Text> Siswa
+                          Peringkat{" "}
+                          <Text
+                            color={mode === "dark" ? "white" : "black"}
+                            fontFamily="Lato"
+                            fontSize={10}
+                          >
+                            {data.peringkat}
+                          </Text>{" "}
+                          dari{" "}
+                          <Text
+                            color={mode === "dark" ? "white" : "black"}
+                            fontFamily="Lato"
+                            fontSize={10}
+                          >
+                            {data.total_siswa}
+                          </Text>{" "}
+                          Siswa
                         </Text>
                       </HStack>
                     </Box>
@@ -174,7 +214,11 @@ const Rangking = () => {
                       backgroundColor={mode === "dark" ? colors.box : "white"}
                       m={4}
                     >
-                      <HStack justifyContent="space-between" m={4} alignItems="center">
+                      <HStack
+                        justifyContent="space-between"
+                        m={4}
+                        alignItems="center"
+                      >
                         <HStack space="md" alignItems="center">
                           {Number(data.peringkat) <= 3 ? (
                             <Image
@@ -187,12 +231,34 @@ const Rangking = () => {
                             <Text size="2xl">#{data.peringkat}</Text>
                           )}
                           <VStack space="xs">
-                            <Text color={mode === "dark" ? "white" : "black"} fontFamily="Lato" fontSize={16}>Kelas {data.kelas}</Text>
+                            <Text
+                              color={mode === "dark" ? "white" : "black"}
+                              fontFamily="Lato"
+                              fontSize={16}
+                            >
+                              Kelas {data.kelas}
+                            </Text>
                             <Text>{data.kelas_detail}</Text>
                           </VStack>
                         </HStack>
-                        <Text textAlign="right"  fontFamily="Lato" fontSize={10}>
-                          Peringkat <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.peringkat}</Text> dari <Text color={mode === "dark" ? "white" : "black"}  fontFamily="Lato" fontSize={10}>{data.total_siswa}</Text> Siswa
+                        <Text textAlign="right" fontFamily="Lato" fontSize={10}>
+                          Peringkat{" "}
+                          <Text
+                            color={mode === "dark" ? "white" : "black"}
+                            fontFamily="Lato"
+                            fontSize={10}
+                          >
+                            {data.peringkat}
+                          </Text>{" "}
+                          dari{" "}
+                          <Text
+                            color={mode === "dark" ? "white" : "black"}
+                            fontFamily="Lato"
+                            fontSize={10}
+                          >
+                            {data.total_siswa}
+                          </Text>{" "}
+                          Siswa
                         </Text>
                       </HStack>
                     </Box>

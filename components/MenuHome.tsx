@@ -10,8 +10,6 @@ import {
   ActionsheetContent,
   ActionsheetDragIndicatorWrapper,
   ActionsheetDragIndicator,
-  ActionsheetItem,
-  ActionsheetItemText,
   ScrollView,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
@@ -25,6 +23,7 @@ const MenuHome = () => {
 
   return (
     <>
+      {/* Menu Grid */}
       <Box
         bgColor={mode === "dark" ? "black" : "white"}
         borderRadius={10}
@@ -36,8 +35,8 @@ const MenuHome = () => {
         <VStack space="xl">
           {/* Baris Atas */}
           <HStack flexWrap="wrap" justifyContent="flex-start" m={20}>
+            {/* Absensi */}
             <VStack alignItems="center" width="25%">
-              {/* Absensi */}
               <TouchableOpacity onPress={() => router.push("/absensi")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -64,8 +63,8 @@ const MenuHome = () => {
               </TouchableOpacity>
             </VStack>
 
+            {/* Tagihan */}
             <VStack alignItems="center" width="25%">
-              {/* Tagihan */}
               <TouchableOpacity onPress={() => router.push("/tagihan")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -86,14 +85,17 @@ const MenuHome = () => {
                   fontSize={12}
                   textAlign="center"
                   color={mode === "dark" ? "white" : "black"}
+                  flexWrap="wrap" // ✅ biar turun ke baris baru
+                  numberOfLines={2} // ✅ maksimal 2 baris
+                  ellipsizeMode="tail"
                 >
                   Tagihan
                 </Text>
               </TouchableOpacity>
             </VStack>
 
+            {/* Invoice */}
             <VStack alignItems="center" width="25%">
-              {/* Invoice */}
               <TouchableOpacity onPress={() => router.push("/invoice")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -120,8 +122,14 @@ const MenuHome = () => {
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center" width="25%">
-              {/* Hafalan */}
+            {/* Hafalan */}
+            <VStack
+              alignItems="center"
+              flexBasis="25%"
+              flexGrow={1}
+              px={6}
+              mb={12}
+            >
               <TouchableOpacity onPress={() => router.push("/hafalan")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -142,16 +150,10 @@ const MenuHome = () => {
                   fontSize={12}
                   textAlign="center"
                   color={mode === "dark" ? "white" : "black"}
+                  flexShrink={1}
+                  flexWrap="wrap"
                 >
-                  Hafalan
-                </Text>
-                <Text
-                  fontFamily="Lato-Bold"
-                  fontSize={12}
-                  textAlign="center"
-                  color={mode === "dark" ? "white" : "black"}
-                >
-                  Al-Quran
+                  Hafalan Al-Quran
                 </Text>
               </TouchableOpacity>
             </VStack>
@@ -159,8 +161,14 @@ const MenuHome = () => {
 
           {/* Baris Bawah */}
           <HStack flexWrap="wrap" justifyContent="flex-start" m={20} mt={-10}>
-            <VStack alignItems="center" width="25%">
-              {/* Jadwal */}
+            {/* Jadwal */}
+            <VStack
+              alignItems="center"
+              flexBasis="25%"
+              flexGrow={1}
+              px={6}
+              mb={12}
+            >
               <TouchableOpacity onPress={() => router.push("/jadwalPelajaran")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -169,7 +177,7 @@ const MenuHome = () => {
                   alignItems="center"
                 >
                   <MaterialCommunityIcons
-                    name="calendar-blank-outline"
+                    name="clipboard-check-outline"
                     size={20}
                     color={mode === "dark" ? "white" : "black"}
                     style={{ padding: 8 }}
@@ -181,22 +189,22 @@ const MenuHome = () => {
                   fontSize={12}
                   textAlign="center"
                   color={mode === "dark" ? "white" : "black"}
+                  flexShrink={1}
+                  flexWrap="wrap"
                 >
-                  Jadwal
-                </Text>
-                <Text
-                  fontFamily="Lato-Bold"
-                  fontSize={12}
-                  textAlign="center"
-                  color={mode === "dark" ? "white" : "black"}
-                >
-                  Pelajaran
+                  Jadwal Pelajaran
                 </Text>
               </TouchableOpacity>
             </VStack>
 
-            <VStack alignItems="center" width="25%">
-              {/* Rangking */}
+            {/* Rangking */}
+            <VStack
+              alignItems="center"
+              flexBasis="25%"
+              flexGrow={1}
+              px={6}
+              mb={12}
+            >
               <TouchableOpacity onPress={() => router.push("/rangking")}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -205,7 +213,7 @@ const MenuHome = () => {
                   alignItems="center"
                 >
                   <MaterialCommunityIcons
-                    name="transfer-up"
+                    name="clipboard-check-outline"
                     size={20}
                     color={mode === "dark" ? "white" : "black"}
                     style={{ padding: 8 }}
@@ -217,14 +225,16 @@ const MenuHome = () => {
                   fontSize={12}
                   textAlign="center"
                   color={mode === "dark" ? "white" : "black"}
+                  flexShrink={1}
+                  flexWrap="wrap"
                 >
                   Rangking
                 </Text>
               </TouchableOpacity>
             </VStack>
 
+            {/* Lihat Semua */}
             <VStack alignItems="center" width="25%">
-              {/* Lihat Semua */}
               <TouchableOpacity onPress={handleClose}>
                 <Box
                   backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
@@ -251,29 +261,32 @@ const MenuHome = () => {
               </TouchableOpacity>
             </VStack>
 
-            {/* Placeholder kosong biar sejajar */}
+            {/* Placeholder kosong */}
             <VStack alignItems="center" width="25%" />
           </HStack>
         </VStack>
       </Box>
 
+      {/* Actionsheet - hanya sekali */}
       <Actionsheet isOpen={showActionsheet} onClose={handleClose} zIndex={999}>
         <ActionsheetBackdrop />
         <ActionsheetContent
-          maxHeight={"70%"}
           flex={1}
-          zIndex={999}
+          maxHeight={"70%"}
           backgroundColor={mode === "dark" ? "black" : "white"}
         >
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
 
-          <ScrollView width={"95%"}>
+          <ScrollView
+            style={{ width: "100%" }}
+            contentContainerStyle={{ paddingBottom: 40 }}
+          >
+            {/* Judul */}
             <Box alignItems="center" width={"95%"} borderRadius={10}>
               <Text
                 color={mode === "dark" ? "white" : "black"}
-                size="lg"
                 fontWeight={"bold"}
                 fontSize={20}
                 textAlign="left"
@@ -283,6 +296,7 @@ const MenuHome = () => {
               </Text>
             </Box>
 
+            {/* === KEUANGAN === */}
             <Box
               alignItems="flex-start"
               width={"95%"}
@@ -292,7 +306,6 @@ const MenuHome = () => {
             >
               <VStack m={5} space="xl" width={"100%"}>
                 <Text
-                  size="md"
                   color={mode === "dark" ? "white" : "black"}
                   fontWeight={"bold"}
                   fontSize={20}
@@ -411,6 +424,7 @@ const MenuHome = () => {
               </VStack>
             </Box>
 
+            {/* === AKADEMIK === */}
             <Box
               alignItems="flex-start"
               width={"95%"}
@@ -510,365 +524,7 @@ const MenuHome = () => {
               </VStack>
             </Box>
 
-            <Box
-              alignItems="flex-start"
-              width={"95%"}
-              backgroundColor={mode === "dark" ? colors.box : "white"}
-              borderRadius={10}
-              mt={20}
-            >
-              <VStack space="lg" m={5} width={"100%"}>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  fontSize={20}
-                  fontWeight={"bold"}
-                  textAlign="left"
-                  width={"100%"}
-                >
-                  Pengasuhan
-                </Text>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/absensi");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="clipboard-check-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Absensi Biasa
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/absensiHp");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="clipboard-check-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Absensi HP
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/pelanggaran");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <Ionicons
-                        name="warning-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Pelanggaran
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-              </VStack>
-            </Box>
-          </ScrollView>
-        </ActionsheetContent>
-      </Actionsheet>
-      <Actionsheet isOpen={showActionsheet} onClose={handleClose} zIndex={999}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent
-          maxHeight={"70%"}
-          flex={1}
-          zIndex={999}
-          backgroundColor={mode === "dark" ? "black" : "white"}
-        >
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-
-          <ScrollView width={"95%"}>
-            <Box alignItems="center" width={"95%"} borderRadius={10}>
-              <Text
-                color={mode === "dark" ? "white" : "black"}
-                size="lg"
-                fontWeight={"bold"}
-                fontSize={20}
-                textAlign="left"
-                width={"100%"}
-              >
-                All Menu
-              </Text>
-            </Box>
-
-            <Box
-              alignItems="flex-start"
-              width={"95%"}
-              backgroundColor={mode === "dark" ? colors.box : "white"}
-              borderRadius={10}
-              mt={20}
-            >
-              <VStack m={5} space="xl" width={"100%"}>
-                <Text
-                  size="md"
-                  color={mode === "dark" ? "white" : "black"}
-                  fontWeight={"bold"}
-                  fontSize={20}
-                  textAlign="left"
-                  width={"100%"}
-                >
-                  Keuangan
-                </Text>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/tagihan");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="sack-percent"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Tagihan
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    handleClose();
-                    router.push("/invoice");
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="script-text-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Invoice
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={handleClose}>
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="hand-coin-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Pembayaran Mesin
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/saldo");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <Ionicons
-                        name="wallet-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Saldo
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-              </VStack>
-            </Box>
-
-            <Box
-              alignItems="flex-start"
-              width={"95%"}
-              backgroundColor={mode === "dark" ? colors.box : "white"}
-              borderRadius={10}
-              mt={20}
-            >
-              <VStack m={5} space="lg" width={"100%"}>
-                <Text
-                  color={mode === "dark" ? "white" : "black"}
-                  fontWeight={"bold"}
-                  fontSize={20}
-                  textAlign="left"
-                  width={"100%"}
-                >
-                  Akademik
-                </Text>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/jadwalPelajaran");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="calendar-check-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Jadwal Pelajaran
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push("/rangking");
-                    handleClose();
-                  }}
-                >
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="transfer-up"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Rangking
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={handleClose}>
-                  <HStack mx={20} alignItems="center">
-                    <Box
-                      backgroundColor={mode === "dark" ? colors.box : "#F5F5F5"}
-                      p={3}
-                      borderRadius={8}
-                    >
-                      <MaterialCommunityIcons
-                        name="clipboard-check-outline"
-                        size={25}
-                        color={mode === "dark" ? "white" : "black"}
-                      />
-                    </Box>
-                    <Text
-                      mx={20}
-                      color={mode === "dark" ? "white" : "black"}
-                      style={{ fontSize: 16 }}
-                    >
-                      Hafalan Al-Qur'an
-                    </Text>
-                  </HStack>
-                </TouchableOpacity>
-              </VStack>
-            </Box>
-
+            {/* === PENGASUHAN === */}
             <Box
               alignItems="flex-start"
               width={"95%"}

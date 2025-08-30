@@ -115,7 +115,7 @@ export default function SaldoScreen({
           >
             <HStack justifyContent="space-between" px={20}>
               <Text color="white" fontFamily="Lato-Bold">
-                Detail
+                Details
               </Text>
               <AntDesign name="arrowright" size={20} color="white" />
             </HStack>

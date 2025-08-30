@@ -26,6 +26,7 @@ import {
   SafeAreaView,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomBadge from "./CustomBadge";
@@ -85,6 +86,9 @@ const Berlangsung = ({
   const screenHeight = Dimensions.get("window").height;
   const toast = useToast();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isTablet = Math.min(width, height) >= 768;
+  const bottomSpace = isTablet ? 32 : 16;
 
   const flatListRef = useRef<FlatList<ItemType>>(null);
 
@@ -449,6 +453,7 @@ const Berlangsung = ({
         left={0}
         right={0}
         padding={16}
+        paddingBottom={Math.max(insets.bottom, bottomSpace)}
         backgroundColor="transparent"
       >
         <Button

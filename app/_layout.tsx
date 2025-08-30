@@ -4,7 +4,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { GluestackUIProvider, StatusBar } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import { Slot, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -60,6 +60,10 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GluestackUIProvider config={config}>
+        <StatusBar
+          style={colorScheme === "dark" ? "light" : "dark"}
+          backgroundColor={colorScheme === "dark" ? "#000000" : "#ffffff"}
+        />
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
