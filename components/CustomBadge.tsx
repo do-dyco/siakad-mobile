@@ -15,6 +15,7 @@ type Variant =
 interface CustomBadgeProps {
   variant: Variant;
   label: string;
+  children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -49,8 +50,8 @@ const badgeStyles = {
   },
 };
 
-const CustomBadge: React.FC<CustomBadgeProps> = ({ variant, label, style }) => {
-  const { bg, color } = badgeStyles[variant];
+const CustomBadge: React.FC<CustomBadgeProps> = ({ variant, label, children, style }) => {
+  const { bg, color } = badgeStyles[variant] || badgeStyles.primary;
 
   return (
     <Badge
@@ -59,19 +60,22 @@ const CustomBadge: React.FC<CustomBadgeProps> = ({ variant, label, style }) => {
       px={6}
       py={1}
       alignSelf="flex-start"
-      style={style} // menerima style dari luar
+      style={style}
     >
-      <Text
-        fontSize={14}
-        fontWeight="bold"
-        color={color}
-        fontFamily="Lato"
-        m={2}
-      >
-        {label}
-      </Text>
+      {children ? (
+        children
+      ) : (
+        <Text
+          fontSize={14}
+          fontWeight="bold"
+          color={color}
+          fontFamily="Lato"
+          m={2}
+        >
+          {label}
+        </Text>
+      )}
     </Badge>
   );
 };
-
 export default CustomBadge;

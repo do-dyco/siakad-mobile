@@ -18,7 +18,7 @@ import {
   InputField,
   SafeAreaView,
   ScrollView,
-  Spinner, // ⟵ tambah ini
+  Spinner,
   Text,
   VStack,
 } from "@gluestack-ui/themed";
@@ -39,16 +39,19 @@ const Invoice = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const user = useUserStore((state) => state.user);
-  const [length, setLength] = useState(10);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Hindari memproses event scroll berulang-ulang saat sudah dekat bawah
+  // Loading states dipisah biar jelas
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const [length, setLength] = useState(10);
   const reachedEndRef = useRef(false);
 
   const baseParams = {
     search: "",
     start: 1,
-    length, // gunakan state
+    length,
     startDate: "",
     endDate: "",
     orderBy: [
@@ -68,51 +71,56 @@ const Invoice = () => {
     const isCloseToBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 
-    if (isCloseToBottom && !isLoading && !reachedEndRef.current) {
-      reachedEndRef.current = true; // lock sementara sampai fetch selesai
-      setLength((prev) => prev + 10);
+    if (isCloseToBottom && !isLoadingMore && !reachedEndRef.current) {
+      reachedEndRef.current = true;
+      loadMore();
     }
     if (!isCloseToBottom) {
-      // reset lock ketika tidak lagi di bawah
       reachedEndRef.current = false;
     }
   };
 
   const handleRefresh = async () => {
-    if (isLoading) return;
-    setIsLoading(true);
+    if (isRefreshing) return;
+    setIsRefreshing(true);
     try {
-      const newParams = {
-        ...baseParams,
-        length: 10, // reset pagination
-      };
+      const newParams = { ...baseParams, length: 10 };
       const response = await apiService.myInvoice(newParams);
       setData(response.data?.invoice_tagihans || []);
-      setLength(10); // kembali ke 10
+      setLength(10);
     } catch (error) {
       console.error("Refresh error:", error);
     } finally {
-      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  const loadMore = async () => {
+    setIsLoadingMore(true);
+    try {
+      const newLength = length + 10;
+      const newParams = { ...baseParams, length: newLength };
+      const response = await apiService.myInvoice(newParams);
+      const newData = response.data?.invoice_tagihans || [];
+      setData(newData);
+      setLength(newLength);
+    } catch (error) {
+      console.error("Load more error:", error);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
   const fetchData = async () => {
-    if (isLoading) return;
-    setIsLoading(true);
+    setIsInitialLoading(true);
     try {
-      // kirim length terbaru
       const newParams = { ...baseParams, length };
       const response = await apiService.myInvoice(newParams);
-      const newData = response.data?.invoice_tagihans || [];
-
-      // Jika API mengembalikan data kumulatif (1..length), cukup replace
-      // Kalau API mengembalikan hanya batch terbaru, bisa di-append.
-      // Di sini aman pakai replace untuk cegah duplikasi.
-      setData(newData);
+      setData(response.data?.invoice_tagihans || []);
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -136,10 +144,10 @@ const Invoice = () => {
         backgroundColor={mode === "dark" ? "black" : "white"}
         height={screenHeight}
         onScroll={handleScroll}
-        scrollEventThrottle={16} // ⟵ lebih responsif
-        contentContainerStyle={{ paddingBottom: 48 }} // ⟵ jarak bawah +48
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingBottom: 48 }}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
       >
         <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
@@ -199,15 +207,29 @@ const Invoice = () => {
           <Divider mt={20} bgColor={colors.gray.light[200]} />
         </Box>
 
-        {/* Invoice List */}
         <VStack mx={10}>
-          {!data || data.length === 0 ? (
+          {/* Kondisi 1: Loading awal */}
+          {isInitialLoading && data.length === 0 && (
+            <Center my={16}>
+              <Spinner size="large" />
+              <Text mt="$2" color={mode === "dark" ? "white" : "black"}>
+                Memuat data...
+              </Text>
+            </Center>
+          )}
+
+          {/* Kondisi 2: Tidak ada data */}
+          {!isInitialLoading && data.length === 0 && (
             <NoData
               title="Belum ada data Invoice"
               desc="Jika anda sudah memiliki Invoice, invoice tersebut akan muncul disini."
               icon=""
             />
-          ) : (
+          )}
+
+          {/* Kondisi 3: Ada data */}
+          {!isInitialLoading &&
+            data.length > 0 &&
             data.map((item: any, index: number) => (
               <React.Fragment key={item.no_invoice ?? index}>
                 <TouchableOpacity
@@ -227,6 +249,7 @@ const Invoice = () => {
                     mb={20}
                     mt={20}
                   >
+                    {/* Header invoice */}
                     <Box
                       borderTopRightRadius={10}
                       borderTopLeftRadius={10}
@@ -273,6 +296,7 @@ const Invoice = () => {
                       </HStack>
                     </Box>
 
+                    {/* Content invoice */}
                     <HStack justifyContent="space-between" mt={10} m={10}>
                       <VStack space="md">
                         <Text
@@ -296,6 +320,40 @@ const Invoice = () => {
                         label={item.status}
                       />
                     </HStack>
+
+                    <VStack mt={10} m={10} space="md">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontSize={14}
+                        fontFamily="Lato"
+                        fontWeight={"$semibold"}
+                      >
+                        Tagihan
+                      </Text>
+                      <Box
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          gap: 8,
+                        }}
+                      >
+                        {item.tagihan_users.slice(0, 2).map((tagihan, idx) => (
+                          <CustomBadge
+                            key={idx}
+                            variant="primary"
+                            label={tagihan?.master_tagihan?.nama}
+                          />
+                        ))}
+
+                        {item.tagihan_users.length > 2 && (
+                          <CustomBadge
+                            key="more"
+                            variant="primary"
+                            label={`+${item.tagihan_users.length - 2} tagihan lainnya`}
+                          />
+                        )}
+                      </Box>
+                    </VStack>
 
                     <DashedDivider />
                     <VStack mx={10} mt={10} mb={10}>
@@ -321,11 +379,10 @@ const Invoice = () => {
                   </Box>
                 </TouchableOpacity>
               </React.Fragment>
-            ))
-          )}
+            ))}
 
-          {/* Footer Loader saat hit API */}
-          {isLoading && (
+          {/* Spinner load more */}
+          {isLoadingMore && data.length > 0 && (
             <Center my={16}>
               <Spinner size="large" />
               <Text mt="$2" color={mode === "dark" ? "white" : "black"}>
