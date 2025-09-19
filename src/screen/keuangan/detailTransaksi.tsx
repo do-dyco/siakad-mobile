@@ -24,6 +24,7 @@ import { Dimensions, useColorScheme } from "react-native";
 const DetailTransaksi = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  
 
   return (
     <SafeAreaView

@@ -281,7 +281,7 @@ const StatusTransaksi = () => {
                     ).toLocaleString("id-ID")}
                     .
                   </Text>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() =>
                       copyToClipboard(
                         String(
@@ -299,7 +299,7 @@ const StatusTransaksi = () => {
                     <Text mx={20} color={textColor} fontFamily="Lato">
                       Copy
                     </Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </HStack>
               </Box>
 

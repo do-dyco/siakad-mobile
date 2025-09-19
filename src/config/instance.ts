@@ -18,6 +18,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
     const token = useUserStore.getState().accessToken;
+    
     if (token) {
       config.headers = {
         ...(config.headers || {}),

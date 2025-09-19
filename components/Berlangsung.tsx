@@ -19,7 +19,7 @@ import {
   Spinner,
   Center,
 } from "@gluestack-ui/themed";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   Dimensions,
   useColorScheme,
@@ -83,7 +83,6 @@ const Berlangsung = ({
   onScrollPositionChange,
 }: Props) => {
   const mode = useColorScheme();
-  const screenHeight = Dimensions.get("window").height;
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -102,26 +101,19 @@ const Berlangsung = ({
   // ✅ Dedup data biar key FlatList unik
   const uniqueData = useMemo(() => {
     const seen = new Set<string>();
-    const filtered = data.filter((item) => {
+    return data.filter((item) => {
       const key = `${item.id}-${item.no_tagihan}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
-
-    return filtered;
   }, [data]);
 
-  // Reset checkbox saat data berubah
-  useEffect(() => {
-    setCheckedValue([]);
-  }, [uniqueData]);
-
-  // Utils
+  // ✅ Format Rupiah
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
 
-  // Checkbox handler
+  // ✅ Checkbox handler
   const handleCheckboxChange = (value: string) => {
     setCheckedValue((prev) =>
       prev.includes(value)
@@ -130,19 +122,22 @@ const Berlangsung = ({
     );
   };
 
-  // Refresh handler
+  // ✅ Refresh handler (reset hanya saat reload total)
   const handleRefresh = async () => {
-    if (onReload) await onReload();
+    if (onReload) {
+      await onReload();
+      setCheckedValue([]); // reset setelah reload
+    }
   };
 
-  // Infinite scroll handler
+  // ✅ Infinite scroll handler
   const handleLoadMore = () => {
     if (hasMore && !isLoadingMore && onLoadMore && scrollDirection === "down") {
       onLoadMore();
     }
   };
 
-  // Scroll tracking
+  // ✅ Scroll tracking
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
     onScrollPositionChange?.(currentScrollY);
@@ -156,7 +151,7 @@ const Berlangsung = ({
     setLastScrollY(currentScrollY);
   };
 
-  // Submit invoice handler
+  // ✅ Submit invoice handler
   const handleSubmit = async () => {
     if (checkedValue.length === 0) {
       toast.show({
@@ -187,6 +182,9 @@ const Berlangsung = ({
       // Hit API create invoice
       const payload = { tagihanUserIds: checkedValue };
       const response = await apiService.createInvoiceNumber(payload);
+
+      console.log("Create Invoice Response:", response);
+      
       const inv: InvoiceTagihan = response?.data?.invoice_tagihan ?? {};
 
       if (!inv?.no_invoice) throw new Error("Nomor invoice tidak tersedia");
@@ -206,7 +204,7 @@ const Berlangsung = ({
       });
 
       if (onReload) await onReload();
-      setCheckedValue([]);
+      setCheckedValue([]); // reset setelah sukses
     } catch (error) {
       console.error("Failed to create invoice:", error);
       toast.show({
@@ -227,7 +225,7 @@ const Berlangsung = ({
     }
   };
 
-  // Footer loader / info
+  // ✅ Footer loader / info
   const renderFooter = () => {
     if (isLoadingMore && hasMore) {
       return (
@@ -265,7 +263,7 @@ const Berlangsung = ({
     return null;
   };
 
-  // Early return jika kosong
+  // ✅ Early return jika kosong
   if (!uniqueData || uniqueData.length === 0) {
     return (
       <NoData
@@ -449,11 +447,11 @@ const Berlangsung = ({
       {/* Floating Footer Button */}
       <Box
         position="absolute"
-        bottom={0}
+        bottom={30}
         left={0}
         right={0}
         padding={16}
-        paddingBottom={Math.max(insets.bottom, bottomSpace)}
+        // paddingBottom={Math.max(insets.bottom, bottomSpace)}
         backgroundColor="transparent"
       >
         <Button

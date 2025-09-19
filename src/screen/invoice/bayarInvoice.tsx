@@ -52,14 +52,14 @@ const BayarInvoice = () => {
   const textColor = isDark ? "white" : "black";
   const bgColor = isDark ? "black" : "white";
   const [loading, setLoading] = useState(false);
-  const { invoice } = useLocalSearchParams();
+  const { invoice, nominal } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState([]);
   const { user } = useUserStore();
   const [showActionsheet, setShowActionsheet] = useState(false);
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
   const insets = useSafeAreaInsets();
 
-  // console.log("noInvoice:", dataInvoice);
+  console.log("noInvoice:", useLocalSearchParams());
   // console.log("user:", user);
 
   const formatRupiah = (value: number) =>
@@ -213,7 +213,7 @@ const BayarInvoice = () => {
                     fontSize={14}
                     fontWeight={"$semibold"}
                   >
-                    Bank Mandiri
+                    {dataInvoice?.pembayaran?.metode || ""}
                   </Text>
                 </HStack>
 

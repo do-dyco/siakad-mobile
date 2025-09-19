@@ -62,6 +62,8 @@ const TransferVa = () => {
   const lastThree = amount.slice(-3);
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
+  const {from} = useLocalSearchParams();
+  console.log("From:", from);
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);

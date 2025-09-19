@@ -31,7 +31,7 @@ const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [selected, setSelected] = useState<string | null>(null);
-  const { invoice } = useLocalSearchParams<{ invoice?: string }>();
+  const { invoice, from } = useLocalSearchParams<{ invoice?: string }>();
   const { selectedTagihan } = useTagihanStore();
 
   const [saldoData, setSaldoData] = useState<number>(0);
@@ -41,6 +41,9 @@ const MetodeBayar = () => {
   const [selectedRekening, setSelectedRekening] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  console.log("tag",from);
+  
 
   const allowedCodes = ["bca", "bni", "bri", "bmi", "mandiri"];
   const vaItem = useMemo(
@@ -127,6 +130,7 @@ const MetodeBayar = () => {
           nama_rekening: pay.nama_rekening || "",
           nominal,
           no_invoice: inv?.no_invoice,
+          from: from,
         },
       });
       return;
@@ -212,8 +216,8 @@ const MetodeBayar = () => {
       };
 
       try {
-        const response = await apiService.payment(params);
-        if (response?.data?.success) {
+        // const response = await apiService.payment(params);
+       
           router.push({
             pathname: "/bayarSaldo",
             params: {
@@ -221,11 +225,6 @@ const MetodeBayar = () => {
               no_invoice: dataInvoice.no_invoice,
             },
           });
-        } else {
-          setShowAlert(true);
-          setTimeout(() => setShowAlert(false), 3000);
-        }
-        return;
       } catch (error) {
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);

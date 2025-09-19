@@ -77,6 +77,9 @@ const TransferNow = () => {
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
 
+  const {from} = useLocalSearchParams();
+  console.log("From:", from);
+
   // console.log("Data Invoice:", dataInvoice);
 
   const formatRupiah = (value: number) => {
@@ -192,7 +195,15 @@ const TransferNow = () => {
   const handleBatalTransaksi = () => {
     setShowModal(false);
 
-    router.push("/invoice");
+    if (from === "tagihan") {
+      router.push({
+        pathname: "/tagihan",
+      });
+      return;
+    } else{
+
+      router.push("/invoice");
+    }
   };
 
   const params = {

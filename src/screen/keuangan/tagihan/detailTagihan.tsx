@@ -1,8 +1,7 @@
-import tagihan from "@/app/tagihan";
+import CustomBadge from "@/components/CustomBadge";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
-import { useTagihanStore } from "@/src/store/tagihanStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   HStack,
@@ -16,85 +15,60 @@ import {
   AccordionItem,
   AccordionHeader,
   AccordionTrigger,
+  AccordionTitleText,
   AccordionIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   AccordionContent,
+  AccordionContentText,
   Button,
 } from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
 
-type TagihanUser = {
-  id: string;
-  no_tagihan: string;
-  expire_at: string;
-  nominal: number;
-  master_tagihan?: { nama?: string };
-};
-
-type InvoiceTagihan = {
-  id?: string;
-  no_invoice?: string;
-  nominal?: number;
-  status?: "PAID" | "UNPAID" | string;
-  tagihan_users?: TagihanUser[];
-};
-
-const DetailInvoice = () => {
+const DetailTagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const { selectedTagihan } = useTagihanStore();
-  const { no_invoice } = useLocalSearchParams<{ no_invoice?: string }>();
+  const { noInvoice } = useLocalSearchParams();
+  const [dataInvoice, setDataInvoice] = useState({});
 
-  const [tagihanData, setTagihanData] = useState<InvoiceTagihan>({});
-  const [loadingCreate, setLoadingCreate] = useState(false);
 
-  console.log("Selected Tagihan:", tagihanData);
+  const formatRupiah = (value: number) =>
+    new Intl.NumberFormat("id-ID").format(value);
 
-  const fetchDetail = async (invNo: string) => {
+  const fetchDetail = async () => {
     try {
-      const response = await apiService.myInvoiceDetail(invNo);
-      const inv: InvoiceTagihan = response?.data?.invoice_tagihan ?? {};
-      setTagihanData(inv);
+      const response = await apiService.myInvoiceDetail(noInvoice);
+      setDataInvoice(response.data.invoice_tagihan);
     } catch (error) {
-      setTagihanData({});
-      console.error("Failed to load:", error);
+      setDataInvoice({});
+      console.error("Failed to fetch detail:", error);
     }
   };
 
-  const handleNext = async () => {
-    // Pastikan sudah ada nomor invoice; kalau belum, buat dulu
-    let invNo = tagihanData?.no_invoice;
-    if (!invNo) {
-      const created = await createInvoice();
-      invNo = created?.no_invoice;
-      if (!invNo) {
-        console.warn("Invoice belum siap / gagal dibuat");
-        return;
-      }
+  const handleNext = () => {
+    if (!dataInvoice?.no_invoice) {
+      console.warn("Invoice belum siap");
+      return;
+    }
+
+    if (dataInvoice.status === "PAID") {
+      router.push({
+        pathname: "/bayarInvoice",
+        params: { invoice: dataInvoice.no_invoice },
+      });
+      return;
     }
 
     router.push({
       pathname: "/metodeBayar",
-      params: { invoice: invNo },
+      params: { invoice: dataInvoice.no_invoice, from: "tagihan" },
     });
   };
 
   useEffect(() => {
-    if (typeof no_invoice === "string" && no_invoice.trim().length > 0) {
-      fetchDetail(no_invoice);
-      router.push({
-        pathname: "/detailInvoice",
-        params: { noInvoice: no_invoice },
-      });
-    }
-    if ((selectedTagihan || []).length > 0) {
-      createInvoice();
-      return;
-    }
-    console.warn("Tidak ada invoice / tagihan terpilih");
+    fetchDetail();
   }, []);
 
   return (
@@ -104,36 +78,81 @@ const DetailInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Tagihan"} />
+        <Header data={"Detail Transaksi"}  />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
-            <Text>Jumlah Tagihan</Text>
-            <Text>Invoice ID</Text>
+            <Text
+              color={colors.gray.light[400]}
+              fontSize={14}
+              fontFamily="Lato"
+              fontWeight={"$semibold"}
+            >
+              Jumlah Tagihan
+            </Text>
+            <Text
+              color={colors.gray.light[400]}
+              fontSize={14}
+              fontFamily="Lato"
+              fontWeight={"$semibold"}
+            >
+              Invoice ID
+            </Text>
           </HStack>
 
           <HStack justifyContent="space-between">
             <Text
               fontSize={16}
               fontWeight={"$bold"}
+              fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
-              Rp.{" "}
-              {new Intl.NumberFormat("id-ID").format(tagihanData?.nominal || 0)}
+              Rp. {formatRupiah(dataInvoice.nominal)}
             </Text>
             <Text
               fontWeight={"$bold"}
+              fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
-              {tagihanData?.no_invoice ||
-                (loadingCreate ? "Membuat invoice..." : "—")}
+              {dataInvoice.no_invoice}
             </Text>
           </HStack>
 
-          <Divider
-            bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
-          />
+          <HStack justifyContent="space-between">
+            <VStack space="md">
+              <HStack
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+              >
+                <Text
+                  color={mode == "dark" ? "white" : "black"}
+                  fontSize={14}
+                  fontFamily="Lato"
+                  fontWeight={"$semibold"}
+                >
+                  Bayar Sebelum
+                </Text>
 
-          <Text color={mode == "dark" ? "white" : "black"} mt={10}>
+                <CustomBadge variant="danger" label="05:59:49 " />
+              </HStack>
+              <Text
+                color={mode == "dark" ? "white" : "black"}
+                fontSize={12}
+                fontFamily="Lato"
+              >
+                {dataInvoice.created_at}
+              </Text>
+            </VStack>
+          </HStack>
+          <Divider bgColor={colors.border} />
+
+          <Text
+            color={mode == "dark" ? "white" : "black"}
+            fontFamily="Lato"
+            fontSize={14}
+            mt={10}
+            fontWeight={"$semibold"}
+          >
             Tagihan
           </Text>
 
@@ -141,131 +160,178 @@ const DetailInvoice = () => {
             width="100%"
             size="md"
             bgColor={mode === "dark" ? colors.box : "white"}
-            type="multiple"
+            type="single"
             isCollapsible={true}
+            isDisabled={false}
           >
-            {(tagihanData?.tagihan_users ?? []).map((item) => {
-              const [tanggal = "-", waktu = "-"] = (
-                item?.expire_at ?? ""
-              ).split(" ");
-              return (
-                <AccordionItem
-                  key={item.id}
-                  value={item.id}
-                  backgroundColor={mode === "dark" ? "#22262F" : "white"}
-                >
-                  <AccordionHeader>
-                    <AccordionTrigger>
-                      {({ isExpanded }) => (
-                        <>
-                          <HStack justifyContent="space-between" mx={2}>
-                            <HStack space="md">
-                              <Box
-                                borderWidth={1}
-                                borderRadius={6}
-                                borderColor={
-                                  mode === "dark"
-                                    ? colors.border
-                                    : colors.gray.light[200]
-                                }
-                                justifyContent="center"
-                                alignContent="center"
-                                backgroundColor={colors.boxWarning}
-                                height={20}
-                                width={20}
-                              >
-                                <MaterialCommunityIcons
-                                  name="text-box-outline"
-                                  size={16}
-                                  color={"white"}
-                                />
-                              </Box>
-                              <Text color={mode === "dark" ? "white" : "black"}>
-                                Tagihan {item.no_tagihan}
-                              </Text>
-                            </HStack>
+            <AccordionItem
+              value="a"
+              backgroundColor={mode === "dark" ? "#22262F" : "white"}
+            >
+              <AccordionHeader>
+                <AccordionTrigger>
+                  {({ isExpanded }) => {
+                    return (
+                      <>
+                        <HStack justifyContent="space-between" mx={2}>
+                          <HStack space="md">
+                            <Box
+                              borderWidth={1}
+                              borderRadius={6}
+                              borderColor={colors.border}
+                              justifyContent="center"
+                              alignContent="center"
+                              backgroundColor={colors.boxWarning}
+                              height={20}
+                              width={20}
+                            >
+                              <MaterialCommunityIcons
+                                name="text-box-outline"
+                                size={16}
+                                color={"white"}
+                              />
+                            </Box>
+
+                            <Text
+                              color={mode === "dark" ? "white" : "black"}
+                              fontFamily="Lato"
+                              fontSize={14}
+                              fontWeight={"$semibold"}
+                            >
+                              Tagihan{" "}
+                              {dataInvoice?.tagihan_users?.[0]?.no_tagihan}
+                            </Text>
                           </HStack>
+                        </HStack>
+                        {isExpanded ? (
                           <AccordionIcon
-                            as={isExpanded ? ChevronUpIcon : ChevronDownIcon}
+                            as={ChevronUpIcon}
                             ml="$3"
                             color={mode === "dark" ? "white" : "black"}
                           />
-                        </>
-                      )}
-                    </AccordionTrigger>
-                  </AccordionHeader>
+                        ) : (
+                          <AccordionIcon
+                            as={ChevronDownIcon}
+                            ml="$3"
+                            color={mode === "dark" ? "white" : "black"}
+                          />
+                        )}
+                      </>
+                    );
+                  }}
+                </AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent>
+                <Box
+                  borderWidth={1}
+                  borderRadius={8}
+                  borderColor={
+                    mode === "dark" ? colors.border : colors.gray.light[200]
+                  }
+                  backgroundColor={mode === "dark" ? "black" : "white"}
+                >
+                  <VStack m={10} space="md">
+                    <HStack justifyContent="space-between">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
+                        Nama Tagihan
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {dataInvoice?.tagihan_users?.[0]?.master_tagihan?.nama}
+                      </Text>
+                    </HStack>
 
-                  <AccordionContent>
-                    <Box
-                      borderWidth={1}
-                      borderRadius={6}
-                      borderColor={
-                        mode === "dark" ? colors.border : colors.gray.light[200]
-                      }
-                      backgroundColor={mode === "dark" ? "black" : "white"}
-                    >
-                      <VStack m={10} space="md">
-                        <HStack justifyContent="space-between">
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            Nama Tagihan
-                          </Text>
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            {item.master_tagihan?.nama ?? "-"}
-                          </Text>
-                        </HStack>
+                    <HStack justifyContent="space-between">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
+                        Tanggal
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {new Date(
+                          dataInvoice?.tagihan_users?.[0]?.updated_at?.split(
+                            " "
+                          )[0]
+                        ).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </Text>
+                    </HStack>
 
-                        <HStack justifyContent="space-between">
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            Tanggal
-                          </Text>
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            {tanggal}
-                          </Text>
-                        </HStack>
+                    <HStack justifyContent="space-between">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
+                        Waktu
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        {dataInvoice?.tagihan_users?.[0]?.updated_at
+                          ?.split(" ")[1]
+                          ?.slice(0, 5)}
+                      </Text>
+                    </HStack>
 
-                        <HStack justifyContent="space-between">
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            Waktu
-                          </Text>
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            {waktu}
-                          </Text>
-                        </HStack>
-
-                        <HStack justifyContent="space-between">
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            Nominal Tertagih
-                          </Text>
-                          <Text color={mode === "dark" ? "white" : "black"}>
-                            Rp{" "}
-                            {new Intl.NumberFormat("id-ID").format(
-                              item.nominal
-                            )}
-                          </Text>
-                        </HStack>
-                      </VStack>
-                    </Box>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
+                    <HStack justifyContent="space-between">
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                      >
+                        Nominal Tertagih
+                      </Text>
+                      <Text
+                        color={mode === "dark" ? "white" : "black"}
+                        fontFamily="Lato"
+                        fontSize={14}
+                        fontWeight={"$semibold"}
+                      >
+                        Rp.{" "}
+                        {formatRupiah(
+                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0
+                        )}
+                      </Text>
+                    </HStack>
+                  </VStack>
+                </Box>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </VStack>
       </ScrollView>
-
-      <Divider
-        bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
-      />
+      <Divider bgColor={"transparent"} />
       <VStack mt={10} mx={10} mb={20}>
         <Button
           bgColor={colors.primary}
           borderRadius={10}
           mt={4}
           onPress={handleNext}
-          isDisabled={loadingCreate || tagihanData?.status === "PAID"}
         >
-          <Text color="white">
-            {loadingCreate ? "Memproses..." : "Selanjutnya"}
+          <Text color="white" fontFamily="Lato" fontSize={16}>
+            Bayar Invoice
           </Text>
         </Button>
       </VStack>
@@ -273,4 +339,4 @@ const DetailInvoice = () => {
   );
 };
 
-export default DetailInvoice;
+export default DetailTagihan;

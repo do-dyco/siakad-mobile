@@ -16,8 +16,8 @@ import { useRouter } from "expo-router";
 
 type HeaderProps = {
   data?: string;
-  backTo?: string;
-  replace?: boolean;
+  backTo?: string;   // fallback ke halaman tertentu
+  replace?: boolean; // true = replace, false = push
 };
 
 export default function Header({ data, backTo, replace }: HeaderProps) {
@@ -25,14 +25,18 @@ export default function Header({ data, backTo, replace }: HeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
-    if (backTo) {
+    // kalau expo-router versi terbaru: ada canGoBack()
+    if (router.canGoBack?.()) {
+      router.back();
+    } else if (backTo) {
       if (replace) {
-        router.replace(backTo);
+        router.push(backTo);
       } else {
         router.push(backTo as any);
       }
     } else {
-      router.back();
+      // fallback terakhir → balik ke home
+      router.replace("/");
     }
   };
 

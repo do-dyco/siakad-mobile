@@ -200,7 +200,7 @@ const Proses = ({
           onPress={() =>
             router.push({
               pathname: "/detailTagihan",
-              params: { no_invoice: String(item.no_invoice) },
+              params: { noInvoice: String(item.no_invoice) },
             })
           }
           onLongPress={() => copyToClipboard(item.no_invoice, "Nomor Invoice")}

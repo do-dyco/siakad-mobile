@@ -17,7 +17,7 @@ import {
   VStack,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -35,11 +35,11 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
-  status?: "IN_PROGRESS" | "PAID" | string;
+  status?: "UNPAID" | "IN_PROGRESS" | "PAID" | string;
   master_tagihan?: { nama?: string };
 };
 
-const LIMIT = 10;
+const LIMIT = 50; // ambil banyak sekaligus biar tidak bolak-balik
 
 const Tagihan = () => {
   const mode = useColorScheme();
@@ -54,14 +54,6 @@ const Tagihan = () => {
   const user = useUserStore((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
-
-  // Pagination
-  const [ongoingPage, setOngoingPage] = useState(1);
-  const [prosesPage, setProsesPage] = useState(1);
-  const [ongoingHasMore, setOngoingHasMore] = useState(true);
-  const [prosesHasMore, setProsesHasMore] = useState(true);
-  const [isLoadingMoreOngoing, setIsLoadingMoreOngoing] = useState(false);
-  const [isLoadingMoreProses, setIsLoadingMoreProses] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Data
@@ -74,18 +66,12 @@ const Tagihan = () => {
     proses: 0,
   });
 
-  // Lock fetch per tab biar tidak dobel
-  const fetchingRef = useRef<{ IN_PROGRESS: boolean; PAID: boolean }>({
-    IN_PROGRESS: false,
-    PAID: false,
-  });
-
   const params = useMemo(
     () => ({
       search,
       startDate,
       endDate,
-      limit: LIMIT,
+      length: LIMIT,
       tahun,
       start: 1,
       userId: Number(user?.id),
@@ -93,115 +79,55 @@ const Tagihan = () => {
     [search, startDate, endDate, tahun, user?.id]
   );
 
-  const mergeUnique = (prev: ItemType[], incoming: ItemType[]) => {
-    const map = new Map<string, ItemType>();
-    prev.forEach((it) => map.set(it.id, it));
-    incoming.forEach((it) => {
-      if (!map.has(it.id)) map.set(it.id, it);
-    });
-    return Array.from(map.values());
-  };
-
-  const fetchData = async (
-    status: "IN_PROGRESS" | "PAID",
-    pageNumber: number,
-    isLoadMore: boolean
-  ) => {
-    if (fetchingRef.current[status]) return;
-    fetchingRef.current[status] = true;
-
+  const fetchData = async () => {
     try {
-      if (!isLoadMore) setIsLoading(true);
-      if (status === "IN_PROGRESS" && isLoadMore) setIsLoadingMoreOngoing(true);
-      if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(true);
+      setIsLoading(true);
 
-      // ✅ Sesuai Postman
       const fetchParams = {
         search,
-        start: pageNumber, // ini integer (page index)
-        length: LIMIT, // jumlah record per page
+        start: 1,
+        length: LIMIT,
         userId: user?.id,
         orderBy: [
-          { column: -48898829, asc: true },
-          { column: -88908730, asc: false },
+          { column: 0, asc: false },
+          { column: 0, asc: false },
         ],
-        status: status ? status : "",
         startDate,
         endDate,
         tahun,
       };
 
-      const response = await apiService.myListTagihan(fetchParams);
-      const newData: ItemType[] = response?.data?.tagihan_users ?? [];
-      const totalRecords = response?.data?.records_total ?? 0;
+      console.log("Requesting:", fetchParams);
 
-      if (status === "IN_PROGRESS") {
-        if (isLoadMore) {
-          setOngoingData((prev) => {
-            const merged = [...prev, ...newData];
-            setOngoingHasMore(merged.length < totalRecords);
-            return merged;
-          });
-        } else {
-          setOngoingData(newData);
-          setOngoingHasMore(newData.length < totalRecords);
-        }
-      } else {
-        if (isLoadMore) {
-          setProsesData((prev) => {
-            const merged = [...prev, ...newData];
-            // kalau API sudah nggak kirim data baru → habis
-            if (newData.length === 0) {
-              setProsesHasMore(false);
-            } else {
-              setProsesHasMore(merged.length < totalRecords);
-            }
-            return merged;
-          });
-        } else {
-          setProsesData(newData);
-          setProsesHasMore(newData.length < totalRecords);
-        }
-      }
+      const response = await apiService.myListTagihan(fetchParams);
+
+      const allData: ItemType[] = (response?.data?.tagihan_users ?? []).map(
+        (item: any) => ({
+          ...item,
+          status: item.status?.toUpperCase(),
+        })
+      );
+
+      console.log("API response status list:", allData.map((d) => d.status));
+
+      // pisahkan manual
+      const unpaid = allData.filter((d) => d.status === "UNPAID");
+      const inProgress = allData.filter((d) => d.status === "IN_PROGRESS");
+
+      setOngoingData(unpaid);
+      setProsesData(inProgress);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      if (status === "IN_PROGRESS" && isLoadMore)
-        setIsLoadingMoreOngoing(false);
-      if (status === "PAID" && isLoadMore) setIsLoadingMoreProses(false);
-      if (!isLoadMore) setIsLoading(false);
-      fetchingRef.current[status] = false;
+      setIsLoading(false);
     }
   };
 
-  // Load more — naikkan page 1 per kali
-  const loadMoreOngoing = async () => {
-    if (!ongoingHasMore || isLoadingMoreOngoing) return;
-    const nextPage = ongoingPage + 1; // start naik 1
-    setOngoingPage(nextPage);
-    await fetchData("IN_PROGRESS", nextPage, true);
-  };
-
-  const loadMoreProses = async () => {
-    if (!prosesHasMore || isLoadingMoreProses) return;
-    const nextPage = prosesPage + 1;
-    setProsesPage(nextPage);
-    await fetchData("PAID", nextPage, true);
-  };
-
-  // Refresh
   const handleRefresh = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
-    setOngoingPage(1);
-    setProsesPage(1);
-    setOngoingHasMore(true);
-    setProsesHasMore(true);
     try {
-      await Promise.all([
-        fetchData("IN_PROGRESS", 1, false),
-        fetchData("PAID", 1, false),
-      ]);
+      await fetchData();
     } finally {
       setIsRefreshing(false);
     }
@@ -209,21 +135,7 @@ const Tagihan = () => {
 
   // Initial load & saat filter berubah
   useEffect(() => {
-    // reset
-    setOngoingPage(1);
-    setProsesPage(1);
-    setOngoingHasMore(true);
-    setProsesHasMore(true);
-
-    const loadAll = async () => {
-      setIsLoading(true);
-      await Promise.all([
-        fetchData("IN_PROGRESS", 1, false),
-        fetchData("PAID", 1, false),
-      ]);
-      setIsLoading(false);
-    };
-    loadAll();
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
@@ -234,8 +146,8 @@ const Tagihan = () => {
 
   const routes = useMemo(
     () => [
-      { key: "first", title: "Sedang Berlangsung" },
-      { key: "second", title: "Dalam Proses" },
+      { key: "first", title: "Sedang Berlangsung" }, // UNPAID
+      { key: "second", title: "Dalam Proses" }, // IN_PROGRESS
     ],
     []
   );
@@ -247,7 +159,7 @@ const Tagihan = () => {
     >
       {/* Header */}
       <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)")}>
           <HStack m={5} alignItems="center">
             <MaterialIcons
               name="chevron-left"
@@ -338,9 +250,8 @@ const Tagihan = () => {
                     <Berlangsung
                       data={ongoingData}
                       onReload={handleRefresh}
-                      onLoadMore={loadMoreOngoing}
-                      hasMore={ongoingHasMore}
-                      isLoadingMore={isLoadingMoreOngoing}
+                      hasMore={false}
+                      isLoadingMore={false}
                       isRefreshing={isRefreshing}
                       initialScrollOffset={scrollPositions.ongoing}
                       onScrollPositionChange={(offset) =>
@@ -353,9 +264,8 @@ const Tagihan = () => {
                     <Proses
                       data={prosesData}
                       onReload={handleRefresh}
-                      onLoadMore={loadMoreProses}
-                      hasMore={prosesHasMore}
-                      isLoadingMore={isLoadingMoreProses}
+                      hasMore={false}
+                      isLoadingMore={false}
                       isRefreshing={isRefreshing}
                       initialScrollOffset={scrollPositions.proses}
                       onScrollPositionChange={(offset) =>

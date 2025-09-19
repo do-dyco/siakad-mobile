@@ -88,8 +88,9 @@ const BayarSaldo = () => {
   const lastThree = amount.slice(-3);
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? "black" : "white";
+  
+  const token = useUserStore.getState().accessToken;
 
-  console.log("Nominal:", dataInvoice);
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
@@ -108,31 +109,40 @@ const BayarSaldo = () => {
   const params = {
     invoiceId: dataInvoice.id,
     metode: "saldo",
-    // rekeningSekolahId: dataInvoice.id,
+    token: token,
+    password: password,
   };
+
+  console.log("param", params);
 
   useEffect(() => {
     fetchDetail();
   }, []);
 
-  const handleSubmit = () => {
-    setLoading(true);
-    try {
-      const response = apiService.payment(params);
+const handleSubmit = async () => {
+  setLoading(true);
+  try {
+    const response = await apiService.payment(params);
+
+    if (response?.meta?.status_code === 200) {
       router.push({
-        pathname: "/statusTransaksi",
+        pathname: "/bayarInvoice",
         params: {
           nominal: nominal,
           no_invoice: dataInvoice.no_invoice,
         },
       });
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Gagal mengirim data");
-    } finally {
-      setLoading(false);
+    } else {
+      Alert.alert("Error", response?.data?.message || "Gagal mengirim data");
     }
-  };
+  } catch (error) {
+    console.error("Payment error:", error);
+    Alert.alert("Error", "Terjadi kesalahan saat mengirim data");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (!dataInvoice || Object.keys(dataInvoice).length === 0) {
     return (
@@ -149,7 +159,7 @@ const BayarSaldo = () => {
           backgroundColor={mode === "dark" ? "black" : "white"}
           height={screenHeight}
         >
-          <Header data={"Transfer Sekarang"} />
+          <Header data={"Bayar Sekarang"} />
           <VStack space="md" flex={1} m={10}>
             <Text fontFamily="Lato" color={textColor} size="lg">
               Bayar Tagihan
@@ -376,7 +386,7 @@ const BayarSaldo = () => {
               size="sm"
               action="secondary"
               mr="$3"
-              onPress={() => setShowModal(false)}
+              onPress={() => router.push("/(tabs)")}
             >
               <Text fontFamily="Lato" color={textColor}>
                 Ya, Batalkan
