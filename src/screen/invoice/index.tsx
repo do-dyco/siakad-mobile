@@ -1,6 +1,7 @@
 import CustomBadge from "@/components/CustomBadge";
 import DashedDivider from "@/components/dashedDivider";
 import NoData from "@/components/NoData";
+import SearchFilter from "@/components/SearchFilter";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
@@ -39,7 +40,11 @@ const Invoice = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const user = useUserStore((state) => state.user);
-
+  const [index, setIndex] = useState(0);
+  const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [tahun, setTahun] = useState("");
   // Loading states dipisah biar jelas
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -133,10 +138,125 @@ const Invoice = () => {
     }).format(number || 0);
   };
 
+    // Handler untuk search
+    const handleSearchChange = (text: string) => {
+      setSearch(text);
+    };
+  
+    // Handler untuk filter (bisa dikustomisasi sesuai kebutuhan)
+    const handleFilterPress = () => {
+      handleRefresh();
+      // Atau bisa buka modal filter, dll
+    };
+  
+    // Filter options untuk ActionSheet
+    const filterOptions: FilterOption[] = [
+      {
+        label: "Minggu Ini",
+        value: "this_week",
+        onPress: () => {
+          console.log("Filter: Minggu Ini");
+          const now = new Date();
+          const dayOfWeek = now.getDay();
+  
+          const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+  
+          const startOfWeek = new Date(now);
+          startOfWeek.setDate(now.getDate() + diffToMonday);
+          startOfWeek.setHours(0, 0, 0, 0);
+  
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          endOfWeek.setHours(23, 59, 59, 999);
+          
+          setStartDate(startOfWeek.toISOString().split('T')[0]);
+          setEndDate(endOfWeek.toISOString().split('T')[0]);
+          setTahun("");
+        }
+      },
+      {
+        label: "Bulan Ini",
+        value: "this_month",
+        onPress: () => {
+          console.log("Filter: Bulan Ini");
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          
+          setStartDate(startOfMonth.toISOString().split('T')[0]);
+          setEndDate(endOfMonth.toISOString().split('T')[0]);
+          setTahun("");
+        }
+      },
+      {
+        label: "Tahun Ini",
+        value: "this_year",
+        onPress: () => {
+          console.log("Filter: Tahun Ini");
+          const currentYear = new Date().getFullYear().toString();
+          setTahun(currentYear);
+          setStartDate("");
+          setEndDate("");
+        }
+      },
+      {
+        label: "3 Bulan Terakhir",
+        value: "last_3_months",
+        onPress: () => {
+          console.log("Filter: 3 Bulan Terakhir");
+          const now = new Date();
+          const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+          
+          setStartDate(threeMonthsAgo.toISOString().split('T')[0]);
+          setEndDate(now.toISOString().split('T')[0]);
+          setTahun("");
+        }
+      },
+      {
+        label: "Filter Status",
+        style: { fontWeight: 'bold', color: mode === "dark" ? "white" : "black" },
+        value: "header_status",
+        onPress: () => {},
+      },
+      {
+        label: "Semua",
+        value: "all",
+        onPress: () => {
+          console.log("Filter Status: Semua");
+          // misalnya reset status filter
+        },
+      },
+      {
+        label: "Paid",
+        value: "PAID",
+        onPress: () => {
+          console.log("Filter Status: PAID");
+          // setStatus("PAID");
+        },
+      },
+      {
+        label: "Pending",
+        value: "PENDING",
+        onPress: () => {
+          console.log("Filter Status: Pending");
+          // setStatus("UNPAID");
+        },
+      },
+      {
+        label: "Reset",
+        value: "refresh",
+        onPress: () => {
+          console.log("Reset");
+          handleRefresh();
+        }
+      }
+    ];
+
+
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [length]);
+  
+  }, [length, search, startDate, endDate, tahun]);
 
   return (
     <SafeAreaView>
@@ -172,38 +292,22 @@ const Invoice = () => {
           </TouchableOpacity>
 
           {/* Search and Filter */}
-          <HStack mt={15} space="md" m={5}>
-            <Input
-              variant="rounded"
-              width={"85%"}
-              borderColor={"transparent"}
-              backgroundColor={
-                mode === "dark" ? colors.gray.dark[800] : colors.gray.light[200]
-              }
-            >
-              <InputField placeholder="Cari transaksi disini" />
-            </Input>
-
-            <TouchableOpacity onPress={() => setShowActionsheet(true)}>
-              <Box
-                borderRadius={"$full"}
-                backgroundColor={
-                  mode === "light"
-                    ? colors.gray.light[200]
-                    : colors.gray.dark[800]
-                }
-                borderWidth={1}
-                borderColor={colors.border}
-              >
-                <Ionicons
-                  name="filter"
-                  size={25}
-                  color={mode === "dark" ? "white" : "black"}
-                  style={{ margin: 8 }}
-                />
-              </Box>
-            </TouchableOpacity>
-          </HStack>
+          <Box mt={15} m={5}>
+            <SearchFilter
+              searchValue={search}
+              onSearchChange={handleSearchChange}
+              onFilterPress={handleFilterPress}
+              onSearchSubmit={handleRefresh}
+              placeholder="Cari transaksi disini"
+              searchWidth="85%" // Disesuaikan untuk 2 filter
+              showFilter={true}
+              filterIcon="filter"
+              debounceDelay={3000}
+              enableActionSheet={true}
+              filterOptions={filterOptions}
+              actionSheetTitle="Filter Periode"
+            />
+          </Box>
           <Divider mt={20} bgColor={colors.gray.light[200]} />
         </Box>
 
