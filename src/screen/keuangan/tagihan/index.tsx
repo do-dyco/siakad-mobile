@@ -15,8 +15,8 @@ import {
   Text,
   VStack,
 } from "@gluestack-ui/themed";
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -44,6 +44,9 @@ const Tagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const layout = useWindowDimensions();
+  
+  // Get active tab from params (untuk back navigation)
+  const { activeTab } = useLocalSearchParams();
 
   const [index, setIndex] = useState(0);
   const [search, setSearch] = useState("");
@@ -55,6 +58,9 @@ const Tagihan = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // console.log("tab",activeTab);
+  
+
   // Data
   const [ongoingData, setOngoingData] = useState<ItemType[]>([]);
   const [prosesData, setProsesData] = useState<ItemType[]>([]);
@@ -64,6 +70,17 @@ const Tagihan = () => {
     ongoing: 0,
     proses: 0,
   });
+
+  console.log("Render Tagihan:", { activeTab, index });
+  
+useFocusEffect(
+  useCallback(() => {
+    if (activeTab !== undefined) {
+      console.log("activeTab di Tagihan:", activeTab);
+      setIndex(activeTab === "1" ? 1 : 0);
+    }
+  }, [activeTab])
+);
 
   const params = useMemo(
     () => ({
@@ -324,6 +341,7 @@ const Tagihan = () => {
                       onScrollPositionChange={(offset) =>
                         updateScrollPosition("ongoing", offset)
                       }
+                      currentTab="0" // Pass current tab info
                     />
                   );
                 case "second":
@@ -338,6 +356,7 @@ const Tagihan = () => {
                       onScrollPositionChange={(offset) =>
                         updateScrollPosition("proses", offset)
                       }
+                      currentTab="1" // Pass current tab info
                     />
                   );
                 default:

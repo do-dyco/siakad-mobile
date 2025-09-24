@@ -70,6 +70,7 @@ type Props = {
   isRefreshing?: boolean;
   initialScrollOffset?: number;
   onScrollPositionChange?: (offset: number) => void;
+  currentTab?: string; // Tab info untuk navigation
 };
 
 const Berlangsung = ({
@@ -81,6 +82,7 @@ const Berlangsung = ({
   isRefreshing = false,
   initialScrollOffset = 0,
   onScrollPositionChange,
+  currentTab = "0", // Default tab Sedang Berlangsung
 }: Props) => {
   const mode = useColorScheme();
   const toast = useToast();
@@ -97,6 +99,7 @@ const Berlangsung = ({
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
 
   const { setSelectedTagihan } = useTagihanStore();
+  
 
   // ✅ Dedup data biar key FlatList unik
   const uniqueData = useMemo(() => {
@@ -451,7 +454,6 @@ const Berlangsung = ({
         left={0}
         right={0}
         padding={16}
-        // paddingBottom={Math.max(insets.bottom, bottomSpace)}
         backgroundColor="transparent"
       >
         <Button

@@ -45,20 +45,27 @@ const Invoice = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tahun, setTahun] = useState("");
+  
   // Loading states dipisah biar jelas
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const [length, setLength] = useState(10);
+  // State baru untuk pagination yang lebih baik
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const pageSize = 10;
+  
   const reachedEndRef = useRef(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const baseParams = {
-    search: "",
+    search: search,
     start: 1,
-    length,
-    startDate: "",
-    endDate: "",
+    length: currentPage * pageSize,
+    startDate: startDate,
+    endDate: endDate,
+    tahun: tahun,
     orderBy: [
       {
         column: 1,
@@ -76,7 +83,7 @@ const Invoice = () => {
     const isCloseToBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 
-    if (isCloseToBottom && !isLoadingMore && !reachedEndRef.current) {
+    if (isCloseToBottom && !isLoadingMore && !reachedEndRef.current && hasMoreData) {
       reachedEndRef.current = true;
       loadMore();
     }
@@ -88,11 +95,24 @@ const Invoice = () => {
   const handleRefresh = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
+    setCurrentPage(1);
+    
     try {
-      const newParams = { ...baseParams, length: 10 };
+      const newParams = { 
+        ...baseParams, 
+        length: pageSize,
+        search: search,
+        startDate: startDate,
+        endDate: endDate,
+        tahun: tahun
+      };
+      
       const response = await apiService.myInvoice(newParams);
-      setData(response.data?.invoice_tagihans || []);
-      setLength(10);
+      const newData = response.data?.invoice_tagihans || [];
+      
+      setData(newData);
+      setHasMoreData(newData.length >= pageSize);
+      
     } catch (error) {
       console.error("Refresh error:", error);
     } finally {
@@ -101,14 +121,34 @@ const Invoice = () => {
   };
 
   const loadMore = async () => {
+    if (!hasMoreData) return;
+    
     setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+    
     try {
-      const newLength = length + 10;
-      const newParams = { ...baseParams, length: newLength };
+      const newParams = { 
+        ...baseParams, 
+        start: (nextPage - 1) * pageSize + 1,
+        length: pageSize,
+        search: search,
+        startDate: startDate,
+        endDate: endDate,
+        tahun: tahun
+      };
+      
       const response = await apiService.myInvoice(newParams);
       const newData = response.data?.invoice_tagihans || [];
-      setData(newData);
-      setLength(newLength);
+      
+      if (newData.length > 0) {
+        // Append data baru ke data existing, jangan replace
+        setData(prevData => [...prevData, ...newData]);
+        setCurrentPage(nextPage);
+        setHasMoreData(newData.length >= pageSize);
+      } else {
+        setHasMoreData(false);
+      }
+      
     } catch (error) {
       console.error("Load more error:", error);
     } finally {
@@ -118,10 +158,24 @@ const Invoice = () => {
 
   const fetchData = async () => {
     setIsInitialLoading(true);
+    setCurrentPage(1);
+    
     try {
-      const newParams = { ...baseParams, length };
+      const newParams = { 
+        ...baseParams, 
+        length: pageSize,
+        search: search,
+        startDate: startDate,
+        endDate: endDate,
+        tahun: tahun
+      };
+      
       const response = await apiService.myInvoice(newParams);
-      setData(response.data?.invoice_tagihans || []);
+      const newData = response.data?.invoice_tagihans || [];
+      
+      setData(newData);
+      setHasMoreData(newData.length >= pageSize);
+      
     } catch (error) {
       console.error(error);
     } finally {
@@ -138,129 +192,144 @@ const Invoice = () => {
     }).format(number || 0);
   };
 
-    // Handler untuk search
-    const handleSearchChange = (text: string) => {
-      setSearch(text);
-    };
-  
-    // Handler untuk filter (bisa dikustomisasi sesuai kebutuhan)
-    const handleFilterPress = () => {
-      handleRefresh();
-      // Atau bisa buka modal filter, dll
-    };
-  
-    // Filter options untuk ActionSheet
-    const filterOptions: FilterOption[] = [
-      {
-        label: "Minggu Ini",
-        value: "this_week",
-        onPress: () => {
-          console.log("Filter: Minggu Ini");
-          const now = new Date();
-          const dayOfWeek = now.getDay();
-  
-          const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
-  
-          const startOfWeek = new Date(now);
-          startOfWeek.setDate(now.getDate() + diffToMonday);
-          startOfWeek.setHours(0, 0, 0, 0);
-  
-          const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate() + 6);
-          endOfWeek.setHours(23, 59, 59, 999);
-          
-          setStartDate(startOfWeek.toISOString().split('T')[0]);
-          setEndDate(endOfWeek.toISOString().split('T')[0]);
-          setTahun("");
-        }
-      },
-      {
-        label: "Bulan Ini",
-        value: "this_month",
-        onPress: () => {
-          console.log("Filter: Bulan Ini");
-          const now = new Date();
-          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-          
-          setStartDate(startOfMonth.toISOString().split('T')[0]);
-          setEndDate(endOfMonth.toISOString().split('T')[0]);
-          setTahun("");
-        }
-      },
-      {
-        label: "Tahun Ini",
-        value: "this_year",
-        onPress: () => {
-          console.log("Filter: Tahun Ini");
-          const currentYear = new Date().getFullYear().toString();
-          setTahun(currentYear);
-          setStartDate("");
-          setEndDate("");
-        }
-      },
-      {
-        label: "3 Bulan Terakhir",
-        value: "last_3_months",
-        onPress: () => {
-          console.log("Filter: 3 Bulan Terakhir");
-          const now = new Date();
-          const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-          
-          setStartDate(threeMonthsAgo.toISOString().split('T')[0]);
-          setEndDate(now.toISOString().split('T')[0]);
-          setTahun("");
-        }
-      },
-      {
-        label: "Filter Status",
-        style: { fontWeight: 'bold', color: mode === "dark" ? "white" : "black" },
-        value: "header_status",
-        onPress: () => {},
-      },
-      {
-        label: "Semua",
-        value: "all",
-        onPress: () => {
-          console.log("Filter Status: Semua");
-          // misalnya reset status filter
-        },
-      },
-      {
-        label: "Paid",
-        value: "PAID",
-        onPress: () => {
-          console.log("Filter Status: PAID");
-          // setStatus("PAID");
-        },
-      },
-      {
-        label: "Pending",
-        value: "PENDING",
-        onPress: () => {
-          console.log("Filter Status: Pending");
-          // setStatus("UNPAID");
-        },
-      },
-      {
-        label: "Reset",
-        value: "refresh",
-        onPress: () => {
-          console.log("Reset");
-          handleRefresh();
-        }
+  // Handler untuk search
+  const handleSearchChange = (text: string) => {
+    setSearch(text);
+    setCurrentPage(1); // Reset pagination saat search
+  };
+
+  // Handler untuk filter
+  const handleFilterPress = () => {
+    setCurrentPage(1); // Reset pagination saat filter
+    handleRefresh();
+  };
+
+  // Filter options untuk ActionSheet
+  const filterOptions: FilterOption[] = [
+    {
+      label: "Minggu Ini",
+      value: "this_week",
+      onPress: () => {
+        console.log("Filter: Minggu Ini");
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+
+        const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() + diffToMonday);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        setStartDate(startOfWeek.toISOString().split('T')[0]);
+        setEndDate(endOfWeek.toISOString().split('T')[0]);
+        setTahun("");
+        setCurrentPage(1);
       }
-    ];
+    },
+    {
+      label: "Bulan Ini",
+      value: "this_month",
+      onPress: () => {
+        console.log("Filter: Bulan Ini");
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        
+        setStartDate(startOfMonth.toISOString().split('T')[0]);
+        setEndDate(endOfMonth.toISOString().split('T')[0]);
+        setTahun("");
+        setCurrentPage(1);
+      }
+    },
+    {
+      label: "Tahun Ini",
+      value: "this_year",
+      onPress: () => {
+        console.log("Filter: Tahun Ini");
+        const currentYear = new Date().getFullYear().toString();
+        setTahun(currentYear);
+        setStartDate("");
+        setEndDate("");
+        setCurrentPage(1);
+      }
+    },
+    {
+      label: "3 Bulan Terakhir",
+      value: "last_3_months",
+      onPress: () => {
+        console.log("Filter: 3 Bulan Terakhir");
+        const now = new Date();
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+        
+        setStartDate(threeMonthsAgo.toISOString().split('T')[0]);
+        setEndDate(now.toISOString().split('T')[0]);
+        setTahun("");
+        setCurrentPage(1);
+      }
+    },
+    {
+      label: "Filter Status",
+      style: { fontWeight: 'bold', color: mode === "dark" ? "white" : "black" },
+      value: "header_status",
+      onPress: () => {},
+    },
+    {
+      label: "Semua",
+      value: "all",
+      onPress: () => {
+        console.log("Filter Status: Semua");
+        setCurrentPage(1);
+      },
+    },
+    {
+      label: "Paid",
+      value: "PAID",
+      onPress: () => {
+        console.log("Filter Status: PAID");
+        setCurrentPage(1);
+      },
+    },
+    {
+      label: "Pending",
+      value: "PENDING",
+      onPress: () => {
+        console.log("Filter Status: Pending");
+        setCurrentPage(1);
+      },
+    },
+    {
+      label: "Reset",
+      value: "refresh",
+      onPress: () => {
+        console.log("Reset");
+        setSearch("");
+        setStartDate("");
+        setEndDate("");
+        setTahun("");
+        setCurrentPage(1);
+        handleRefresh();
+      }
+    }
+  ];
 
-
+  // useEffect yang diperbaiki - hanya fetch ulang saat filter berubah
   useEffect(() => {
-    fetchData();
-  
-  }, [length, search, startDate, endDate, tahun]);
+    // Debounce untuk search
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, search ? 500 : 0); // Delay 500ms untuk search, langsung untuk filter lain
+
+    return () => clearTimeout(timeoutId);
+  }, [search, startDate, endDate, tahun]); // Remove currentPage dari dependency
 
   return (
     <SafeAreaView>
       <ScrollView
+        ref={scrollViewRef}
         backgroundColor={mode === "dark" ? "black" : "white"}
         height={screenHeight}
         onScroll={handleScroll}
@@ -299,7 +368,7 @@ const Invoice = () => {
               onFilterPress={handleFilterPress}
               onSearchSubmit={handleRefresh}
               placeholder="Cari transaksi disini"
-              searchWidth="85%" // Disesuaikan untuk 2 filter
+              searchWidth="85%"
               showFilter={true}
               filterIcon="filter"
               debounceDelay={3000}
@@ -335,7 +404,7 @@ const Invoice = () => {
           {!isInitialLoading &&
             data.length > 0 &&
             data.map((item: any, index: number) => (
-              <React.Fragment key={item.no_invoice ?? index}>
+              <React.Fragment key={`${item.no_invoice}-${index}`}>
                 <TouchableOpacity
                   onPress={() =>
                     router.push({
@@ -486,11 +555,20 @@ const Invoice = () => {
             ))}
 
           {/* Spinner load more */}
-          {isLoadingMore && data.length > 0 && (
+          {isLoadingMore && (
             <Center my={16}>
               <Spinner size="large" />
               <Text mt="$2" color={mode === "dark" ? "white" : "black"}>
-                Memuat data...
+                Memuat lebih banyak...
+              </Text>
+            </Center>
+          )}
+
+          {/* Pesan jika tidak ada data lagi */}
+          {!hasMoreData && data.length > 0 && (
+            <Center my={16}>
+              <Text color={mode === "dark" ? "white" : "black"} opacity={0.6}>
+                Semua data telah ditampilkan
               </Text>
             </Center>
           )}

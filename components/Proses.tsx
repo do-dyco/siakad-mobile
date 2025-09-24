@@ -47,6 +47,7 @@ type Props = {
   isRefreshing?: boolean;
   onScrollPositionChange?: (offset: number) => void;
   initialScrollOffset?: number;
+  currentTab?: string; // Tab info untuk navigation
 };
 
 const Proses = ({
@@ -57,6 +58,7 @@ const Proses = ({
   isLoadingMore = false,
   isRefreshing = false,
   onScrollPositionChange,
+  currentTab = "1",
 }: Props) => {
   const mode = useColorScheme();
   const toast = useToast();
@@ -130,6 +132,19 @@ const Proses = ({
     onScrollPositionChange?.(currentScrollY);
   };
 
+// contoh handle navigate di Proses.tsx
+const handleNavigateToDetail = (noInvoice: string) => {
+  router.push({
+    pathname: "/detailTagihan",
+    params: { 
+      noInvoice,
+      from: "/tagihan",
+      activeTab: "1", // ✅ tab "Dalam Proses"
+    },
+  });
+};
+
+
   // ✅ Footer Loader & Info
   const renderFooter = () => {
     if (isLoadingMore && hasMore) {
@@ -167,6 +182,7 @@ const Proses = ({
 
     return null;
   };
+  
 
   if (!uniqueData || uniqueData.length === 0) {
     return (
@@ -197,12 +213,7 @@ const Proses = ({
       ListFooterComponent={renderFooter}
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/detailTagihan",
-              params: { noInvoice: String(item.no_invoice) },
-            })
-          }
+          onPress={() => handleNavigateToDetail(item.no_invoice)}
           onLongPress={() => copyToClipboard(item.no_invoice, "Nomor Invoice")}
         >
           <Box

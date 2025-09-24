@@ -30,9 +30,11 @@ import { Dimensions, useColorScheme } from "react-native";
 const DetailTagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const { noInvoice } = useLocalSearchParams();
+  const { noInvoice, from, activeTab } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState({});
 
+  // console.log("Params:", { activeTab, from });
+  
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -63,7 +65,11 @@ const DetailTagihan = () => {
 
     router.push({
       pathname: "/metodeBayar",
-      params: { invoice: dataInvoice.no_invoice, from: "tagihan" },
+      params: { 
+        invoice: dataInvoice.no_invoice, 
+        from: from,
+        activeTab: tab,
+      },
     });
   };
 
@@ -78,7 +84,9 @@ const DetailTagihan = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Transaksi"}  />
+        {/* Header dengan tab support - tidak perlu custom onBack lagi */}
+        <Header data="Detail Transaksi" backTo={from} activeTab={activeTab} />
+        
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
             <Text
