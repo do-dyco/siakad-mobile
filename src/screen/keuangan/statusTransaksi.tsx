@@ -194,8 +194,11 @@ const StatusTransaksi = () => {
                   size="md"
                   variant="solid"
                   borderRadius={12}
+                  borderColor={isDark ? colors.border : colors.gray.light[200]}
+                  borderWidth={1}
+
                   bgColor={
-                    isDark ? colors.gray.dark[800] : colors.gray.light[200]
+                    isDark ? colors.gray.dark[800] : colors.gray.light[25]
                   }
                   width="50%"
                 >
@@ -264,7 +267,7 @@ const StatusTransaksi = () => {
                 borderRadius={10}
                 borderColor={isDark ? colors.border : colors.gray.light[200]}
                 bgColor={
-                  isDark ? colors.gray.dark[800] : colors.gray.light[200]
+                  isDark ? colors.gray.dark[800] : colors.gray.light[25]
                 }
               >
                 <HStack
@@ -322,8 +325,12 @@ const StatusTransaksi = () => {
           {/* Detail Transaksi */}
           <TouchableOpacity onPress={toggleActionsheet}>
             <Box
-              borderRadius={10}
-              bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[200]}
+             borderWidth={1}
+                borderRadius={10}
+                borderColor={isDark ? colors.border : colors.gray.light[200]}
+                bgColor={
+                  isDark ? colors.gray.dark[800] : colors.gray.light[50]
+                }
             >
               <HStack justifyContent="space-between" m={10}>
                 <HStack space="md">
@@ -346,10 +353,14 @@ const StatusTransaksi = () => {
           </TouchableOpacity>
 
           {/* Bantuan */}
-          <Box
-            borderRadius={10}
-            bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[200]}
-          >
+           <Box
+             borderWidth={1}
+                borderRadius={10}
+                borderColor={isDark ? colors.border : colors.gray.light[200]}
+                bgColor={
+                  isDark ? colors.gray.dark[800] : colors.gray.light[50]
+                }
+            >
             <HStack justifyContent="space-between" m={10}>
               <HStack space="md">
                 <MaterialCommunityIcons

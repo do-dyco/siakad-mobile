@@ -31,7 +31,7 @@ const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [selected, setSelected] = useState<string | null>(null);
-  const { invoice, from } = useLocalSearchParams<{ invoice?: string }>();
+  const { invoice, from, activeTab } = useLocalSearchParams<{ invoice?: string }>();
   const { selectedTagihan } = useTagihanStore();
 
   const [saldoData, setSaldoData] = useState<number>(0);
@@ -131,6 +131,7 @@ const MetodeBayar = () => {
           nominal,
           no_invoice: inv?.no_invoice,
           from: from,
+          activeTab: activeTab,
         },
       });
       return;

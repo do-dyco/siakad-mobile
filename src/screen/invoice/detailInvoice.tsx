@@ -56,7 +56,10 @@ const handleNext = () => {
     if (dataInvoice.status === "PAID") {
       router.push({
         pathname: "/bayarInvoice",
-        params: { invoice: dataInvoice.no_invoice },
+        params: { 
+          invoice: dataInvoice.no_invoice, 
+          from: from,
+          activeTab: activeTab, },
       });
       return;
     }

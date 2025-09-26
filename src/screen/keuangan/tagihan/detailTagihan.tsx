@@ -33,7 +33,7 @@ const DetailTagihan = () => {
   const { noInvoice, from, activeTab } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState({});
 
-  // console.log("Params:", { activeTab, from });
+  console.log("Params:", { activeTab, from });
   
 
   const formatRupiah = (value: number) =>
@@ -58,7 +58,10 @@ const DetailTagihan = () => {
     if (dataInvoice.status === "PAID") {
       router.push({
         pathname: "/bayarInvoice",
-        params: { invoice: dataInvoice.no_invoice },
+        params: {  
+          invoice: dataInvoice.no_invoice, 
+          from: from,
+          activeTab: activeTab, },
       });
       return;
     }

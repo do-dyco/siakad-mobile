@@ -62,7 +62,7 @@ const TransferNow = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
-  const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice } =
+  const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice, activeTab, from } =
     useLocalSearchParams();
   const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
@@ -77,8 +77,8 @@ const TransferNow = () => {
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? colors.black : colors.white;
 
-  const {from} = useLocalSearchParams();
-  console.log("From:", from);
+  const {} = useLocalSearchParams();
+  console.log("From:", from, activeTab);
 
   // console.log("Data Invoice:", dataInvoice);
 
@@ -195,9 +195,10 @@ const TransferNow = () => {
   const handleBatalTransaksi = () => {
     setShowModal(false);
 
-    if (from === "tagihan") {
+    if (from === "/tagihan") {
       router.push({
         pathname: "/tagihan",
+        params: { activeTab: activeTab },
       });
       return;
     } else{

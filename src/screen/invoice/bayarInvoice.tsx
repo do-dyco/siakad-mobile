@@ -56,7 +56,7 @@ const BayarInvoice = () => {
   const textColor = isDark ? "white" : "black";
   const bgColor = isDark ? "black" : "white";
   const [loading, setLoading] = useState(false);
-  const { invoice, nominal } = useLocalSearchParams();
+  const { invoice, from, activeTab } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState([]);
   const { user } = useUserStore();
   const [showActionsheet, setShowActionsheet] = useState(false);
@@ -153,10 +153,10 @@ const BayarInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Invoice"} />
+        <Header data={"Detail Invoice"} from={from} activeTab={activeTab}/>
 
         <VStack m={20} mt={20} space={"md"}>
-          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }}>
+          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: "white", borderRadius: 16}}>
           <Box borderRadius={16} borderWidth={1} borderColor="#373A41">
             <Box borderTopRightRadius={10} borderTopLeftRadius={10}>
               <ImageBackground
