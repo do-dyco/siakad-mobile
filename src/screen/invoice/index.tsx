@@ -56,6 +56,10 @@ const Invoice = () => {
   const [hasMoreData, setHasMoreData] = useState(true);
   const pageSize = 10;
   
+  // State untuk filter yang aktif
+  const [activePeriodFilter, setActivePeriodFilter] = useState<string | null>(null);
+  const [activeStatusFilters, setActiveStatusFilters] = useState<string[]>([]);
+  
   const reachedEndRef = useRef(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -66,6 +70,7 @@ const Invoice = () => {
     startDate: startDate,
     endDate: endDate,
     tahun: tahun,
+    status: activeStatusFilters.length > 0 ? activeStatusFilters : undefined,
     orderBy: [
       {
         column: 1,
@@ -104,7 +109,8 @@ const Invoice = () => {
         search: search,
         startDate: startDate,
         endDate: endDate,
-        tahun: tahun
+        tahun: tahun,
+        status: activeStatusFilters.length > 0 ? activeStatusFilters : undefined,
       };
       
       const response = await apiService.myInvoice(newParams);
@@ -134,7 +140,8 @@ const Invoice = () => {
         search: search,
         startDate: startDate,
         endDate: endDate,
-        tahun: tahun
+        tahun: tahun,
+        status: activeStatusFilters.length > 0 ? activeStatusFilters : undefined,
       };
       
       const response = await apiService.myInvoice(newParams);
@@ -167,7 +174,8 @@ const Invoice = () => {
         search: search,
         startDate: startDate,
         endDate: endDate,
-        tahun: tahun
+        tahun: tahun,
+        status: activeStatusFilters.length > 0 ? activeStatusFilters : undefined,
       };
       
       const response = await apiService.myInvoice(newParams);
@@ -204,8 +212,43 @@ const Invoice = () => {
     handleRefresh();
   };
 
+  const toggleStatusFilter = (status: string) => {
+    setActiveStatusFilters((prev) =>
+      prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
+    );
+    setCurrentPage(1);
+  };
+
+  // Reset semua filter
+  const clearAllFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setTahun("");
+    setActivePeriodFilter(null);
+    setActiveStatusFilters([]);
+    setCurrentPage(1);
+    handleRefresh();
+  };
+
+  // Handler untuk menghapus filter individual
+  const handleRemoveFilter = (filterLabel: string) => {
+    // Cek jika filter adalah period filter
+    const periodFilters = ["Minggu Ini", "Bulan Ini", "Tahun Ini", "3 Bulan Terakhir"];
+    if (periodFilters.includes(filterLabel)) {
+      setActivePeriodFilter(null);
+      setStartDate("");
+      setEndDate("");
+      setTahun("");
+    } else {
+      // Status filter
+      setActiveStatusFilters(prev => prev.filter(f => f !== filterLabel));
+    }
+    setCurrentPage(1);
+    handleRefresh();
+  };
+
   // Filter options untuk ActionSheet
-  const filterOptions: FilterOption[] = [
+  const filterOptions: any[] = [
     {
       label: "Minggu Ini",
       value: "this_week",
@@ -227,6 +270,7 @@ const Invoice = () => {
         setStartDate(startOfWeek.toISOString().split('T')[0]);
         setEndDate(endOfWeek.toISOString().split('T')[0]);
         setTahun("");
+        setActivePeriodFilter("Minggu Ini");
         setCurrentPage(1);
       }
     },
@@ -242,6 +286,7 @@ const Invoice = () => {
         setStartDate(startOfMonth.toISOString().split('T')[0]);
         setEndDate(endOfMonth.toISOString().split('T')[0]);
         setTahun("");
+        setActivePeriodFilter("Bulan Ini");
         setCurrentPage(1);
       }
     },
@@ -254,6 +299,7 @@ const Invoice = () => {
         setTahun(currentYear);
         setStartDate("");
         setEndDate("");
+        setActivePeriodFilter("Tahun Ini");
         setCurrentPage(1);
       }
     },
@@ -268,52 +314,28 @@ const Invoice = () => {
         setStartDate(threeMonthsAgo.toISOString().split('T')[0]);
         setEndDate(now.toISOString().split('T')[0]);
         setTahun("");
+        setActivePeriodFilter("3 Bulan Terakhir");
         setCurrentPage(1);
       }
     },
-    {
-      label: "Filter Status",
-      style: { fontWeight: 'bold', color: mode === "dark" ? "white" : "black" },
-      value: "header_status",
-      onPress: () => {},
+    { label: "Semua", value: "all", onPress: () => clearAllFilters() },
+    { label: "Paid", value: "PAID", onPress: () => toggleStatusFilter("PAID") },
+    { label: "Pending", value: "PENDING", onPress: () => toggleStatusFilter("PENDING") 
     },
-    {
-      label: "Semua",
-      value: "all",
-      onPress: () => {
-        console.log("Filter Status: Semua");
-        setCurrentPage(1);
-      },
+  ];
+
+  // Status filter options (untuk filter kedua)
+  const statusFilterOptions: any[] = [
+    { 
+      label: "Paid", 
+      value: "PAID", 
+      onPress: () => toggleStatusFilter("Paid") 
     },
-    {
-      label: "Paid",
-      value: "PAID",
-      onPress: () => {
-        console.log("Filter Status: PAID");
-        setCurrentPage(1);
-      },
+    { 
+      label: "Pending", 
+      value: "PENDING", 
+      onPress: () => toggleStatusFilter("Pending") 
     },
-    {
-      label: "Pending",
-      value: "PENDING",
-      onPress: () => {
-        console.log("Filter Status: Pending");
-        setCurrentPage(1);
-      },
-    },
-    {
-      label: "Reset",
-      value: "refresh",
-      onPress: () => {
-        console.log("Reset");
-        setSearch("");
-        setStartDate("");
-        setEndDate("");
-        setTahun("");
-        setCurrentPage(1);
-        handleRefresh();
-      }
-    }
   ];
 
   // useEffect yang diperbaiki - hanya fetch ulang saat filter berubah
@@ -324,7 +346,7 @@ const Invoice = () => {
     }, search ? 500 : 0); // Delay 500ms untuk search, langsung untuk filter lain
 
     return () => clearTimeout(timeoutId);
-  }, [search, startDate, endDate, tahun]); // Remove currentPage dari dependency
+  }, [search, startDate, endDate, tahun, activeStatusFilters]); // Include activeStatusFilters
 
   return (
     <SafeAreaView>
@@ -366,15 +388,25 @@ const Invoice = () => {
               searchValue={search}
               onSearchChange={handleSearchChange}
               onFilterPress={handleFilterPress}
+              onSecondFilterPress={() => console.log("Second filter pressed")}
               onSearchSubmit={handleRefresh}
               placeholder="Cari transaksi disini"
               searchWidth="85%"
               showFilter={true}
+              showSecondFilter={true}
               filterIcon="filter"
+              secondFilterIcon="options"
               debounceDelay={3000}
               enableActionSheet={true}
+              enableSecondActionSheet={true}
               filterOptions={filterOptions}
+              secondFilterOptions={statusFilterOptions}
               actionSheetTitle="Filter Periode"
+              secondActionSheetTitle="Filter Status"
+              selectedFilters={activePeriodFilter ? [activePeriodFilter] : []}
+              selectedSecondFilters={activeStatusFilters}
+              onClearAllFilters={clearAllFilters}
+              onRemoveFilter={handleRemoveFilter}
             />
           </Box>
           <Divider mt={20} bgColor={colors.gray.light[200]} />

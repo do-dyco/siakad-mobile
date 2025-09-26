@@ -5,6 +5,7 @@ import {
   Input,
   InputField,
   Box,
+  Text,
   Actionsheet,
   ActionsheetBackdrop,
   ActionsheetContent,
@@ -13,7 +14,7 @@ import {
   ActionsheetItem,
   ActionsheetItemText,
 } from "@gluestack-ui/themed";
-import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import colors from "@/src/config/colors";
 
 export interface FilterOption {
@@ -36,19 +37,21 @@ interface SearchFilterProps {
   secondFilterIcon?: keyof typeof Ionicons.glyphMap;
   debounceDelay?: number;
   style?: object;
-  // ActionSheet props for main filter
   enableActionSheet?: boolean;
   filterOptions?: FilterOption[];
   actionSheetTitle?: string;
   actionSheetMessage?: string;
-  // ActionSheet props for second filter
   enableSecondActionSheet?: boolean;
   secondFilterOptions?: FilterOption[];
   secondActionSheetTitle?: string;
   secondActionSheetMessage?: string;
+  selectedFilters?: string[];
+  selectedSecondFilters?: string[];
+  onClearAllFilters?: () => void;
+  onRemoveFilter?: (filterLabel: string) => void;
 }
 
-type ActionSheetType = 'main' | 'second' | null;
+type ActionSheetType = "main" | "second" | null;
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   searchValue,
@@ -72,13 +75,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   secondFilterOptions = [],
   secondActionSheetTitle = "Pilih Opsi",
   secondActionSheetMessage,
+  selectedFilters = [],
+  selectedSecondFilters = [],
+  onClearAllFilters,
+  onRemoveFilter,
 }) => {
   const mode = useColorScheme();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [activeActionSheet, setActiveActionSheet] = useState<ActionSheetType>(null);
 
   useEffect(() => {
-    // cleanup saat unmount
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -90,7 +96,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   const handleFilterPress = () => {
     if (enableActionSheet && filterOptions.length > 0) {
-      setActiveActionSheet('main');
+      setActiveActionSheet("main");
     } else {
       onFilterPress?.();
     }
@@ -98,50 +104,95 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   const handleSecondFilterPress = () => {
     if (enableSecondActionSheet && secondFilterOptions.length > 0) {
-      setActiveActionSheet('second');
+      setActiveActionSheet("second");
     } else {
       onSecondFilterPress?.();
     }
   };
 
-  const handleFilterOptionPress = (option: FilterOption) => {
+  const handleFilterOptionPress = (option: FilterOption, type: ActionSheetType) => {
     option.onPress();
-    handleClose();
   };
 
   const handleChangeText = (text: string) => {
     onSearchChange(text);
-
-    // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-
-    // Set new timeout for debounce
     if (debounceDelay > 0) {
       typingTimeoutRef.current = setTimeout(() => {
-        console.log("Search triggered:", text);
         onSearchSubmit?.();
       }, debounceDelay);
     }
   };
 
   const handleSubmit = () => {
-    // Clear timeout on manual submit
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
     onSearchSubmit?.();
   };
 
-  // Calculate dynamic search width based on visible filters
+  const handleClearAllFilters = () => {
+    onClearAllFilters?.();
+    handleClose();
+  };
+
   const calculateSearchWidth = () => {
     if (showFilter && showSecondFilter) return "70%";
     if (showFilter || showSecondFilter) return "80%";
     return "100%";
   };
 
-  const dynamicSearchWidth = searchWidth === "75%" ? calculateSearchWidth() : searchWidth;
+  const dynamicSearchWidth =
+    searchWidth === "75%" ? calculateSearchWidth() : searchWidth;
+
+  // Gabungan filter aktif dari props
+  const renderActiveFilters = () => {
+    const allFilters = [...selectedFilters, ...selectedSecondFilters];
+
+    if (allFilters.length === 0) return null;
+
+    return (
+      <ActionsheetItem>
+        <HStack space="sm" flexWrap="wrap">
+          {allFilters.map((filter, idx) => (
+            <Box
+              key={idx}
+              flexDirection="row"
+              alignItems="center"
+              py={"$1"}
+              px={"$2"}
+              borderRadius={18}
+              bgColor={
+                mode === "dark"
+                  ? colors.gray.dark[700]
+                  : colors.gray.light[200]
+              }
+              mb="$2"
+            >
+              <Text
+                mr="$1"
+                color={mode === "dark" ? "white" : "black"}
+                fontWeight="$semibold"
+                fontFamily="lato"
+                fontSize={12}
+              >
+                {filter}
+              </Text>
+              <TouchableOpacity onPress={() => onRemoveFilter?.(filter)}>
+                <Ionicons
+                  name="close"
+                  size={14}
+                  color={mode === "dark" ? "white" : "black"}
+                />
+              </TouchableOpacity>
+            </Box>
+          ))}
+        </HStack>
+      </ActionsheetItem>
+    );
+  };
 
   return (
     <>
@@ -161,69 +212,66 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             onSubmitEditing={handleSubmit}
             returnKeyType="search"
             placeholderTextColor={
-              mode === "dark"
-                ? "rgba(255, 255, 255, 0.6)"
-                : "rgba(0, 0, 0, 0.6)"
+              mode === "dark" ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)"
             }
           />
         </Input>
 
-        {/* Main Filter Button */}
+        {/* Main Filter */}
         {showFilter && (
           <TouchableOpacity onPress={handleFilterPress}>
             <Box
               borderRadius="$full"
+              flexDirection="row"
+              alignItems="center"
+              px="$3"
+              py="$2"
               backgroundColor={
-                mode === "light"
-                  ? colors.gray.light[25]
-                  : colors.gray.dark[800]
+                mode === "light" ? colors.gray.light[25] : colors.gray.dark[800]
               }
             >
               <FontAwesome6
                 name={"sliders"}
-                size={25}
+                size={20}
                 color={mode === "dark" ? "white" : "black"}
-                style={{ margin: 8 }}
               />
             </Box>
           </TouchableOpacity>
         )}
 
-        {/* Second Filter Button */}
+        {/* Second Filter */}
         {showSecondFilter && (
           <TouchableOpacity onPress={handleSecondFilterPress}>
             <Box
               borderRadius="$full"
+              flexDirection="row"
+              alignItems="center"
+              px="$3"
+              py="$2"
               backgroundColor={
-                mode === "light"
-                  ? colors.gray.light[25]
-                  : colors.gray.dark[800]
+                mode === "light" ? colors.gray.light[25] : colors.gray.dark[800]
               }
             >
               <Ionicons
                 name={secondFilterIcon}
-                size={25}
+                size={20}
                 color={mode === "dark" ? "white" : "black"}
-                style={{ margin: 8 }}
               />
             </Box>
           </TouchableOpacity>
         )}
       </HStack>
 
-      {/* Main Filter ActionSheet */}
-      <Actionsheet 
-        isOpen={activeActionSheet === 'main'} 
-        onClose={handleClose} 
-        zIndex={999}
-      >
+      {/* ActionSheet Main */}
+      <Actionsheet isOpen={activeActionSheet === "main"} onClose={handleClose}>
         <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
+        <ActionsheetContent h="$72">
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          
-          {/* Title */}
+
+          {renderActiveFilters()}
+
           {actionSheetTitle && (
             <ActionsheetItem>
               <ActionsheetItemText fontSize="$lg" fontWeight="$semibold">
@@ -232,45 +280,54 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </ActionsheetItem>
           )}
 
-          {/* Message */}
-          {actionSheetMessage && (
-            <ActionsheetItem>
-              <ActionsheetItemText fontSize="$sm" color="$textLight500">
-                {actionSheetMessage}
-              </ActionsheetItemText>
-            </ActionsheetItem>
-          )}
-
-          {/* Filter Options */}
           {filterOptions.map((option, index) => (
             <ActionsheetItem
               key={`main-${option.value}-${index}`}
-              onPress={() => handleFilterOptionPress(option)}
+              onPress={() => handleFilterOptionPress(option, "main")}
             >
               <ActionsheetItemText>{option.label}</ActionsheetItemText>
             </ActionsheetItem>
           ))}
 
-          {/* Cancel Button */}
-          <ActionsheetItem onPress={handleClose}>
-            <ActionsheetItemText color="$red500">Batal</ActionsheetItemText>
-          </ActionsheetItem>
+          <HStack px="$4" py="$2" space="lg">
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                alignItems: "center",
+              }}
+              onPress={handleClearAllFilters}
+            >
+              <Text color="black" fontWeight="$semibold">Hapus Filter</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                backgroundColor: colors.primary,
+                alignItems: "center",
+              }}
+              onPress={handleClose}
+            >
+              <Text color="white" fontWeight="$semibold">Tutup</Text>
+            </TouchableOpacity>
+          </HStack>
         </ActionsheetContent>
       </Actionsheet>
 
-      {/* Second Filter ActionSheet */}
-      <Actionsheet 
-        isOpen={activeActionSheet === 'second'} 
-        onClose={handleClose} 
-        zIndex={999}
-      >
+      {/* ActionSheet Second */}
+      <Actionsheet isOpen={activeActionSheet === "second"} onClose={handleClose}>
         <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
+        <ActionsheetContent h="$72">
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          
-          {/* Title */}
+
+          {renderActiveFilters()}
+
           {secondActionSheetTitle && (
             <ActionsheetItem>
               <ActionsheetItemText fontSize="$lg" fontWeight="$semibold">
@@ -279,29 +336,46 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </ActionsheetItem>
           )}
 
-          {/* Message */}
-          {secondActionSheetMessage && (
-            <ActionsheetItem>
-              <ActionsheetItemText fontSize="$sm" color="$textLight500">
-                {secondActionSheetMessage}
-              </ActionsheetItemText>
-            </ActionsheetItem>
-          )}
+          {secondFilterOptions.map((option, index) => {
+            const isSelected = selectedSecondFilters.includes(option.label);
+            return (
+              <ActionsheetItem
+                key={`second-${option.value}-${index}`}
+                onPress={() => handleFilterOptionPress(option, "second")}
+              >
+                <ActionsheetItemText>
+                  {option.label} {isSelected ? "✓" : ""}
+                </ActionsheetItemText>
+              </ActionsheetItem>
+            );
+          })}
 
-          {/* Second Filter Options */}
-          {secondFilterOptions.map((option, index) => (
-            <ActionsheetItem
-              key={`second-${option.value}-${index}`}
-              onPress={() => handleFilterOptionPress(option)}
+          <HStack px="$4" py="$2" space="lg">
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                alignItems: "center",
+              }}
+              onPress={handleClearAllFilters}
             >
-              <ActionsheetItemText>{option.label}</ActionsheetItemText>
-            </ActionsheetItem>
-          ))}
+              <Text color="black" fontWeight="$semibold">Hapus Filter</Text>
+            </TouchableOpacity>
 
-          {/* Cancel Button */}
-          <ActionsheetItem onPress={handleClose}>
-            <ActionsheetItemText color="$red500">Batal</ActionsheetItemText>
-          </ActionsheetItem>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                backgroundColor: colors.primary,
+                alignItems: "center",
+              }}
+              onPress={handleClose}
+            >
+              <Text color="white" fontWeight="$semibold">Tutup</Text>
+            </TouchableOpacity>
+          </HStack>
         </ActionsheetContent>
       </Actionsheet>
     </>

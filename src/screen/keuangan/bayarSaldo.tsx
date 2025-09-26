@@ -137,7 +137,7 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     console.error("Payment error:", error);
-    Alert.alert("Error", "Terjadi kesalahan saat mengirim data");
+    Alert.alert("Error", "Mohon periksa kembali password anda");
   } finally {
     setLoading(false);
   }

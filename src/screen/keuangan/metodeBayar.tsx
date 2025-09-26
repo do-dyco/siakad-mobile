@@ -42,7 +42,7 @@ const MetodeBayar = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log("tag",from);
+  console.log("tag",dataVa);
   
 
   const allowedCodes = ["bca", "bni", "bri", "bmi", "mandiri"];
@@ -238,6 +238,9 @@ const MetodeBayar = () => {
       const selectedBank = selected.replace("-va", "");
       const vaChannel = vaChannels.find((ch) => ch.code === selectedBank);
 
+      console.log("va channel", vaChannel);
+      
+
       if (!vaChannel) {
         alert("Virtual Account tidak ditemukan.");
         return;
@@ -250,9 +253,15 @@ const MetodeBayar = () => {
         invoiceId: dataInvoice.id,
       };
 
+      console.log("param va",paramsVa);
+      
+
       try {
         const response = await apiService.paymentVa(paramsVa);
+        console.log("response",response);
+        
         const vaNumber = response?.data?.pembayaran_tagihan || {};
+
         router.push({
           pathname: "/transferVa",
           params: {
@@ -265,7 +274,7 @@ const MetodeBayar = () => {
             no_rekening: vaNumber.no_rekening,
           },
         });
-        return;
+        return response;
       } catch (error) {
         setShowAlert(true);
         console.error("Failed to fetch VA:", error);

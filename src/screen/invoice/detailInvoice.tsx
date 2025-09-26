@@ -30,10 +30,9 @@ import { Dimensions, useColorScheme } from "react-native";
 const DetailInvoice = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const { noInvoice } = useLocalSearchParams();
+  const { noInvoice, from, activeTab } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState({});
 
-  // console.log("noInvoice", noInvoice);
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -48,14 +47,14 @@ const DetailInvoice = () => {
     }
   };
 
-  const handleNext = () => {
+const handleNext = () => {
     if (!dataInvoice?.no_invoice) {
       console.warn("Invoice belum siap");
       return;
     }
 
     if (dataInvoice.status === "PAID") {
-      router.replace({
+      router.push({
         pathname: "/bayarInvoice",
         params: { invoice: dataInvoice.no_invoice },
       });
@@ -64,7 +63,11 @@ const DetailInvoice = () => {
 
     router.push({
       pathname: "/metodeBayar",
-      params: { invoice: dataInvoice.no_invoice },
+      params: { 
+        invoice: dataInvoice.no_invoice, 
+        from: from,
+        activeTab: activeTab,
+      },
     });
   };
 

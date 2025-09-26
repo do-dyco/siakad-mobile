@@ -33,7 +33,7 @@ import { router } from "expo-router";
 import NoData from "@/components/NoData";
 import colors from "@/src/config/colors";
 
-const absensi = () => {
+const Absensi = () => {
   const mode = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
@@ -200,4 +200,4 @@ const absensi = () => {
   );
 };
 
-export default absensi;
+export default Absensi;

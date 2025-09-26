@@ -222,14 +222,6 @@ useFocusEffect(
         setTahun("");
       }
     },
-    {
-      label: "Reset",
-      value: "refresh",
-      onPress: () => {
-        console.log("Reset");
-        handleRefresh();
-      }
-    }
   ];
 
   useEffect(() => {

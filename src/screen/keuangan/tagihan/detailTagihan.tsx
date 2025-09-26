@@ -68,7 +68,7 @@ const DetailTagihan = () => {
       params: { 
         invoice: dataInvoice.no_invoice, 
         from: from,
-        activeTab: tab,
+        activeTab: activeTab,
       },
     });
   };

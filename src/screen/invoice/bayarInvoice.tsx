@@ -39,11 +39,15 @@ import {
   ToastDescription,
 } from "@gluestack-ui/themed";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Dimensions, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
+import ShareSheet from "@/components/ShareSheet";
+import ViewShot from "react-native-view-shot";
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
 
 const BayarInvoice = () => {
   const mode = useColorScheme();
@@ -58,9 +62,12 @@ const BayarInvoice = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
   const insets = useSafeAreaInsets();
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const viewShotRef = useRef<any>(null);
 
-  console.log("noInvoice:", useLocalSearchParams());
+  console.log("bayar incoice:", useLocalSearchParams());
   // console.log("user:", user);
+  
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -114,6 +121,27 @@ const BayarInvoice = () => {
       });
     }
   };
+  
+  const handleDownload = async () => {
+  try {
+    const uri = await viewShotRef.current.capture();
+    const fileUri = FileSystem.documentDirectory + "invoice.png";
+
+    await FileSystem.copyAsync({ from: uri, to: fileUri });
+
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert("Izin penyimpanan ditolak");
+      return;
+    }
+    await MediaLibrary.saveToLibraryAsync(fileUri);
+    alert("Invoice berhasil disimpan di galeri");
+  } catch (e) {
+    console.error("Gagal unduh invoice:", e);
+    alert("Gagal menyimpan invoice");
+  }
+};
+
 
   useEffect(() => {
     fetchDetailInvoice();
@@ -128,6 +156,7 @@ const BayarInvoice = () => {
         <Header data={"Detail Invoice"} />
 
         <VStack m={20} mt={20} space={"md"}>
+          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }}>
           <Box borderRadius={16} borderWidth={1} borderColor="#373A41">
             <Box borderTopRightRadius={10} borderTopLeftRadius={10}>
               <ImageBackground
@@ -235,32 +264,38 @@ const BayarInvoice = () => {
                   </Text>
                 </HStack>
 
+              
                 <HStack
                   justifyContent="space-between"
                   mx={20}
                   mb={20}
                   space="md"
-                >
-                  <HStack space="md">
-                    <Feather name="download" size={20} color={colors.primary} />
-                    <Text color={colors.primary}> Unduh</Text>
-                  </HStack>
+                  >
+                  <TouchableOpacity onPress={handleDownload}>
+                    <HStack space="md">
+                      <Feather name="download" size={20} color={colors.primary} />
+                      <Text color={colors.primary}> Unduh</Text>
+                    </HStack>
+                  </TouchableOpacity>
                   <Text color={mode === "light" ? "#E9EAEB" : "#373A41"}>
                     {" "}
                     |{" "}
                   </Text>
-                  <HStack space="md">
-                    <Octicons
-                      name="share-android"
-                      size={20}
-                      color={colors.primary}
-                    />
-                    <Text color={colors.primary}> Bagikan</Text>
-                  </HStack>
+                    <TouchableOpacity onPress={() => setShowShareSheet(true)}>
+                      <HStack space="md">
+                        <Octicons
+                          name="share-android"
+                          size={20}
+                          color={colors.primary}
+                        />
+                        <Text color={colors.primary}> Bagikan</Text>
+                      </HStack>
+                  </TouchableOpacity>
                 </HStack>
               </VStack>
             </Box>
           </Box>
+        </ViewShot>
 
           <TouchableOpacity onPress={toggleActionsheet}>
             <Box
@@ -643,6 +678,15 @@ const BayarInvoice = () => {
           </Accordion>
         </ActionsheetContent>
       </Actionsheet>
+
+      <ShareSheet
+        isOpen={showShareSheet}
+        onClose={() => setShowShareSheet(false)}
+        bgColor={bgColor}
+        textColor={textColor}
+        invoice={dataInvoice?.no_invoice}
+        nominal={dataInvoice?.nominal}
+      />
     </SafeAreaView>
   );
 };

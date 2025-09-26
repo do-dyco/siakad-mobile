@@ -109,7 +109,7 @@ export default {
   paymentVa: async (params: any) => {
     try {
       const response: AxiosResponse = await axiosInstance.post(
-        PATH.API_DEV + `/v2/user/pembayaran-tagihan/payment-gateway`,
+        PATH.API_DEV + `/v2/user/pembayaran-tagihan`,
         params
       );
       return response.data;
