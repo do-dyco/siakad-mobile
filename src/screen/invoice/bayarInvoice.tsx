@@ -156,7 +156,7 @@ const BayarInvoice = () => {
         <Header data={"Detail Invoice"} from={from} activeTab={activeTab}/>
 
         <VStack m={20} mt={20} space={"md"}>
-          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: "white", borderRadius: 16}}>
+          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: isDark ? "black" : "white", borderRadius: 16}}>
           <Box borderRadius={16} borderWidth={1} borderColor="#373A41">
             <Box borderTopRightRadius={10} borderTopLeftRadius={10}>
               <ImageBackground

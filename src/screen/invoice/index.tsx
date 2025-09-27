@@ -349,7 +349,11 @@ const Invoice = () => {
   }, [search, startDate, endDate, tahun, activeStatusFilters]); // Include activeStatusFilters
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{
+          flex: 1,
+          backgroundColor: mode === "dark" ? "black" : "white",
+        }}
+        edges={["top", "bottom"]}>
       <ScrollView
         ref={scrollViewRef}
         backgroundColor={mode === "dark" ? "black" : "white"}

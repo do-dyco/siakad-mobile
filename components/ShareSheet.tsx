@@ -23,7 +23,7 @@ type ShareSheetProps = {
 // ✅ Komponen invoice preview (hanya ditampilkan, tidak dipakai untuk share)
 const InvoicePreview = React.forwardRef<any, ShareSheetProps>(
   ({ invoice, nominal }, ref) => (
-    <ViewShot ref={ref} options={{ format: "png", quality: 0.9 }}>
+    <ViewShot ref={ref} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: mode === isDark ? "black" : "white", borderRadius: 16}}>
       <VStack
         p={20}
         bg="white"

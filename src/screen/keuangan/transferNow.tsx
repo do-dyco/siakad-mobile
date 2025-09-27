@@ -238,9 +238,15 @@ const TransferNow = () => {
 
   return (
     <>
-      <SafeAreaView flex={1} mb={35}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: mode === "dark" ? "black" : "white",
+        }}
+        edges={["top", "bottom"]}
+      >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, backgroundColor: mode === "dark" ? "black" : "white" }}
           backgroundColor={mode === "dark" ? "black" : "white"}
           height={screenHeight}
         >
@@ -500,7 +506,7 @@ const TransferNow = () => {
           </VStack>
         </ScrollView>
 
-        <Box bgColor={bgColor}>
+        <Box bgColor={mode === "dark" ? "black" : "white"} position="absolute" bottom={0} width="100%" pb={20}>
           <VStack space="md" m={10}>
             <Center>
               <TouchableOpacity onPress={() => setShowModal(true)}>
@@ -538,14 +544,20 @@ const TransferNow = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         finalFocusRef={ref}
+       
       >
         <ModalBackdrop />
-        <ModalContent>
+        <ModalContent  bgColor={mode === "dark" ? "black" : "white"}>
           <ModalHeader>
             <Heading size="lg" color={textColor} fontFamily="Lato">
               Batalkan Transaksi?
             </Heading>
-            <MaterialCommunityIcons name="close" size={25} color="#94979C" />
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
+              style={{ position: "absolute", right: 15, top: 15 }}
+            >
+              <MaterialCommunityIcons name="close" size={25} color="#94979C" />
+            </TouchableOpacity>
           </ModalHeader>
           <ModalBody>
             <Text fontFamily="Lato" color={textColor} size="xs">

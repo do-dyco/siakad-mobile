@@ -243,8 +243,11 @@ useFocusEffect(
 
   return (
     <SafeAreaView
-      backgroundColor={mode === "dark" ? "black" : "white"}
-      height={screenHeight}
+     style={{
+          flex: 1,
+          backgroundColor: mode === "dark" ? "black" : "white",
+        }}
+        edges={["top", "bottom"]}
     >
       {/* Header */}
       <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>
