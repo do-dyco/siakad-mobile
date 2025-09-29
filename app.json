@@ -13,7 +13,13 @@
       "backgroundColor": "#FFFFFF"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "react-native-reanimated",
+        {
+          "arg": "value"
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
