@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useAuthStore } from "../src/store/authStore";
 import { useFonts } from "expo-font";
+import * as NavigationBar from 'expo-navigation-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +37,19 @@ export default function RootLayout() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    // Set navigation bar color based on theme
+    if (colorScheme) {
+      if (colorScheme === "dark") {
+        NavigationBar.setBackgroundColorAsync("#000000");
+        NavigationBar.setButtonStyleAsync("light");
+      } else {
+        NavigationBar.setBackgroundColorAsync("#ffffff");
+        NavigationBar.setButtonStyleAsync("dark");
+      }
+    }
+  }, [colorScheme]);
 
   useEffect(() => {
     if (!fontsLoaded || !hasHydrated || !isMounted) return;

@@ -250,7 +250,7 @@ const TransferNow = () => {
           backgroundColor={mode === "dark" ? "black" : "white"}
           height={screenHeight}
         >
-          <Header data={"Transfer Sekarang"} />
+          <Header data={"Transfer Sekarang"} backTo={from} activeTab={activeTab}/>
           <VStack space="md" flex={1} m={10}>
             <Text fontFamily="Lato" color={textColor} size="lg">
               Transfer Bank
