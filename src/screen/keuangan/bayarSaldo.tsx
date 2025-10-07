@@ -1,6 +1,7 @@
 import CustomBadge from "@/components/CustomBadge";
 import DashedDivider from "@/components/dashedDivider";
 import Header from "@/components/Header";
+import AlertCustom from "@/components/Alert";
 import colors from "@/src/config/colors";
 import {
   Entypo,
@@ -44,6 +45,12 @@ import {
   AccordionHeader,
   ChevronUpIcon,
   ChevronDownIcon,
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -79,6 +86,13 @@ const BayarSaldo = () => {
   const user = useUserStore((state) => state.user);
   const [dataInvoice, setDataInvoice] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
+  const [userBalance, setUserBalance] = useState<number>(0);
+  const [balanceLoading, setBalanceLoading] = useState<boolean>(true);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState<"error" | "warning">("error");
+  const alertRef = useRef();
 
   const handleClose = () => setShowActionsheet(false);
   const rawAmount =
@@ -106,6 +120,20 @@ const BayarSaldo = () => {
     }
   };
 
+  const fetchUserBalance = async () => {
+    try {
+      const response = await apiService.mySaldo();
+      if (response?.data?.saldo !== undefined) {
+        setUserBalance(response.data.saldo);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user balance:", error);
+      setUserBalance(0);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
   const params = {
     invoiceId: dataInvoice.id,
     metode: "saldo",
@@ -117,9 +145,21 @@ const BayarSaldo = () => {
 
   useEffect(() => {
     fetchDetail();
+    fetchUserBalance();
   }, []);
 
 const handleSubmit = async () => {
+  const invoiceAmount = Number(dataInvoice?.nominal) || 0;
+  
+  // Check balance before making the API call
+  if (userBalance < invoiceAmount) {
+    setAlertTitle("Saldo Tidak Cukup");
+    setAlertMessage(`Saldo Anda tidak mencukupi. Saldo Anda saat ini Rp ${formatRupiah(userBalance)}, sementara jumlah tagihan sebesar Rp ${formatRupiah(invoiceAmount)}. Silakan isi ulang saldo terlebih dahulu.`);
+    setAlertType("error");
+    setShowAlert(true);
+    return;
+  }
+
   setLoading(true);
   try {
     const response = await apiService.payment(params);
@@ -133,11 +173,17 @@ const handleSubmit = async () => {
         },
       });
     } else {
-      Alert.alert("Error", response?.data?.message || "Gagal mengirim data");
+      setAlertTitle("Error");
+      setAlertMessage(response?.data?.message || "Gagal mengirim data");
+      setAlertType("error");
+      setShowAlert(true);
     }
   } catch (error) {
     console.error("Payment error:", error);
-    Alert.alert("Error", "Mohon periksa kembali password anda");
+    setAlertTitle("Error");
+    setAlertMessage("Mohon periksa kembali password anda");
+    setAlertType("error");
+    setShowAlert(true);
   } finally {
     setLoading(false);
   }
@@ -348,12 +394,13 @@ const handleSubmit = async () => {
               bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
             />
             <Button
-              bgColor={colors.primary}
+              bgColor={userBalance < Number(dataInvoice?.nominal) ? colors.gray.light[300] : colors.primary}
               borderRadius={10}
               mt={4}
               onPress={handleSubmit}
+              disabled={userBalance < Number(dataInvoice?.nominal)}
             >
-              <Text fontFamily="Lato" color="white">
+              <Text fontFamily="Lato" color={userBalance < Number(dataInvoice?.nominal) ? colors.gray.light[500] : "white"}>
                 Bayar Sekarang
               </Text>
             </Button>
@@ -616,6 +663,38 @@ const handleSubmit = async () => {
           </Accordion>
         </VStack>
       </CustomActionSheet>
+      
+      {/* AlertDialog for error messages */}
+      <AlertDialog
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        leastDestructiveRef={alertRef}
+      >
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Heading size="lg" color={textColor} fontFamily="Lato">
+              {alertTitle}
+            </Heading>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <Text fontFamily="Lato" color={textColor} size="sm">
+              {alertMessage}
+            </Text>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button
+              size="sm"
+              action="positive"
+              borderWidth="$0"
+              onPress={() => setShowAlert(false)}
+              bgColor={colors.primary}
+            >
+              <ButtonText fontFamily="Lato">Tutup</ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

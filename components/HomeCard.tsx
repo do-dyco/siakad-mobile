@@ -28,7 +28,11 @@ export default function SaldoScreen({
     return new Intl.NumberFormat("id-ID").format(numericValue);
   };
 
-  const safeSaldo = data?.saldo ?? "0";
+  const safeSaldo =
+  !data?.saldo || (typeof data.saldo === "object" && Object.keys(data.saldo).length === 0)
+    ? "0"
+    : data.saldo;
+
 
   return (
     <ScrollView
