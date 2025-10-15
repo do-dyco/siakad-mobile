@@ -34,9 +34,15 @@ import {
   AccordionIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  Toast,
-  ToastTitle,
-  ToastDescription,
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogCloseButton,
+  AlertDialogBody,
+  AlertDialogFooter,
+  Button,
+  ButtonText,
 } from "@gluestack-ui/themed";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
@@ -56,7 +62,8 @@ const BayarInvoice = () => {
   const textColor = isDark ? "white" : "black";
   const bgColor = isDark ? "black" : "white";
   const [loading, setLoading] = useState(false);
-  const { invoice, from, activeTab } = useLocalSearchParams();
+  const { invoice, from, activeTab, nominal, no_invoice, metode } =
+    useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState([]);
   const { user } = useUserStore();
   const [showActionsheet, setShowActionsheet] = useState(false);
@@ -64,10 +71,28 @@ const BayarInvoice = () => {
   const insets = useSafeAreaInsets();
   const [showShareSheet, setShowShareSheet] = useState(false);
   const viewShotRef = useRef<any>(null);
+  const [alertData, setAlertData] = useState({
+    isOpen: false,
+    type: "success" as "success" | "error",
+    title: "",
+    message: "",
+  });
+
+  const [capturedUri, setCapturedUri] = useState<string | null>(null);
+
+  const handleOpenShareSheet = async () => {
+    try {
+      const uri = await viewShotRef.current.capture();
+      setCapturedUri(uri);
+      setShowShareSheet(true);
+    } catch (e) {
+      console.error("Gagal capture invoice:", e);
+    }
+  };
 
   console.log("bayar incoice:", useLocalSearchParams());
+  console.log("no_invoice:", dataInvoice);
   // console.log("user:", user);
-  
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
@@ -75,7 +100,7 @@ const BayarInvoice = () => {
   const fetchDetailInvoice = async () => {
     setLoading(true);
     try {
-      const response = await apiService.myInvoiceDetail(invoice);
+      const response = await apiService.myInvoiceDetail(invoice || no_invoice);
       setDataInvoice(response.data.invoice_tagihan);
     } catch (error) {
       console.error("Error fetching invoice details:", error);
@@ -83,65 +108,48 @@ const BayarInvoice = () => {
     setLoading(false);
   };
 
+  const handleCloseAlert = () => setAlertData({ ...alertData, isOpen: false });
+
   const copyToClipboard = async (text: string, label = "Teks") => {
     try {
       await Clipboard.setStringAsync(text);
-      toast.show({
-        placement: "bottom",
-        render: ({ id }) => (
-          <Toast
-            nativeID={`toast-${id}`}
-            action="success"
-            variant="solid"
-            mt={insets.top + 8}
-            alignSelf="center"
-          >
-            <VStack space="xs">
-              <ToastTitle>Disalin</ToastTitle>
-              <ToastDescription>
-                {label} telah disalin ke clipboard
-              </ToastDescription>
-            </VStack>
-          </Toast>
-        ),
+      setAlertData({
+        isOpen: true,
+        type: "success",
+        title: "Berhasil Disalin",
+        message: `${label} telah disalin ke clipboard.`,
       });
+      setTimeout(() => handleCloseAlert(), 2000); // auto close
     } catch (e) {
-      toast.show({
-        placement: "bottom",
-        render: ({ id }) => (
-          <Toast nativeID={`toast-${id}`} action="error" variant="solid">
-            <VStack space="xs">
-              <ToastTitle>Gagal</ToastTitle>
-              <ToastDescription>
-                Tidak dapat menyalin ke clipboard
-              </ToastDescription>
-            </VStack>
-          </Toast>
-        ),
+      setAlertData({
+        isOpen: true,
+        type: "error",
+        title: "Gagal Menyalin",
+        message: "Tidak dapat menyalin ke clipboard.",
       });
+      setTimeout(() => handleCloseAlert(), 2500);
     }
   };
-  
+
   const handleDownload = async () => {
-  try {
-    const uri = await viewShotRef.current.capture();
-    const fileUri = FileSystem.documentDirectory + "invoice.png";
+    try {
+      const uri = await viewShotRef.current.capture();
+      const fileUri = FileSystem.documentDirectory + "invoice.png";
 
-    await FileSystem.copyAsync({ from: uri, to: fileUri });
+      await FileSystem.copyAsync({ from: uri, to: fileUri });
 
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== "granted") {
-      alert("Izin penyimpanan ditolak");
-      return;
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Izin penyimpanan ditolak");
+        return;
+      }
+      await MediaLibrary.saveToLibraryAsync(fileUri);
+      alert("Invoice berhasil disimpan di galeri");
+    } catch (e) {
+      console.error("Gagal unduh invoice:", e);
+      alert("Gagal menyimpan invoice");
     }
-    await MediaLibrary.saveToLibraryAsync(fileUri);
-    alert("Invoice berhasil disimpan di galeri");
-  } catch (e) {
-    console.error("Gagal unduh invoice:", e);
-    alert("Gagal menyimpan invoice");
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchDetailInvoice();
@@ -153,135 +161,148 @@ const BayarInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Invoice"} from={from} activeTab={activeTab}/>
+        <Header data={"Detail Invoice"} from={from} activeTab={activeTab} />
 
         <VStack m={20} mt={20} space={"md"}>
-          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: isDark ? "black" : "white", borderRadius: 16}}>
-          <Box borderRadius={16} borderWidth={1} borderColor="#373A41">
-            <Box borderTopRightRadius={10} borderTopLeftRadius={10}>
-              <ImageBackground
-                source={require("@/assets/images/paymentSuccess.png")}
-                style={{
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                  width: "auto",
-                }}
-                imageStyle={{
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                }}
-              >
-                <Text
-                  color="white"
-                  fontWeight={"$semibold"}
-                  m={15}
-                  fontFamily="Lato"
-                  fontSize={16}
+          <ViewShot
+            ref={viewShotRef}
+            options={{ format: "png", quality: 0.9 }}
+            style={{
+              backgroundColor: isDark ? "black" : "white",
+              borderRadius: 16,
+            }}
+          >
+            <Box borderRadius={16} borderWidth={1} borderColor="#373A41">
+              <Box borderTopRightRadius={10} borderTopLeftRadius={10}>
+                <ImageBackground
+                  source={require("@/assets/images/paymentSuccess.png")}
+                  style={{
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
+                    width: "auto",
+                  }}
+                  imageStyle={{
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
+                  }}
                 >
-                  {dataInvoice?.no_invoice || ""}
-                </Text>
-              </ImageBackground>
-
-              <VStack space="md" mt={10} mx={10}>
-                <Center>
                   <Text
-                    color={mode === "dark" ? "white" : "black"}
+                    color="white"
+                    fontWeight={"$semibold"}
+                    m={15}
                     fontFamily="Lato"
                     fontSize={16}
-                    fontWeight={"$semibold"}
                   >
-                    Transaksi Berhasil
+                    {dataInvoice?.no_invoice || no_invoice}
                   </Text>
+                </ImageBackground>
 
-                  <Text size="sm" fontFamily="Lato" fontSize={12}>
-                    {dataInvoice?.created_at || ""}
-                  </Text>
+                <VStack space="md" mt={10} mx={10}>
+                  <Center>
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={16}
+                      fontWeight={"$semibold"}
+                    >
+                      Transaksi Berhasil
+                    </Text>
 
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    size="2xl"
-                    mt={10}
-                    fontWeight={"$bold"}
-                    fontFamily="Lato"
-                    fontSize={24}
-                  >
-                    Rp. {formatRupiah(dataInvoice?.pembayaran?.nominal) || "0"}
-                  </Text>
-                </Center>
-                <DashedDivider />
+                    <Text size="sm" fontFamily="Lato" fontSize={12}>
+                      {dataInvoice?.created_at || ""}
+                    </Text>
 
-                <HStack justifyContent="space-between">
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={14}
-                  >
-                    Pengirim
-                  </Text>
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={14}
-                    fontWeight={"$semibold"}
-                  >
-                    {user?.username || ""}
-                  </Text>
-                </HStack>
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      size="2xl"
+                      mt={10}
+                      fontWeight={"$bold"}
+                      fontFamily="Lato"
+                      fontSize={24}
+                    >
+                      Rp.{" "}
+                      {formatRupiah(
+                        dataInvoice?.pembayaran?.nominal || nominal
+                      ) || "0"}
+                    </Text>
+                  </Center>
+                  <DashedDivider />
 
-                <HStack justifyContent="space-between">
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={14}
-                  >
-                    Transfer melalui
-                  </Text>
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={14}
-                    fontWeight={"$semibold"}
-                  >
-                    {dataInvoice?.pembayaran?.metode || ""}
-                  </Text>
-                </HStack>
+                  <HStack justifyContent="space-between">
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={14}
+                    >
+                      Pengirim
+                    </Text>
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={14}
+                      fontWeight={"$semibold"}
+                    >
+                      {user?.username || ""}
+                    </Text>
+                  </HStack>
 
-                <HStack justifyContent="space-between">
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={14}
-                  >
-                    Penerima
-                  </Text>
-                  <Text
-                    color={mode === "dark" ? "white" : "black"}
-                    fontFamily="Lato"
-                    fontSize={16}
-                    fontWeight={"$semibold"}
-                  >
-                    {dataInvoice?.profil_sekolah?.nama_sekolah || ""}
-                  </Text>
-                </HStack>
+                  <HStack justifyContent="space-between">
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={14}
+                    >
+                      Transfer melalui
+                    </Text>
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={14}
+                      fontWeight={"$semibold"}
+                    >
+                      {dataInvoice?.pembayaran?.metode || "Saldo"}
+                    </Text>
+                  </HStack>
 
-              
-                <HStack
-                  justifyContent="space-between"
-                  mx={20}
-                  mb={20}
-                  space="md"
+                  <HStack justifyContent="space-between">
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={14}
+                    >
+                      Penerima
+                    </Text>
+                    <Text
+                      color={mode === "dark" ? "white" : "black"}
+                      fontFamily="Lato"
+                      fontSize={16}
+                      fontWeight={"$semibold"}
+                    >
+                      {dataInvoice?.profil_sekolah?.nama_sekolah || ""}
+                    </Text>
+                  </HStack>
+
+                  <HStack
+                    justifyContent="space-between"
+                    mx={20}
+                    mb={20}
+                    space="md"
                   >
-                  <TouchableOpacity onPress={handleDownload}>
-                    <HStack space="md">
-                      <Feather name="download" size={20} color={colors.primary} />
-                      <Text color={colors.primary}> Unduh</Text>
-                    </HStack>
-                  </TouchableOpacity>
-                  <Text color={mode === "light" ? "#E9EAEB" : "#373A41"}>
-                    {" "}
-                    |{" "}
-                  </Text>
-                    <TouchableOpacity onPress={() => setShowShareSheet(true)}>
+                    <TouchableOpacity onPress={handleDownload}>
+                      <HStack space="md">
+                        <Feather
+                          name="download"
+                          size={20}
+                          color={colors.primary}
+                        />
+                        <Text color={colors.primary}> Unduh</Text>
+                      </HStack>
+                    </TouchableOpacity>
+                    <Text color={mode === "light" ? "#E9EAEB" : "#373A41"}>
+                      {" "}
+                      |{" "}
+                    </Text>
+                    <TouchableOpacity onPress={handleOpenShareSheet}>
                       <HStack space="md">
                         <Octicons
                           name="share-android"
@@ -290,12 +311,12 @@ const BayarInvoice = () => {
                         />
                         <Text color={colors.primary}> Bagikan</Text>
                       </HStack>
-                  </TouchableOpacity>
-                </HStack>
-              </VStack>
+                    </TouchableOpacity>
+                  </HStack>
+                </VStack>
+              </Box>
             </Box>
-          </Box>
-        </ViewShot>
+          </ViewShot>
 
           <TouchableOpacity onPress={toggleActionsheet}>
             <Box
@@ -679,13 +700,38 @@ const BayarInvoice = () => {
         </ActionsheetContent>
       </Actionsheet>
 
+      <AlertDialog isOpen={alertData.isOpen} onClose={handleCloseAlert}>
+        <AlertDialogBackdrop />
+        <AlertDialogContent mt={16}>
+          <AlertDialogBody mt={16}>
+            <HStack justifyContent="space-between" alignItems="center">
+              <HStack alignItems="center" space="md">
+                <Box bgColor={"#000000"} p={2} borderRadius={"$full"}>
+                  <Ionicons
+                    name={alertData.type === "success" ? "checkmark" : "alert"}
+                    size={18}
+                    color="white"
+                  />
+                </Box>
+                <Text fontSize={14} fontFamily="Lato-Bold" ml={8}>
+                  {alertData.title}
+                </Text>
+              </HStack>
+            </HStack>
+
+            <Text fontSize={12} fontFamily="Lato" mt={2} ml={40} mb={16}>
+              {alertData.message}
+            </Text>
+          </AlertDialogBody>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <ShareSheet
         isOpen={showShareSheet}
         onClose={() => setShowShareSheet(false)}
         bgColor={bgColor}
         textColor={textColor}
-        invoice={dataInvoice?.no_invoice}
-        nominal={dataInvoice?.nominal}
+        imageUri={capturedUri}
       />
     </SafeAreaView>
   );

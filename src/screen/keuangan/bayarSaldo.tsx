@@ -81,7 +81,7 @@ const BayarSaldo = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
-  const { nominal, no_invoice } = useLocalSearchParams();
+  const { nominal, no_invoice, from, activeTab } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
   const user = useUserStore((state) => state.user);
   const [dataInvoice, setDataInvoice] = useState<any>({});
@@ -102,9 +102,8 @@ const BayarSaldo = () => {
   const lastThree = amount.slice(-3);
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? "black" : "white";
-  
-  const token = useUserStore.getState().accessToken;
 
+  const token = useUserStore.getState().accessToken;
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
@@ -139,6 +138,8 @@ const BayarSaldo = () => {
     metode: "saldo",
     token: token,
     password: password,
+    from: from,
+    activeTab: activeTab,
   };
 
   console.log("param", params);
@@ -148,47 +149,52 @@ const BayarSaldo = () => {
     fetchUserBalance();
   }, []);
 
-const handleSubmit = async () => {
-  const invoiceAmount = Number(dataInvoice?.nominal) || 0;
-  
-  // Check balance before making the API call
-  if (userBalance < invoiceAmount) {
-    setAlertTitle("Saldo Tidak Cukup");
-    setAlertMessage(`Saldo Anda tidak mencukupi. Saldo Anda saat ini Rp ${formatRupiah(userBalance)}, sementara jumlah tagihan sebesar Rp ${formatRupiah(invoiceAmount)}. Silakan isi ulang saldo terlebih dahulu.`);
-    setAlertType("error");
-    setShowAlert(true);
-    return;
-  }
+  const handleSubmit = async () => {
+    const invoiceAmount = Number(dataInvoice?.nominal) || 0;
 
-  setLoading(true);
-  try {
-    const response = await apiService.payment(params);
-
-    if (response?.meta?.status_code === 200) {
-      router.push({
-        pathname: "/bayarInvoice",
-        params: {
-          nominal: nominal,
-          no_invoice: dataInvoice.no_invoice,
-        },
-      });
-    } else {
-      setAlertTitle("Error");
-      setAlertMessage(response?.data?.message || "Gagal mengirim data");
+    // Check balance before making the API call
+    if (userBalance < invoiceAmount) {
+      setAlertTitle("Saldo Tidak Cukup");
+      setAlertMessage(
+        `Saldo Anda tidak mencukupi. Saldo Anda saat ini Rp ${formatRupiah(
+          userBalance
+        )}, sementara jumlah tagihan sebesar Rp ${formatRupiah(
+          invoiceAmount
+        )}. Silakan isi ulang saldo terlebih dahulu.`
+      );
       setAlertType("error");
       setShowAlert(true);
+      return;
     }
-  } catch (error) {
-    console.error("Payment error:", error);
-    setAlertTitle("Error");
-    setAlertMessage("Mohon periksa kembali password anda");
-    setAlertType("error");
-    setShowAlert(true);
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setLoading(true);
+    try {
+      const response = await apiService.payment(params);
+
+      if (response?.meta?.status_code === 200) {
+        router.push({
+          pathname: "/bayarInvoice",
+          params: {
+            nominal: nominal,
+            no_invoice: dataInvoice.no_invoice,
+          },
+        });
+      } else {
+        setAlertTitle("Error");
+        setAlertMessage(response?.data?.message || "Gagal mengirim data");
+        setAlertType("error");
+        setShowAlert(true);
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      setAlertTitle("Error");
+      setAlertMessage("Mohon periksa kembali password anda");
+      setAlertType("error");
+      setShowAlert(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!dataInvoice || Object.keys(dataInvoice).length === 0) {
     return (
@@ -394,13 +400,24 @@ const handleSubmit = async () => {
               bgColor={mode === "dark" ? colors.border : colors.gray.light[200]}
             />
             <Button
-              bgColor={userBalance < Number(dataInvoice?.nominal) ? colors.gray.light[300] : colors.primary}
+              bgColor={
+                userBalance < Number(dataInvoice?.nominal)
+                  ? colors.gray.light[300]
+                  : colors.primary
+              }
               borderRadius={10}
               mt={4}
               onPress={handleSubmit}
               disabled={userBalance < Number(dataInvoice?.nominal)}
             >
-              <Text fontFamily="Lato" color={userBalance < Number(dataInvoice?.nominal) ? colors.gray.light[500] : "white"}>
+              <Text
+                fontFamily="Lato"
+                color={
+                  userBalance < Number(dataInvoice?.nominal)
+                    ? colors.gray.light[500]
+                    : "white"
+                }
+              >
                 Bayar Sekarang
               </Text>
             </Button>
@@ -414,7 +431,7 @@ const handleSubmit = async () => {
         finalFocusRef={ref}
       >
         <ModalBackdrop />
-        <ModalContent>
+        <ModalContent bgColor={bgColor}>
           <ModalHeader>
             <Heading size="lg" color={textColor} fontFamily="Lato">
               Batalkan Transaksi?
@@ -663,7 +680,7 @@ const handleSubmit = async () => {
           </Accordion>
         </VStack>
       </CustomActionSheet>
-      
+
       {/* AlertDialog for error messages */}
       <AlertDialog
         isOpen={showAlert}
@@ -671,7 +688,7 @@ const handleSubmit = async () => {
         leastDestructiveRef={alertRef}
       >
         <AlertDialogBackdrop />
-        <AlertDialogContent>
+        <AlertDialogContent bgColor={bgColor}>
           <AlertDialogHeader>
             <Heading size="lg" color={textColor} fontFamily="Lato">
               {alertTitle}

@@ -1,14 +1,13 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   TouchableOpacity,
-  Share,
-  Linking,
   Alert,
   useColorScheme,
+  Share,
+  Linking,
 } from "react-native";
-import { Center, HStack, Text, VStack } from "@gluestack-ui/themed";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import ViewShot from "react-native-view-shot";
+import { Center, HStack, Text, VStack, Image } from "@gluestack-ui/themed";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import CustomActionSheet from "@/components/CustomActionSheet";
 
 type ShareSheetProps = {
@@ -16,159 +15,176 @@ type ShareSheetProps = {
   onClose: () => void;
   bgColor?: string;
   textColor?: string;
+  imageUri?: string; // hasil tangkapan ViewShot
   invoice?: string;
-  nominal?: number;
+  nominal?: number | string;
 };
-
-// ✅ Komponen invoice preview (hanya ditampilkan, tidak dipakai untuk share)
-const InvoicePreview = React.forwardRef<any, ShareSheetProps>(
-  ({ invoice, nominal }, ref) => (
-    <ViewShot ref={ref} options={{ format: "png", quality: 0.9 }} style={{backgroundColor: mode === isDark ? "black" : "white", borderRadius: 16}}>
-      <VStack
-        p={20}
-        bg="white"
-        borderRadius={12}
-        borderWidth={1}
-        borderColor="#ccc"
-        alignItems="center"
-      >
-        <Text fontWeight="bold" fontSize={18} mb={5}>
-          Invoice #{invoice}
-        </Text>
-        <Text fontSize={16}>Total: Rp. {nominal?.toLocaleString("id-ID")}</Text>
-      </VStack>
-    </ViewShot>
-  )
-);
 
 export default function ShareSheet({
   isOpen,
   onClose,
   bgColor = "white",
   textColor = "black",
+  imageUri,
   invoice,
   nominal,
 }: ShareSheetProps) {
-  
-    const viewShotRef = useRef<any>(null);
-    const mode = useColorScheme();
+  const mode = useColorScheme();
 
-  // 📤 Share invoice sebagai teks (via native share sheet)
-  const shareAsText = async () => {
+  // 📤 Share gambar ke aplikasi lain (WhatsApp, Telegram, Instagram)
+  const shareImage = async () => {
+    if (!imageUri) {
+      Alert.alert("Gagal", "Gambar invoice belum tersedia untuk dibagikan.");
+      return;
+    }
+
     try {
-      const message = `📄 Invoice #${invoice}\nTotal: Rp. ${nominal?.toLocaleString(
-        "id-ID"
-      )}\n\nTerima kasih telah melakukan pembayaran.`;
-
       await Share.share({
-        message,
+        url: imageUri,
+        message: "📄 Invoice pembayaran Anda",
         title: "Bagikan Invoice",
       });
     } catch (e) {
-      console.error("Gagal share:", e);
+      console.error("Gagal share gambar:", e);
+      Alert.alert("Gagal", "Tidak dapat membagikan gambar invoice.");
     }
+
     onClose();
   };
 
-  const openWhatsApp = (message: string) => {
-    const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
-    Linking.openURL(url).catch(() =>
-      Alert.alert("Error", "WhatsApp tidak terpasang di perangkat ini")
-    );
-  };
-
-  const openInstagram = () => {
-    const url = "instagram://app";
-    Linking.openURL(url).catch(() =>
-      Alert.alert("Error", "Instagram tidak terpasang di perangkat ini")
-    );
-  };
-
-  const openTelegram = (message: string) => {
-    const url = `tg://msg?text=${encodeURIComponent(message)}`;
-    Linking.openURL(url).catch(() =>
-      Alert.alert("Error", "Telegram tidak terpasang di perangkat ini")
-    );
-  };
-
-  const openEmail = (subject: string, body: string) => {
-    const url = `mailto:?subject=${encodeURIComponent(
+  // 📧 Buka email langsung dengan subject dan body
+  const openEmail = async () => {
+    const subject = `Invoice Pembayaran #${invoice || ""}`;
+    const body = `Halo,\n\nBerikut rincian pembayaran Anda:\n\nInvoice: ${
+      invoice || "-"
+    }\nTotal: Rp. ${Number(nominal || 0).toLocaleString(
+      "id-ID"
+    )}\n\nTerima kasih.`;
+    const emailUrl = `mailto:?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
-    Linking.openURL(url).catch(() =>
-      Alert.alert("Error", "Tidak dapat membuka aplikasi email")
-    );
-  };
 
-  const defaultMessage = `📄 Invoice #${invoice}\nTotal: Rp. ${nominal?.toLocaleString(
-    "id-ID"
-  )}`;
+    try {
+      const supported = await Linking.canOpenURL(emailUrl);
+      if (supported) {
+        await Linking.openURL(emailUrl);
+      } else {
+        Alert.alert(
+          "Gagal",
+          "Tidak dapat membuka aplikasi email di perangkat ini."
+        );
+      }
+    } catch (e) {
+      console.error("Gagal membuka email:", e);
+      Alert.alert("Gagal", "Tidak dapat membuka aplikasi email.");
+    }
+
+    onClose();
+  };
 
   return (
     <CustomActionSheet isOpen={isOpen} onClose={onClose} bgColor={bgColor}>
-      {/* Preview invoice */}
-      <VStack space="md">
+      <VStack space="md" alignItems="center">
+        {/* Judul */}
         <Center>
-
-        <Text 
+          <Text
             color={mode === "dark" ? "white" : "black"}
             fontFamily="Lato"
             fontSize={14}
-            fontWeight={"$semibold"}>
-            Share dengan
-        </Text>
+            fontWeight="$semibold"
+          >
+            Bagikan Invoice Sebagai Gambar
+          </Text>
         </Center>
 
-            {/* Bagian share icons */}
-            <HStack
-                w="100%"
-                justifyContent="space-around"
-                alignItems="center"
-                mt={5}
-            >
-                <TouchableOpacity onPress={() => openWhatsApp(defaultMessage)}>
-                <VStack alignItems="center">
-                    <MaterialCommunityIcons name="whatsapp" size={32} color="green" />
-                    <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
-                    WhatsApp
-                    </Text>
-                </VStack>
-                </TouchableOpacity>
+        {/* Preview Thumbnail */}
+        {imageUri ? (
+          <Image
+            source={{ uri: imageUri }}
+            alt="Invoice Preview"
+            width={200}
+            height={120}
+            borderRadius={12}
+            mt={10}
+          />
+        ) : (
+          <Text fontSize={12} color={mode === "dark" ? "#AAA" : "#666"} mt={10}>
+            Gambar belum tersedia
+          </Text>
+        )}
 
-                <TouchableOpacity onPress={openInstagram}>
-                <VStack alignItems="center">
-                    <MaterialCommunityIcons name="instagram" size={32} color="#C13584" />
-                    <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
-                    Instagram
-                    </Text>
-                </VStack>
-                </TouchableOpacity>
+        {/* Barisan ikon share */}
+        <HStack
+          w="100%"
+          justifyContent="space-around"
+          alignItems="center"
+          mt={15}
+        >
+          {/* WhatsApp */}
+          <TouchableOpacity onPress={shareImage} activeOpacity={0.7}>
+            <VStack alignItems="center">
+              <MaterialCommunityIcons
+                name="whatsapp"
+                size={36}
+                color="#25D366"
+              />
+              <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
+                WhatsApp
+              </Text>
+            </VStack>
+          </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => openTelegram(defaultMessage)}>
-                <VStack alignItems="center">
-                    <MaterialCommunityIcons name="telegram" size={32} color="#0088cc" />
-                    <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
-                    Telegram
-                    </Text>
-                </VStack>
-                </TouchableOpacity>
+          {/* Instagram */}
+          <TouchableOpacity onPress={shareImage} activeOpacity={0.7}>
+            <VStack alignItems="center">
+              <MaterialCommunityIcons
+                name="instagram"
+                size={36}
+                color="#C13584"
+              />
+              <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
+                Instagram
+              </Text>
+            </VStack>
+          </TouchableOpacity>
 
-                <TouchableOpacity
-                onPress={() => openEmail("Invoice Pembayaran", defaultMessage)}
-                >
-                <VStack alignItems="center">
-                    <MaterialCommunityIcons
-                    name="email-outline"
-                    size={32}
-                    color="#ff9900"
-                    />
-                    <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
-                    Email
-                    </Text>
-                </VStack>
-                </TouchableOpacity>
-            </HStack>
-        </VStack>
+          {/* Telegram */}
+          <TouchableOpacity onPress={shareImage} activeOpacity={0.7}>
+            <VStack alignItems="center">
+              <MaterialIcons name="telegram" size={36} color="#0088cc" />
+              <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
+                Telegram
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+
+          {/* Email */}
+          <TouchableOpacity onPress={openEmail} activeOpacity={0.7}>
+            <VStack alignItems="center">
+              <MaterialCommunityIcons
+                name="email-outline"
+                size={36}
+                color="#FFA500"
+              />
+              <Text mt={2} fontSize={14} color={textColor} fontFamily="Lato">
+                Email
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+        </HStack>
+
+        {/* Tombol tutup */}
+        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+          <Text
+            mt={20}
+            fontSize={14}
+            fontFamily="Lato-Bold"
+            color={mode === "dark" ? "#AAA" : "#555"}
+          >
+            Tutup
+          </Text>
+        </TouchableOpacity>
+      </VStack>
     </CustomActionSheet>
   );
 }
