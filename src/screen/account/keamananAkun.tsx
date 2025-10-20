@@ -1,19 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import { Entypo } from "@expo/vector-icons";
-import {
-  SafeAreaView,
-  Text,
-  Box,
-  HStack,
-  VStack,
-  ScrollView,
-  Button,
-  InputField,
-  Input,
-  InputSlot,
-  useToast,
-} from "@gluestack-ui/themed";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -22,6 +9,8 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
+import { Box, Button, HStack, Input, InputField, InputSlot, SafeAreaView, ScrollView, Text, VStack, useToast } from '@gluestack-ui/themed';
+
 
 const KeamananAkun = () => {
   const mode = useColorScheme();

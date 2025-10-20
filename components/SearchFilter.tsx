@@ -12,8 +12,8 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetDragIndicator,
   ActionsheetItem,
-  ActionsheetItemText,
-} from "@gluestack-ui/themed";
+  ActionsheetItemText
+} from '@gluestack-ui/themed';
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import colors from "@/src/config/colors";
 

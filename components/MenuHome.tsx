@@ -10,8 +10,8 @@ import {
   ActionsheetContent,
   ActionsheetDragIndicatorWrapper,
   ActionsheetDragIndicator,
-  ScrollView,
-} from "@gluestack-ui/themed";
+  ScrollView
+} from '@gluestack-ui/themed';
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { TouchableOpacity, useColorScheme } from "react-native";

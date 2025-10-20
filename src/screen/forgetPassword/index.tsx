@@ -1,17 +1,3 @@
-import {
-  Input,
-  InputField,
-  VStack,
-  Text,
-  Button,
-  Center,
-  Image,
-  HStack,
-  InputSlot,
-  Divider,
-  SafeAreaView,
-  ScrollView,
-} from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
 import {
@@ -20,6 +6,8 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Button, Center, Divider, HStack, Image, Input, InputField, InputSlot, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 export default function ForgetPassword() {
   const router = useRouter();

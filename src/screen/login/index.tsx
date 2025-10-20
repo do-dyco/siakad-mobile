@@ -1,16 +1,3 @@
-import {
-  Input,
-  InputField,
-  VStack,
-  Text,
-  Button,
-  Center,
-  Image,
-  InputSlot,
-  ScrollView,
-  SafeAreaView,
-  Pressable,
-} from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
 import {
@@ -24,6 +11,8 @@ import AlertCustom from "@/components/Alert";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
 import { useAuthStore } from "@/src/store/authStore";
+import { Button, Center, Image, Input, InputField, InputSlot, Pressable, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 export default function Login() {
   const router = useRouter();

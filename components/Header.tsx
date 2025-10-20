@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from "react";
-import { Box, HStack, StatusBar, Text } from "@gluestack-ui/themed";
+import { Box, HStack, StatusBar, Text } from '@gluestack-ui/themed';
 import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

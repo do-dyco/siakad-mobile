@@ -1,20 +1,11 @@
 import React from "react";
-import {
-  VStack,
-  HStack,
-  Text,
-  Box,
-  Image,
-  ScrollView,
-  Pressable,
-  Icon,
-  Center,
-} from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
 import colors from "@/src/config/colors";
 import Header from "@/components/Header";
+import { Box, Center, HStack, Icon, Image, Pressable, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const ArticleDetail = () => {
   const router = useRouter();

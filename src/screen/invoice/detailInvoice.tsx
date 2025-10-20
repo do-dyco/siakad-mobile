@@ -3,29 +3,11 @@ import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  HStack,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Divider,
-  Box,
-  Accordion,
-  AccordionItem,
-  AccordionHeader,
-  AccordionTrigger,
-  AccordionTitleText,
-  AccordionIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  AccordionContent,
-  AccordionContentText,
-  Button,
-} from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Accordion, AccordionContent, AccordionContentText, AccordionHeader, AccordionIcon, AccordionItem, AccordionTitleText, AccordionTrigger, Box, Button, ChevronDownIcon, ChevronUpIcon, Divider, HStack, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const DetailInvoice = () => {
   const mode = useColorScheme();

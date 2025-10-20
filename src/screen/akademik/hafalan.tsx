@@ -9,21 +9,11 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import {
-  Box,
-  Center,
-  Divider,
-  HStack,
-  Input,
-  InputField,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Box, Center, Divider, HStack, Input, InputField, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const Hafalan = () => {
   const mode = useColorScheme();

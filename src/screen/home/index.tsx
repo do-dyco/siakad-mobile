@@ -6,16 +6,6 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import {
-  VStack,
-  Text,
-  Box,
-  HStack,
-  Image,
-  ScrollView,
-  ImageBackground,
-  SafeAreaView,
-} from "@gluestack-ui/themed";
 import { Dimensions, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
@@ -25,6 +15,8 @@ import { useUserStore } from "@/src/store/userStore";
 import apiService from "@/src/service/apiService";
 import TagihanCard from "@/components/TagihanCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Box, HStack, Image, ImageBackground, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const Home = () => {
   const screenWidth = Dimensions.get("window").width;

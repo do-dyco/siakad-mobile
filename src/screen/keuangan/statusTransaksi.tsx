@@ -1,37 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 import {
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Box,
-  HStack,
-  Badge,
-  Center,
-  Image,
-  Divider,
-  Avatar,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetDragIndicator,
-  Button,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-  useToast,
-  AccordionContent,
-  AccordionItem,
-  Accordion,
-  AccordionTrigger,
-  AccordionHeader,
-  AccordionIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@gluestack-ui/themed";
-import {
   Feather,
   Ionicons,
   MaterialCommunityIcons,
@@ -44,6 +13,8 @@ import colors from "@/src/config/colors";
 import { router, useLocalSearchParams } from "expo-router";
 import apiService from "@/src/service/apiService";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Accordion, AccordionContent, AccordionHeader, AccordionIcon, AccordionItem, AccordionTrigger, Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, Avatar, Badge, Box, Button, Center, ChevronDownIcon, ChevronUpIcon, Divider, HStack, Image, SafeAreaView, ScrollView, Text, Toast, ToastDescription, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
+
 
 const StatusTransaksi = () => {
   const mode = useColorScheme();

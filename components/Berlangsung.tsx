@@ -17,8 +17,8 @@ import {
   ToastDescription,
   useToast,
   Spinner,
-  Center,
-} from "@gluestack-ui/themed";
+  Center
+} from '@gluestack-ui/themed';
 import React, { useState, useRef, useMemo } from "react";
 import {
   Dimensions,

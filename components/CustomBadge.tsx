@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
-import { Badge, Text } from "@gluestack-ui/themed";
+import { Badge, Text } from '@gluestack-ui/themed';
 import colors from "@/src/config/colors";
 
 type Variant =

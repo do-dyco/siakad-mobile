@@ -4,8 +4,8 @@ import {
   ActionsheetBackdrop,
   ActionsheetContent,
   ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-} from "@gluestack-ui/themed";
+  ActionsheetDragIndicatorWrapper
+} from '@gluestack-ui/themed';
 
 interface CustomActionSheetProps {
   isOpen: boolean;

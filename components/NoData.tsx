@@ -1,5 +1,5 @@
 import { Octicons } from "@expo/vector-icons";
-import { Box, Center, Text } from "@gluestack-ui/themed";
+import { Box, Center, Text } from '@gluestack-ui/themed';
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
 

@@ -4,7 +4,7 @@ import {
   ImageBackground,
   Dimensions,
 } from "react-native";
-import { VStack, Box, HStack, Text } from "@gluestack-ui/themed";
+import { VStack, Box, HStack, Text } from '@gluestack-ui/themed';
 import { MaterialIcons, AntDesign, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";

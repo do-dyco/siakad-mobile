@@ -1,19 +1,11 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  HStack,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Box,
-  Divider,
-  Badge,
-} from "@gluestack-ui/themed";
 import { router, useNavigation } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Badge, Box, Divider, HStack, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const DetailMapel = () => {
   const navigation = useNavigation();

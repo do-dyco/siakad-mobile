@@ -1,15 +1,9 @@
 import Header from "@/components/Header";
 import { EvilIcons } from "@expo/vector-icons";
-import {
-  SafeAreaView,
-  Text,
-  Box,
-  HStack,
-  VStack,
-  ScrollView,
-} from "@gluestack-ui/themed";
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Box, HStack, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const informasiWali = () => {
   const mode = useColorScheme();

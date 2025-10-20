@@ -21,8 +21,8 @@ import {
   HStack,
   Badge,
   Image,
-  Box,
-} from "@gluestack-ui/themed";
+  Box
+} from '@gluestack-ui/themed';
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
 import { Dimensions, Pressable, useColorScheme } from "react-native";

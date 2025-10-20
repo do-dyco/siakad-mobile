@@ -6,19 +6,11 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import {
-  Box,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Divider,
-  HStack,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Box, Divider, HStack, Image, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const Rangking = () => {
   const mode = useColorScheme();

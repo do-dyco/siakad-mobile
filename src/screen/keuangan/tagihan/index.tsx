@@ -6,15 +6,6 @@ import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
 import { MaterialIcons } from "@expo/vector-icons";
-import {
-  Box,
-  Center,
-  Divider,
-  HStack,
-  SafeAreaView,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
@@ -25,6 +16,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
+import { Box, Center, Divider, HStack, SafeAreaView, Text, VStack } from '@gluestack-ui/themed';
+
 
 type ItemType = {
   id: string;

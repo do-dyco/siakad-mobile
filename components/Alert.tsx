@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Box, Text, VStack } from "@gluestack-ui/themed";
+import { Alert, Box, Text, VStack } from '@gluestack-ui/themed';
 import { useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 

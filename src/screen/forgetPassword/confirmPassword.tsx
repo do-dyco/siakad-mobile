@@ -1,26 +1,3 @@
-import {
-  Input,
-  InputField,
-  VStack,
-  Text,
-  Button,
-  Center,
-  Image,
-  HStack,
-  InputSlot,
-  Divider,
-  Heading,
-  Icon,
-  CloseIcon,
-  AlertDialog,
-  AlertDialogBackdrop,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogCloseButton,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Box,
-} from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
 import {
@@ -31,6 +8,8 @@ import {
 } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { useState } from "react";
+import { AlertDialog, AlertDialogBackdrop, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, Box, Button, Center, CloseIcon, Divider, HStack, Heading, Icon, Image, Input, InputField, InputSlot, Text, VStack } from '@gluestack-ui/themed';
+
 
 export default function ConfirmPassword() {
   const router = useRouter();

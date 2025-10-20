@@ -1,35 +1,5 @@
 import React, { useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
-import {
-  VStack,
-  Text,
-  Box,
-  HStack,
-  SafeAreaView,
-  ImageBackground,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetItem,
-  ScrollView,
-  Center,
-  Input,
-  InputField,
-  Badge,
-  BadgeText,
-  Switch,
-  Radio,
-  CircleIcon,
-  RadioIndicator,
-  RadioIcon,
-  RadioGroup,
-  Divider,
-  Checkbox,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckIcon,
-  Button,
-} from "@gluestack-ui/themed";
 import Header from "@/components/Header";
 import {
   Entypo,
@@ -44,6 +14,8 @@ import { TouchableOpacity } from "react-native";
 import colors from "@/src/config/colors";
 import { router } from "expo-router";
 import CustomBadge from "@/components/CustomBadge";
+import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetItem, Badge, BadgeText, Box, Button, Center, CheckIcon, Checkbox, CheckboxIcon, CheckboxIndicator, CircleIcon, Divider, HStack, ImageBackground, Input, InputField, Radio, RadioGroup, RadioIcon, RadioIndicator, SafeAreaView, ScrollView, Switch, Text, VStack } from '@gluestack-ui/themed';
+
 
 const Saldo = () => {
   const screenHeight = Dimensions.get("window").height;

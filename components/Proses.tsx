@@ -12,8 +12,8 @@ import {
   ToastDescription,
   useToast,
   Spinner,
-  Center,
-} from "@gluestack-ui/themed";
+  Center
+} from '@gluestack-ui/themed';
 import React, { useMemo } from "react";
 import {
   TouchableOpacity,

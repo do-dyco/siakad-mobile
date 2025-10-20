@@ -8,18 +8,10 @@ import {
   MaterialCommunityIcons,
   Octicons,
 } from "@expo/vector-icons";
-import {
-  Box,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  ImageBackground,
-  Center,
-  HStack,
-} from "@gluestack-ui/themed";
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Box, Center, HStack, ImageBackground, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const DetailTransaksi = () => {
   const mode = useColorScheme();

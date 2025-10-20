@@ -7,38 +7,6 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import {
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Box,
-  HStack,
-  Badge,
-  Center,
-  Image,
-  Divider,
-  Button,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  Heading,
-  ModalBody,
-  ModalFooter,
-  ButtonText,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-  useToast,
-} from "@gluestack-ui/themed";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -53,6 +21,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import apiService from "@/src/service/apiService";
 import { useUserStore } from "@/src/store/userStore";
+import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetItem, ActionsheetItemText, Badge, Box, Button, ButtonText, Center, Divider, HStack, Heading, Image, Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter, ModalHeader, SafeAreaView, ScrollView, Text, Toast, ToastDescription, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
+
 
 const TransferNow = () => {
   const mode = useColorScheme();

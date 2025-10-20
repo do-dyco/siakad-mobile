@@ -1,25 +1,10 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
-import {
-  Box,
-  HStack,
-  ImageBackground,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Center,
-  Avatar,
-  AvatarFallbackText,
-  Input,
-  InputField,
-  Image,
-  Divider,
-  Button,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Avatar, AvatarFallbackText, Box, Button, Center, Divider, HStack, Image, ImageBackground, Input, InputField, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const topUp = () => {
   const screenHeight = Dimensions.get("window").height;

@@ -1,5 +1,5 @@
 import colors from "@/src/config/colors";
-import { Box, VStack } from "@gluestack-ui/themed";
+import { Box, VStack } from '@gluestack-ui/themed';
 import { Skeleton } from "moti/skeleton";
 import React from "react";
 import { useColorScheme } from "react-native";

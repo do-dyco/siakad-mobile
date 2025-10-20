@@ -8,8 +8,8 @@ import {
   SafeAreaView,
   HStack,
   Divider,
-  Center,
-} from "@gluestack-ui/themed";
+  Center
+} from '@gluestack-ui/themed';
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";

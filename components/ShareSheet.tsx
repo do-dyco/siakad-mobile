@@ -6,7 +6,13 @@ import {
   Share,
   Linking,
 } from "react-native";
-import { Center, HStack, Text, VStack, Image } from "@gluestack-ui/themed";
+import {
+  Center,
+  HStack,
+  Text,
+  VStack,
+  Image
+} from '@gluestack-ui/themed';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import CustomActionSheet from "@/components/CustomActionSheet";
 

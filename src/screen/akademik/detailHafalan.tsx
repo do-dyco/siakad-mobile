@@ -1,17 +1,11 @@
 import colors from "@/src/config/colors";
-import {
-  Box,
-  Center,
-  HStack,
-  ScrollView,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
 import CustomBadge from "@/components/CustomBadge";
+import { Box, Center, HStack, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const DetailHafalan = () => {
   const mode = useColorScheme();

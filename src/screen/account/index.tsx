@@ -5,20 +5,11 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import {
-  Avatar,
-  AvatarFallbackText,
-  Box,
-  Center,
-  HStack,
-  ImageBackground,
-  SafeAreaView,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Avatar, AvatarFallbackText, Box, Center, HStack, ImageBackground, SafeAreaView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const account = () => {
   const mode = useColorScheme();

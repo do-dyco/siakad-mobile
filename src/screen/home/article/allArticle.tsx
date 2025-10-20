@@ -1,16 +1,11 @@
 import React from "react";
-import {
-  Box,
-  VStack,
-  Text,
-  Image,
-  FlatList,
-} from "@gluestack-ui/themed";
 import { Dimensions, useColorScheme } from "react-native";
 import Header from "@/components/Header";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import colors from "@/src/config/colors";
+import { Box, FlatList, Image, Text, VStack } from '@gluestack-ui/themed';
+
 
 const articles = [
   {

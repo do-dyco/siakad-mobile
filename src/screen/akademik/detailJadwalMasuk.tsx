@@ -1,27 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-  Box,
-  Center,
-  Divider,
-  HStack,
-  Input,
-  InputField,
-  InputSlot,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Heading,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -31,6 +10,8 @@ import {
   useColorScheme,
 } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
+import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetItem, ActionsheetItemText, Box, Center, Divider, HStack, Heading, Input, InputField, InputSlot, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const detailJadwalMasuk = () => {
   const mode = useColorScheme();

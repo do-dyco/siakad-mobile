@@ -10,21 +10,9 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import {
-  Box,
-  Center,
-  Divider,
-  HStack,
-  Input,
-  InputField,
-  SafeAreaView,
-  ScrollView,
-  Spinner,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
+import { Box, Center, Divider, HStack, Input, InputField, SafeAreaView, ScrollView, Spinner, Text, VStack } from '@gluestack-ui/themed';
 import {
   Dimensions,
   RefreshControl,

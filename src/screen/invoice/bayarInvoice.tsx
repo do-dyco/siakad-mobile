@@ -10,40 +10,6 @@ import {
   MaterialCommunityIcons,
   Octicons,
 } from "@expo/vector-icons";
-import {
-  Box,
-  ScrollView,
-  VStack,
-  Text,
-  ImageBackground,
-  Center,
-  Divider,
-  HStack,
-  Badge,
-  BadgeText,
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetDragIndicator,
-  AccordionContent,
-  AccordionItem,
-  Accordion,
-  AccordionTrigger,
-  AccordionHeader,
-  AccordionIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  AlertDialog,
-  AlertDialogBackdrop,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogCloseButton,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Button,
-  ButtonText,
-} from "@gluestack-ui/themed";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { Dimensions, useColorScheme } from "react-native";
@@ -54,6 +20,8 @@ import ShareSheet from "@/components/ShareSheet";
 import ViewShot from "react-native-view-shot";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
+import { Accordion, AccordionContent, AccordionHeader, AccordionIcon, AccordionItem, AccordionTrigger, Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, AlertDialog, AlertDialogBackdrop, AlertDialogBody, AlertDialogCloseButton, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, Badge, BadgeText, Box, Button, ButtonText, Center, ChevronDownIcon, ChevronUpIcon, Divider, HStack, ImageBackground, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const BayarInvoice = () => {
   const mode = useColorScheme();

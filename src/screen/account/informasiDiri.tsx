@@ -5,18 +5,10 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import {
-  Center,
-  SafeAreaView,
-  Text,
-  Image,
-  Box,
-  HStack,
-  VStack,
-  ScrollView,
-} from "@gluestack-ui/themed";
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Box, Center, HStack, Image, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const informasiDiri = () => {
   const mode = useColorScheme();

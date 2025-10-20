@@ -8,20 +8,12 @@ import {
   MaterialCommunityIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
-import {
-  Center,
-  SafeAreaView,
-  Text,
-  Box,
-  HStack,
-  VStack,
-  ScrollView,
-  Button,
-} from "@gluestack-ui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React from "react";
 import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Box, Button, Center, HStack, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const pengaturanAkun = () => {
   const mode = useColorScheme();

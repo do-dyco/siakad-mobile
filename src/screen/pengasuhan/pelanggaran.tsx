@@ -4,17 +4,10 @@ import Header from "@/components/Header";
 import NoData from "@/components/NoData";
 import colors from "@/src/config/colors";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Box,
-  HStack,
-  SafeAreaView,
-  ScrollView,
-  VStack,
-  Text,
-  Badge,
-} from "@gluestack-ui/themed";
 import React, { useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { Badge, Box, HStack, SafeAreaView, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+
 
 const Pelanggaran = () => {
   const mode = useColorScheme();
