@@ -5,17 +5,20 @@ import {
   useColorScheme,
   Share,
   Linking,
+  Platform,
 } from "react-native";
 import { Center, HStack, Text, VStack, Image } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import CustomActionSheet from "@/components/CustomActionSheet";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 
 type ShareSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   bgColor?: string;
   textColor?: string;
-  imageUri?: string; // hasil tangkapan ViewShot
+  imageUri?: string; // hasil tangkapan ViewShot (file://...)
   invoice?: string;
   nominal?: number | string;
 };
@@ -31,7 +34,7 @@ export default function ShareSheet({
 }: ShareSheetProps) {
   const mode = useColorScheme();
 
-  // 📤 Share gambar ke aplikasi lain (WhatsApp, Telegram, Instagram)
+  // 📤 Share gambar ke aplikasi lain (WhatsApp, Telegram, Instagram, dll)
   const shareImage = async () => {
     if (!imageUri) {
       Alert.alert("Gagal", "Gambar invoice belum tersedia untuk dibagikan.");
@@ -39,27 +42,48 @@ export default function ShareSheet({
     }
 
     try {
-      await Share.share({
-        url: imageUri,
-        message: "📄 Invoice pembayaran Anda",
+      // Pastikan URI valid dan berbentuk file://
+      const shareData = {
         title: "Bagikan Invoice",
-      });
+        message: `📄 Invoice Pembayaran Anda\n\nInvoice: ${
+          invoice || "-"
+        }\nTotal: Rp. ${Number(nominal || 0).toLocaleString("id-ID")}`,
+        url: imageUri, // hasil ViewShot (file://...)
+      };
+
+      const result = await Share.share(shareData);
+
+      if (result.action === Share.sharedAction) {
+        console.log("Berhasil dibagikan");
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Dibatalkan pengguna");
+      }
     } catch (e) {
       console.error("Gagal share gambar:", e);
-      Alert.alert("Gagal", "Tidak dapat membagikan gambar invoice.");
+      Alert.alert(
+        "Gagal",
+        "Tidak dapat membagikan gambar invoice. Silakan coba simpan manual ke galeri."
+      );
     }
 
     onClose();
   };
 
-  // 📧 Buka email langsung dengan subject dan body
+  // 📧 Buka email langsung dengan subject, body, dan lampiran gambar
   const openEmail = async () => {
+    if (!imageUri) {
+      Alert.alert("Gagal", "Gambar invoice belum tersedia untuk dilampirkan.");
+      return;
+    }
+
+    // Fallback ke mailto secara langsung untuk menghindari dialog ganda
     const subject = `Invoice Pembayaran #${invoice || ""}`;
     const body = `Halo,\n\nBerikut rincian pembayaran Anda:\n\nInvoice: ${
       invoice || "-"
     }\nTotal: Rp. ${Number(nominal || 0).toLocaleString(
       "id-ID"
-    )}\n\nTerima kasih.`;
+    )}\n\nGambar invoice terlampir. Terima kasih.`;
+
     const emailUrl = `mailto:?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
@@ -69,10 +93,24 @@ export default function ShareSheet({
       if (supported) {
         await Linking.openURL(emailUrl);
       } else {
-        Alert.alert(
-          "Gagal",
-          "Tidak dapat membuka aplikasi email di perangkat ini."
-        );
+        // Jika mailto tidak didukung, coba menggunakan Share API untuk mengirim file
+        const shareData = {
+          title: "Kirim Invoice via Email",
+          message: `Halo,\n\nBerikut rincian pembayaran Anda:\n\nInvoice: ${
+            invoice || "-"
+          }\nTotal: Rp. ${Number(nominal || 0).toLocaleString(
+            "id-ID"
+          )}\n\nTerima kasih.`,
+          url: imageUri, // lampirkan gambar invoice
+        };
+
+        const result = await Share.share(shareData);
+
+        if (result.action === Share.sharedAction) {
+          console.log("Email berhasil dikirim");
+        } else if (result.action === Share.dismissedAction) {
+          console.log("Pembagian email dibatalkan pengguna");
+        }
       }
     } catch (e) {
       console.error("Gagal membuka email:", e);

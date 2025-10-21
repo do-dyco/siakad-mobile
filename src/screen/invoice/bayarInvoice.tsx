@@ -50,10 +50,10 @@ import { Dimensions, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
-import ShareSheet from "@/components/ShareSheet";
-import ViewShot from "react-native-view-shot";
+import ViewShot, { captureRef } from "react-native-view-shot";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 const BayarInvoice = () => {
   const mode = useColorScheme();
@@ -69,8 +69,8 @@ const BayarInvoice = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
   const insets = useSafeAreaInsets();
-  const [showShareSheet, setShowShareSheet] = useState(false);
   const viewShotRef = useRef<any>(null);
+  const [imageUri, setImageUri] = useState<string | undefined>();
   const [alertData, setAlertData] = useState({
     isOpen: false,
     type: "success" as "success" | "error",
@@ -78,15 +78,57 @@ const BayarInvoice = () => {
     message: "",
   });
 
-  const [capturedUri, setCapturedUri] = useState<string | null>(null);
-
   const handleOpenShareSheet = async () => {
     try {
       const uri = await viewShotRef.current.capture();
-      setCapturedUri(uri);
-      setShowShareSheet(true);
+
+      // Check if expo-sharing is available
+      if (await Sharing.isAvailableAsync()) {
+        // Use expo-sharing to share the captured image directly
+        const fileName = `invoice_${
+          dataInvoice?.no_invoice || no_invoice || "tidak_diketahui"
+        }.png`;
+        const newUri = `${FileSystem.documentDirectory}${fileName}`;
+
+        await FileSystem.copyAsync({
+          from: uri,
+          to: newUri,
+        });
+
+        await Sharing.shareAsync(newUri, {
+          mimeType: "image/png",
+          dialogTitle: "Bagikan Invoice",
+          UTI: "public.png",
+        });
+      } else {
+        // Fallback to Share API if expo-sharing is not available
+        const { Share } = await import("react-native");
+        const shareData = {
+          title: "Bagikan Invoice",
+          message: `📄 Invoice Pembayaran Anda\n\nInvoice: ${
+            dataInvoice?.no_invoice || no_invoice || "-"
+          }\nTotal: Rp. ${Number(
+            dataInvoice?.pembayaran?.nominal || nominal || 0
+          ).toLocaleString("id-ID")}`,
+          url: uri, // hasil ViewShot (file://...)
+        };
+
+        const result = await Share.share(shareData);
+
+        if (result.action === Share.sharedAction) {
+          console.log("Berhasil dibagikan");
+        } else if (result.action === Share.dismissedAction) {
+          console.log("Dibatalkan pengguna");
+        }
+      }
     } catch (e) {
-      console.error("Gagal capture invoice:", e);
+      console.error("Gagal share invoice:", e);
+      setAlertData({
+        isOpen: true,
+        type: "error",
+        title: "Gagal Membagikan",
+        message: "Tidak dapat membagikan invoice. Silakan coba lagi.",
+      });
     }
   };
 
@@ -148,6 +190,20 @@ const BayarInvoice = () => {
     } catch (e) {
       console.error("Gagal unduh invoice:", e);
       alert("Gagal menyimpan invoice");
+    }
+  };
+
+  const captureInvoice = async () => {
+    try {
+      const uri = await captureRef(viewShotRef, {
+        format: "png",
+        quality: 0.9,
+        result: "tmpfile", // ✅ menghasilkan file:// URI
+      });
+      setImageUri(uri);
+      setIsSheetOpen(true);
+    } catch (e) {
+      console.error("Gagal menangkap invoice:", e);
     }
   };
 
@@ -394,312 +450,6 @@ const BayarInvoice = () => {
         </VStack>
       </ScrollView>
 
-      <Actionsheet
-        isOpen={showActionsheet}
-        onClose={toggleActionsheet}
-        zIndex={999}
-        trapFocus={false}
-      >
-        <ActionsheetBackdrop />
-        <ActionsheetContent
-          h="50%"
-          zIndex={999}
-          backgroundColor={bgColor}
-          pb={insets.bottom + 12}
-        >
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-
-          <HStack
-            justifyContent="space-between"
-            mt={10}
-            width="100%"
-            alignItems="center"
-          >
-            <Text
-              color={textColor}
-              fontWeight="$bold"
-              size="lg"
-              mt={2}
-              fontFamily="Lato"
-            >
-              Detail Transaksi
-            </Text>
-
-            {/* Badge invoice di ActionSheet — tap untuk copy */}
-            <Badge
-              size="md"
-              variant="solid"
-              borderRadius={12}
-              bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[200]}
-              width="48%"
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  copyToClipboard(
-                    String(dataInvoice?.no_invoice || ""),
-                    "Nomor invoice"
-                  )
-                }
-                activeOpacity={0.7}
-              >
-                <HStack space="xs" alignItems="center" m={5}>
-                  <Text
-                    color={isDark ? "white" : "black"}
-                    size="xs"
-                    fontFamily="Lato"
-                  >
-                    {dataInvoice?.no_invoice || ""}
-                  </Text>
-                  <Ionicons
-                    name="copy-outline"
-                    size={18}
-                    color={isDark ? "white" : "#373A41"}
-                  />
-                </HStack>
-              </TouchableOpacity>
-            </Badge>
-          </HStack>
-
-          <Divider mt={10} bgColor={"transparent"} />
-
-          {/* Pengirim */}
-          <Box
-            borderRadius={10}
-            bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[200]}
-            m={10}
-            w="100%"
-          >
-            <Box bgColor={mode === "dark" ? "#22262F" : "white"}>
-              <HStack space="md" m={5}>
-                <Box
-                  backgroundColor={colors.boxWarning}
-                  borderRadius={8}
-                  mt={10}
-                >
-                  <Feather
-                    name="file-text"
-                    size={20}
-                    color="white"
-                    style={{ margin: 5 }}
-                  />
-                </Box>
-                <Text mt={10} color={textColor} fontFamily="Lato" mt={15}>
-                  {dataInvoice?.no_invoice}
-                </Text>
-              </HStack>
-            </Box>
-            <Box m={5}>
-              <HStack justifyContent="space-between" m={10}>
-                <Text fontFamily="Lato">Total Tagihan</Text>
-                <Text color={textColor} fontFamily="Lato">
-                  Rp.
-                  {Number(dataInvoice?.nominal || 0).toLocaleString("id-ID")}
-                </Text>
-              </HStack>
-            </Box>
-          </Box>
-
-          <Divider bgColor={"transparent"} mt={10} />
-
-          <HStack justifyContent="space-between" m={10} w="100%">
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Bank {dataInvoice?.pembayaran?.nama_bank || ""}
-            </Text>
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              {dataInvoice?.pembayaran?.metode || ""}
-            </Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" m={10} w="100%">
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Kode Unik
-            </Text>
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Rp.122
-            </Text>
-          </HStack>
-
-          <HStack justifyContent="space-between" m={10} w="100%">
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Total Transfer
-            </Text>
-            <Text color={textColor} size="xs" fontFamily="Lato">
-              Rp.
-              {Number(dataInvoice?.pembayaran?.nominal || 0).toLocaleString(
-                "id-ID"
-              )}
-            </Text>
-          </HStack>
-
-          <Accordion
-            width="100%"
-            size="md"
-            bgColor={mode === "dark" ? colors.box : "white"}
-            type="single"
-            isCollapsible={true}
-            isDisabled={false}
-          >
-            <AccordionItem
-              value="a"
-              backgroundColor={mode === "dark" ? "#22262F" : "white"}
-            >
-              <AccordionHeader>
-                <AccordionTrigger>
-                  {({ isExpanded }) => {
-                    return (
-                      <>
-                        <HStack justifyContent="space-between" mx={2}>
-                          <HStack space="md">
-                            <Box
-                              borderWidth={1}
-                              borderRadius={6}
-                              borderColor={colors.border}
-                              justifyContent="center"
-                              alignContent="center"
-                              backgroundColor={colors.boxWarning}
-                              height={20}
-                              width={20}
-                            >
-                              <MaterialCommunityIcons
-                                name="text-box-outline"
-                                size={16}
-                                color={"white"}
-                              />
-                            </Box>
-
-                            <Text
-                              color={mode === "dark" ? "white" : "black"}
-                              fontFamily="Lato"
-                              fontSize={14}
-                              fontWeight={"$semibold"}
-                            >
-                              Tagihan{" "}
-                              {dataInvoice?.tagihan_users?.[0]?.no_tagihan}
-                            </Text>
-                          </HStack>
-                        </HStack>
-                        {isExpanded ? (
-                          <AccordionIcon
-                            as={ChevronUpIcon}
-                            ml="$3"
-                            color={mode === "dark" ? "white" : "black"}
-                          />
-                        ) : (
-                          <AccordionIcon
-                            as={ChevronDownIcon}
-                            ml="$3"
-                            color={mode === "dark" ? "white" : "black"}
-                          />
-                        )}
-                      </>
-                    );
-                  }}
-                </AccordionTrigger>
-              </AccordionHeader>
-              <AccordionContent>
-                <Box
-                  borderWidth={1}
-                  borderRadius={8}
-                  borderColor={
-                    mode === "dark" ? colors.border : colors.gray.light[200]
-                  }
-                  backgroundColor={mode === "dark" ? "black" : "white"}
-                >
-                  <VStack m={10} space="md">
-                    <HStack justifyContent="space-between">
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                      >
-                        Nama Tagihan
-                      </Text>
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                        fontWeight={"$semibold"}
-                      >
-                        {dataInvoice?.tagihan_users?.[0]?.master_tagihan?.nama}
-                      </Text>
-                    </HStack>
-
-                    <HStack justifyContent="space-between">
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                      >
-                        Tanggal
-                      </Text>
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                        fontWeight={"$semibold"}
-                      >
-                        {new Date(
-                          dataInvoice?.tagihan_users?.[0]?.updated_at?.split(
-                            " "
-                          )[0]
-                        ).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </Text>
-                    </HStack>
-
-                    <HStack justifyContent="space-between">
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                      >
-                        Waktu
-                      </Text>
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                        fontWeight={"$semibold"}
-                      >
-                        {dataInvoice?.tagihan_users?.[0]?.updated_at
-                          ?.split(" ")[1]
-                          ?.slice(0, 5)}
-                      </Text>
-                    </HStack>
-
-                    <HStack justifyContent="space-between">
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                      >
-                        Nominal Tertagih
-                      </Text>
-                      <Text
-                        color={mode === "dark" ? "white" : "black"}
-                        fontFamily="Lato"
-                        fontSize={14}
-                        fontWeight={"$semibold"}
-                      >
-                        Rp.{" "}
-                        {formatRupiah(
-                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0
-                        )}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </Box>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </ActionsheetContent>
-      </Actionsheet>
-
       <AlertDialog isOpen={alertData.isOpen} onClose={handleCloseAlert}>
         <AlertDialogBackdrop />
         <AlertDialogContent mt={16}>
@@ -725,14 +475,6 @@ const BayarInvoice = () => {
           </AlertDialogBody>
         </AlertDialogContent>
       </AlertDialog>
-
-      <ShareSheet
-        isOpen={showShareSheet}
-        onClose={() => setShowShareSheet(false)}
-        bgColor={bgColor}
-        textColor={textColor}
-        imageUri={capturedUri}
-      />
     </SafeAreaView>
   );
 };

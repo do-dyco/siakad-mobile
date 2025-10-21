@@ -33,7 +33,6 @@ const DetailInvoice = () => {
   const { noInvoice, from, activeTab } = useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState({});
 
-
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
 
@@ -47,7 +46,7 @@ const DetailInvoice = () => {
     }
   };
 
-const handleNext = () => {
+  const handleNext = () => {
     if (!dataInvoice?.no_invoice) {
       console.warn("Invoice belum siap");
       return;
@@ -56,18 +55,19 @@ const handleNext = () => {
     if (dataInvoice.status === "PAID") {
       router.push({
         pathname: "/bayarInvoice",
-        params: { 
-          invoice: dataInvoice.no_invoice, 
+        params: {
+          invoice: dataInvoice.no_invoice,
           from: from,
-          activeTab: activeTab, },
+          activeTab: activeTab,
+        },
       });
       return;
     }
 
     router.push({
       pathname: "/metodeBayar",
-      params: { 
-        invoice: dataInvoice.no_invoice, 
+      params: {
+        invoice: dataInvoice.no_invoice,
         from: from,
         activeTab: activeTab,
       },
@@ -85,7 +85,7 @@ const handleNext = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Transaksi"}  />
+        <Header data={"Detail Transaksi"} />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
             <Text
@@ -330,17 +330,56 @@ const handleNext = () => {
         </VStack>
       </ScrollView>
       <Divider bgColor={"transparent"} />
+      {dataInvoice?.tagihan_users?.[0]?.expire_at && ""}
+
       <VStack mt={10} mx={10} mb={20}>
-        <Button
-          bgColor={colors.primary}
-          borderRadius={10}
-          mt={4}
-          onPress={handleNext}
-        >
-          <Text color="white" fontFamily="Lato" fontSize={16}>
-            Bayar Invoice
-          </Text>
-        </Button>
+        {(() => {
+          // ⏳ Ambil data expire_at dari nested object
+          const expireAt = dataInvoice?.tagihan_users?.[0]?.expire_at;
+
+          if (!expireAt) {
+            // Kalau belum ada (data belum sempat dimuat)
+            return (
+              <Button bgColor="#ccc" borderRadius={10} mt={4} disabled>
+                <Text color="white" fontFamily="Lato" fontSize={16}>
+                  Memuat Data...
+                </Text>
+              </Button>
+            );
+          }
+
+          const now = new Date();
+
+          // ✅ Ubah format "YYYY-MM-DD HH:mm:ss" → ISO: "YYYY-MM-DDTHH:mm:ss+07:00"
+          const expireString = expireAt.replace(" ", "T") + "+07:00";
+          const expireDate = new Date(expireString);
+
+          const isValid = !isNaN(expireDate.getTime());
+          const isExpired = isValid ? expireDate < now : false;
+
+          console.log("expire_at:", expireAt);
+          console.log("expireString:", expireString);
+          console.log("expireDate:", expireDate);
+          console.log("isExpired:", isExpired);
+
+          return (
+            <Button
+              bgColor={!isValid || isExpired ? "#ccc" : colors.primary}
+              borderRadius={10}
+              mt={4}
+              onPress={!isValid || isExpired ? undefined : handleNext}
+              disabled={!isValid || isExpired}
+            >
+              <Text color="white" fontFamily="Lato" fontSize={16}>
+                {!isValid
+                  ? "Format Tanggal Salah"
+                  : isExpired
+                  ? "Invoice Kadaluarsa"
+                  : "Bayar Invoice"}
+              </Text>
+            </Button>
+          );
+        })()}
       </VStack>
     </SafeAreaView>
   );
