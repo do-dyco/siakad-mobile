@@ -59,7 +59,9 @@ export default function TagihanCard({ data = [] }: Props) {
 
   const tagihanList = normalizeData();
 
-  if (tagihanList.length === 0) return null;
+  if (tagihanList.length === 0) return 0;
+
+  console.log("tagihan list", tagihanList);
 
   return (
     <ScrollView
@@ -95,7 +97,16 @@ export default function TagihanCard({ data = [] }: Props) {
                     <HStack space="md" alignItems="center">
                       <Text fontFamily="Lato-Black" color="white" fontSize={24}>
                         {visible
-                          ? `Rp ${formatRupiah(item.saldo)}`
+                          ? `Rp ${formatRupiah(
+                              !item?.saldo ||
+                                item.saldo === "" ||
+                                item.saldo === null ||
+                                item.saldo === undefined ||
+                                (typeof item.saldo === "object" &&
+                                  Object.keys(item.saldo).length === 0)
+                                ? 0
+                                : item.saldo
+                            )}`
                           : getMaskedAmount()}
                       </Text>
                       <TouchableOpacity

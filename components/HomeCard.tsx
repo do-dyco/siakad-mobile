@@ -28,11 +28,25 @@ export default function SaldoScreen({
     return new Intl.NumberFormat("id-ID").format(numericValue);
   };
 
+  // console.log("saldo", data);
+
   const safeSaldo = (() => {
-    if (!data?.saldo || data.saldo === "" || data.saldo === null) return 0;
-    if (typeof data.saldo === "object" && Object.keys(data.saldo).length === 0)
+    const saldo = data?.saldo;
+
+    // Jika saldo tidak ada, kosong string, null, undefined string, atau object kosong → kembalikan 0
+    if (
+      saldo === undefined ||
+      saldo === null ||
+      saldo === "" ||
+      saldo === undefined ||
+      (typeof saldo === "object" && Object.keys(saldo).length === 0)
+    ) {
       return 0;
-    return Number(data.saldo) || 0;
+    }
+
+    // Jika bisa dikonversi ke angka → kembalikan angkanya, kalau tidak → 0
+    const num = Number(saldo);
+    return isNaN(num) ? 0 : num;
   })();
 
   return (
