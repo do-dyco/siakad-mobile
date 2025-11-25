@@ -7,7 +7,11 @@
       "Bash(findstr:*)",
       "Bash(npm install:*)",
       "Bash(node:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.expo.dev)",
+      "Bash(npm view:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
