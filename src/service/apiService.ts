@@ -10,7 +10,7 @@ export default {
 
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + "/v2/auth/login",
-        param
+        param,
       );
       console.log("Login response:", response);
 
@@ -24,7 +24,7 @@ export default {
   mySaldo: async () => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + "/v2/user/saldo-user/my-saldo"
+        PATH.API_DEV + "/v2/user/saldo-user/my-saldo",
       );
       return response.data;
     } catch (error) {
@@ -36,7 +36,41 @@ export default {
   myTagihan: async () => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + "/v2/user/tagihan/summary"
+        PATH.API_DEV + "/v2/user/tagihan/summary",
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Tagihan list dengan filter status (untuk tab Sedang Berlangsung)
+  myTagihanList: async (params: { search?: string; limit?: number; status?: string }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.search) queryParams.append("search", params.search);
+      if (params.limit) queryParams.append("limit", params.limit.toString());
+      if (params.status) queryParams.append("status", params.status);
+
+      const response: AxiosResponse = await axiosInstance.get(
+        PATH.API_DEV + `/v2/user/tagihan?${queryParams.toString()}`,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Invoice-tagihan list (untuk tab Dalam Proses)
+  myInvoiceTagihanList: async (params: { search?: string; status?: string; limit?: number }) => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.search !== undefined) queryParams.append("search", params.search);
+      if (params.status !== undefined) queryParams.append("status", params.status);
+      if (params.limit) queryParams.append("limit", params.limit.toString());
+
+      const response: AxiosResponse = await axiosInstance.get(
+        PATH.API_DEV + `/v2/user/invoice-tagihan?${queryParams.toString()}`,
       );
       return response.data;
     } catch (error) {
@@ -47,7 +81,7 @@ export default {
   tagihanDetail: async (id: any) => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + `/v2/user/pembayaran-tagihan/${id}`
+        PATH.API_DEV + `/v2/user/pembayaran-tagihan/${id}`,
       );
       return response.data;
     } catch (error) {
@@ -61,7 +95,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + `/v2/user/tagihan/datatable`,
-        params
+        params,
       );
 
       return response.data;
@@ -74,7 +108,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.put(
         PATH.API_DEV + `/v2/user/pembayaran-tagihan/confirmation/${user}`,
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -86,7 +120,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + `/v2/user/pembayaran-tagihan/datatable`,
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -98,7 +132,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + `/v2/user/pembayaran-tagihan`,
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -110,7 +144,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + `/v2/user/pembayaran-tagihan`,
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -122,7 +156,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.put(
         PATH.API_DEV + `/v2/user/pembayaran-tagihan/confirmation/${id}`,
-        params
+        params,
       );
       return response;
     } catch (error) {
@@ -135,7 +169,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + "/v2/user/invoice-tagihan/datatable",
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -145,11 +179,24 @@ export default {
 
   myInvoiceDetail: async (noInvoice: any) => {
     try {
-      const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + `/v2/user/invoice-tagihan/inv/${noInvoice}`
+      console.log("=== API myInvoiceDetail ===");
+      console.log("Request noInvoice:", noInvoice);
+      console.log(
+        "URL:",
+        PATH.API_DEV + `/v2/user/invoice-tagihan/inv/${noInvoice}`,
       );
+
+      const response: AxiosResponse = await axiosInstance.get(
+        PATH.API_DEV + `/v2/user/invoice-tagihan/inv/${noInvoice}`,
+      );
+
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
       return response.data;
     } catch (error) {
+      console.error("=== API myInvoiceDetail ERROR ===");
+      console.error("Error:", error);
       throw error;
     }
   },
@@ -158,7 +205,7 @@ export default {
     try {
       const response: AxiosResponse = await axiosInstance.post(
         PATH.API_DEV + `/v2/user/invoice-tagihan`,
-        params
+        params,
       );
       return response.data;
     } catch (error) {
@@ -170,7 +217,7 @@ export default {
   rekening: async () => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + "/v2/user/rekening-sekolah"
+        PATH.API_DEV + "/v2/user/rekening-sekolah",
       );
       return response.data;
     } catch (error) {
@@ -181,7 +228,7 @@ export default {
   virtualAccount: async () => {
     try {
       const response: AxiosResponse = await axiosInstance.get(
-        PATH.API_DEV + "/v2/user/pembayaran-tagihan/payment-gateway"
+        PATH.API_DEV + "/v2/user/pembayaran-tagihan/payment-gateway",
       );
       return response.data;
     } catch (error) {

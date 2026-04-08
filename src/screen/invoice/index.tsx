@@ -4,7 +4,7 @@ import NoData from "@/components/NoData";
 import SearchFilter from "@/components/SearchFilter";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -39,7 +39,7 @@ const Invoice = () => {
   const screenHeight = Dimensions.get("window").height;
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
   const [index, setIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");

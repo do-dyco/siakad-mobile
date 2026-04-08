@@ -1,5 +1,5 @@
 import colors from "@/src/config/colors";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import {
   Entypo,
   FontAwesome,
@@ -25,7 +25,7 @@ const account = () => {
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
 
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
 
   return (
     <SafeAreaView

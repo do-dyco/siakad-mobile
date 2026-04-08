@@ -26,6 +26,7 @@ import NoData from "./NoData";
 import * as Clipboard from "expo-clipboard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { useTagihanStore } from "@/src/store/tagihanStore";
 
 type ItemType = {
   id: string;
@@ -35,6 +36,9 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
   master_tagihan?: { nama?: string };
 };
 
@@ -63,6 +67,7 @@ const Proses = ({
   const mode = useColorScheme();
   const toast = useToast();
   const insets = useSafeAreaInsets();
+  const { setDetailItem } = useTagihanStore();
 
   // ✅ Dedup data
   const uniqueData = useMemo(() => {
@@ -132,18 +137,29 @@ const Proses = ({
     onScrollPositionChange?.(currentScrollY);
   };
 
-// contoh handle navigate di Proses.tsx
-const handleNavigateToDetail = (noInvoice: string) => {
-  router.push({
-    pathname: "/detailTagihan",
-    params: { 
-      noInvoice,
-      from: "/tagihan",
-      activeTab: "1", // ✅ tab "Dalam Proses"
-    },
-  });
-};
+  // Navigate ke detail tagihan
+  const handleNavigateToDetail = (itemIndex: number) => {
+    const item = uniqueData[itemIndex];
 
+    if (!item) {
+      console.error("Item not found at index:", itemIndex);
+      return;
+    }
+
+    // Simpan ke store
+    setDetailItem(item);
+
+    // Navigate
+    router.push({
+      pathname: "/detailTagihan",
+      params: {
+        from: "/tagihan",
+        activeTab: "1",
+        timestamp: Date.now().toString(),
+        id: item.id,
+      },
+    });
+  };
 
   // ✅ Footer Loader & Info
   const renderFooter = () => {
@@ -182,7 +198,6 @@ const handleNavigateToDetail = (noInvoice: string) => {
 
     return null;
   };
-  
 
   if (!uniqueData || uniqueData.length === 0) {
     return (
@@ -211,9 +226,9 @@ const handleNavigateToDetail = (noInvoice: string) => {
         `${item.id || "noid"}-${item.no_invoice || "noinv"}-${index}`
       }
       ListFooterComponent={renderFooter}
-      renderItem={({ item }) => (
+      renderItem={({ item, index }) => (
         <TouchableOpacity
-          onPress={() => handleNavigateToDetail(item.no_invoice)}
+          onPress={() => handleNavigateToDetail(index)}
           onLongPress={() => copyToClipboard(item.no_invoice, "Nomor Invoice")}
         >
           <Box

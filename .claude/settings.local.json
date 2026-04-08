@@ -11,7 +11,22 @@
       "WebSearch",
       "WebFetch(domain:docs.expo.dev)",
       "Bash(npm view:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(C:/Users/Asus Vivobook/AppData/Local/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash(C:/Users/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash(/c/Users/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash(./adb.exe devices:*)",
+      "Bash(where.exe adb:*)",
+      "Bash(\"C:/Users/Android/Sdk/platform-tools/adb.exe\" kill-server:*)",
+      "Bash(\"C:/Users/Android/Sdk/platform-tools/adb.exe\" start-server:*)",
+      "Bash(C:/Users/Android/Sdk/platform-tools/adb.exe:*)",
+      "Bash(\"C:/Users/Android/Sdk/platform-tools/adb.exe\" -s emulator-5554 emu kill)",
+      "Bash(\"C:/Users/Android/Sdk/platform-tools/emulator.exe\" -avd Pixel_6_API_34 -no-snapshot-load)",
+      "Bash(\"C:/Users/Android/Sdk/cmdline-tools/latest/bin/emulator.bat\" -list-avds)",
+      "Bash(C:/Users/Android/Sdk/platform-tools/emulator.exe:*)",
+      "Bash(\"C:/Users/Android/Sdk/platform-tools/adb.exe\" devices:*)",
+      "Bash(cmd:*)"
     ],
     "deny": [],
     "ask": []

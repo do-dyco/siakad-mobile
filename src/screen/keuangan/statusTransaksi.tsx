@@ -36,6 +36,7 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
+  Entypo,
 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import DashedDivider from "@/components/dashedDivider";
@@ -69,6 +70,33 @@ const StatusTransaksi = () => {
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
+
+  const getBankLogo = (namaBank: string) => {
+    const bankName = (namaBank || "").toLowerCase();
+    if (bankName.includes("mandiri")) {
+      return require("@/assets/images/bank/mandiri.png");
+    }
+    if (bankName.includes("bca")) {
+      return require("@/assets/images/bank/bca.png");
+    }
+    if (bankName.includes("bni")) {
+      return require("@/assets/images/bank/bni.png");
+    }
+    if (bankName.includes("bri")) {
+      return require("@/assets/images/bank/bri.png");
+    }
+    if (bankName.includes("bmi")) {
+      return require("@/assets/images/bank/bmi.png");
+    }
+    if (bankName.includes("jago")) {
+      return require("@/assets/images/bank/jago.png");
+    }
+    return null;
+  };
+
+  const isBankKnown = (namaBank: string) => {
+    return getBankLogo(namaBank) !== null;
+  };
 
   const copyToClipboard = async (text: string, label = "Teks") => {
     try {
@@ -196,7 +224,6 @@ const StatusTransaksi = () => {
                   borderRadius={12}
                   borderColor={isDark ? colors.border : colors.gray.light[200]}
                   borderWidth={1}
-
                   bgColor={
                     isDark ? colors.gray.dark[800] : colors.gray.light[25]
                   }
@@ -206,7 +233,7 @@ const StatusTransaksi = () => {
                     onPress={() =>
                       copyToClipboard(
                         String(dataInvoice?.no_invoice || ""),
-                        "Nomor invoice"
+                        "Nomor invoice",
                       )
                     }
                     activeOpacity={0.7}
@@ -231,19 +258,25 @@ const StatusTransaksi = () => {
 
               {/* Bank Info */}
               <HStack space="md">
-                <Image
-                  size="xs"
-                  source={
-                    nama_bank === "MANDIRI"
-                      ? require("@/assets/images/bank/mandiri.png")
-                      : require("@/assets/images/bank/bca.png")
-                  }
-                  alt="bank"
-                  borderRadius={10}
-                />
+                {isBankKnown(
+                  nama_bank || dataInvoice?.pembayaran?.nama_bank,
+                ) ? (
+                  <Image
+                    size="xs"
+                    source={
+                      getBankLogo(
+                        nama_bank || dataInvoice?.pembayaran?.nama_bank,
+                      )!
+                    }
+                    alt="bank"
+                    borderRadius={10}
+                  />
+                ) : (
+                  <Entypo name="wallet" size={20} color={colors.primary} />
+                )}
                 <VStack>
                   <Text fontFamily="Lato" color={textColor} mt={10}>
-                    Bank{" "}
+                    {" "}
                     {(
                       nama_bank ||
                       dataInvoice?.pembayaran?.nama_bank ||
@@ -266,9 +299,7 @@ const StatusTransaksi = () => {
                 borderWidth={1}
                 borderRadius={10}
                 borderColor={isDark ? colors.border : colors.gray.light[200]}
-                bgColor={
-                  isDark ? colors.gray.dark[800] : colors.gray.light[25]
-                }
+                bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[25]}
               >
                 <HStack
                   justifyContent="space-between"
@@ -280,7 +311,7 @@ const StatusTransaksi = () => {
                     {Number(
                       nominal && nominal !== "0"
                         ? nominal
-                        : dataInvoice?.nominal || 0
+                        : dataInvoice?.nominal || 0,
                     ).toLocaleString("id-ID")}
                     .
                   </Text>
@@ -325,12 +356,10 @@ const StatusTransaksi = () => {
           {/* Detail Transaksi */}
           <TouchableOpacity onPress={toggleActionsheet}>
             <Box
-             borderWidth={1}
-                borderRadius={10}
-                borderColor={isDark ? colors.border : colors.gray.light[200]}
-                bgColor={
-                  isDark ? colors.gray.dark[800] : colors.gray.light[50]
-                }
+              borderWidth={1}
+              borderRadius={10}
+              borderColor={isDark ? colors.border : colors.gray.light[200]}
+              bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[50]}
             >
               <HStack justifyContent="space-between" m={10}>
                 <HStack space="md">
@@ -353,14 +382,12 @@ const StatusTransaksi = () => {
           </TouchableOpacity>
 
           {/* Bantuan */}
-           <Box
-             borderWidth={1}
-                borderRadius={10}
-                borderColor={isDark ? colors.border : colors.gray.light[200]}
-                bgColor={
-                  isDark ? colors.gray.dark[800] : colors.gray.light[50]
-                }
-            >
+          <Box
+            borderWidth={1}
+            borderRadius={10}
+            borderColor={isDark ? colors.border : colors.gray.light[200]}
+            bgColor={isDark ? colors.gray.dark[800] : colors.gray.light[50]}
+          >
             <HStack justifyContent="space-between" m={10}>
               <HStack space="md">
                 <MaterialCommunityIcons
@@ -439,7 +466,7 @@ const StatusTransaksi = () => {
                 onPress={() =>
                   copyToClipboard(
                     String(dataInvoice?.no_invoice || ""),
-                    "Nomor invoice"
+                    "Nomor invoice",
                   )
                 }
                 activeOpacity={0.7}
@@ -498,7 +525,7 @@ const StatusTransaksi = () => {
                   {Number(
                     nominal && nominal !== "0"
                       ? nominal
-                      : dataInvoice?.nominal || 0
+                      : dataInvoice?.nominal || 0,
                   ).toLocaleString("id-ID")}
                 </Text>
               </HStack>
@@ -534,7 +561,9 @@ const StatusTransaksi = () => {
             <Text color={textColor} size="xs" fontFamily="Lato">
               Rp.
               {Number(
-                nominal && nominal !== "0" ? nominal : dataInvoice?.nominal || 0
+                nominal && nominal !== "0"
+                  ? nominal
+                  : dataInvoice?.nominal || 0,
               ).toLocaleString("id-ID")}
             </Text>
           </HStack>
@@ -648,8 +677,8 @@ const StatusTransaksi = () => {
                       >
                         {new Date(
                           dataInvoice?.tagihan_users?.[0]?.updated_at?.split(
-                            " "
-                          )[0]
+                            " ",
+                          )[0],
                         ).toLocaleDateString("id-ID", {
                           day: "2-digit",
                           month: "long",
@@ -694,7 +723,7 @@ const StatusTransaksi = () => {
                       >
                         Rp.{" "}
                         {formatRupiah(
-                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0
+                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0,
                         )}
                       </Text>
                     </HStack>

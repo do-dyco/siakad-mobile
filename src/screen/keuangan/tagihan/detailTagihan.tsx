@@ -1,7 +1,6 @@
 import CustomBadge from "@/components/CustomBadge";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
-import apiService from "@/src/service/apiService";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   HStack,
@@ -26,59 +25,92 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { useTagihanStore, DetailTagihanItem } from "@/src/store/tagihanStore";
 
 const DetailTagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const { noInvoice, from, activeTab } = useLocalSearchParams();
-  const [dataInvoice, setDataInvoice] = useState({});
-
-  console.log("Params:", { activeTab, from });
-  
+  const { from, activeTab, id } = useLocalSearchParams();
+  const { detailItem } = useTagihanStore();
+  const [dataInvoice, setDataInvoice] = useState<DetailTagihanItem | null>(
+    null,
+  );
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
 
-  const fetchDetail = async () => {
-    try {
-      const response = await apiService.myInvoiceDetail(noInvoice);
-      setDataInvoice(response.data.invoice_tagihan);
-    } catch (error) {
-      setDataInvoice({});
-      console.error("Failed to fetch detail:", error);
+  console.log("inv", dataInvoice);
+
+  // Ambil data dari store
+  useEffect(() => {
+    // Reset dulu untuk force re-render
+    setDataInvoice(null);
+
+    // Set data dari store
+    if (detailItem) {
+      setDataInvoice({ ...detailItem });
+    } else {
+      setDataInvoice(null);
     }
-  };
+  }, [detailItem, id]);
 
   const handleNext = () => {
+    console.log("=== HANDLE NEXT CLICKED ===");
+    console.log("dataInvoice:", dataInvoice);
+    console.log("dataInvoice.no_invoice:", dataInvoice?.no_invoice);
+    console.log("dataInvoice.status:", dataInvoice?.status);
+    console.log("from:", from);
+    console.log("activeTab:", activeTab);
+
     if (!dataInvoice?.no_invoice) {
-      console.warn("Invoice belum siap");
+      console.error("no_invoice is null/undefined");
       return;
     }
 
+    const params = {
+      invoice: dataInvoice.no_invoice,
+      from: from || "/tagihan",
+      activeTab: activeTab || "1",
+    };
+
+    console.log("Navigating with params:", params);
+
     if (dataInvoice.status === "PAID") {
+      console.log("Status is PAID, going to /bayarInvoice");
       router.push({
         pathname: "/bayarInvoice",
-        params: {  
-          invoice: dataInvoice.no_invoice, 
-          from: from,
-          activeTab: activeTab, },
+        params,
       });
       return;
     }
 
+    console.log("Status is NOT PAID, going to /metodeBayar");
     router.push({
       pathname: "/metodeBayar",
-      params: { 
-        invoice: dataInvoice.no_invoice, 
-        from: from,
-        activeTab: activeTab,
-      },
+      params,
     });
   };
 
-  useEffect(() => {
-    fetchDetail();
-  }, []);
+  // Tampilkan loading jika data belum tersedia
+  if (!dataInvoice) {
+    return (
+      <SafeAreaView
+        flex={1}
+        backgroundColor={mode === "dark" ? "black" : "white"}
+        height={screenHeight}
+      >
+        <Header data="Detail Transaksi" backTo={from} activeTab={activeTab} />
+        <Box flex={1} justifyContent="center" alignItems="center">
+          <Text color={mode === "dark" ? "white" : "black"}>
+            Memuat data...
+          </Text>
+        </Box>
+      </SafeAreaView>
+    );
+  }
+
+  // Parse expire_at untuk tanggal dan waktu
+  const [tanggal, waktu] = dataInvoice.expire_at?.split(" ") ?? ["-", "-"];
 
   return (
     <SafeAreaView
@@ -87,9 +119,9 @@ const DetailTagihan = () => {
       height={screenHeight}
     >
       <ScrollView>
-        {/* Header dengan tab support - tidak perlu custom onBack lagi */}
+        {/* Header dengan tab support */}
         <Header data="Detail Transaksi" backTo={from} activeTab={activeTab} />
-        
+
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
             <Text
@@ -144,14 +176,14 @@ const DetailTagihan = () => {
                   Bayar Sebelum
                 </Text>
 
-                <CustomBadge variant="danger" label="05:59:49 " />
+                <CustomBadge variant="danger" label={waktu} />
               </HStack>
               <Text
                 color={mode == "dark" ? "white" : "black"}
                 fontSize={12}
                 fontFamily="Lato"
               >
-                {dataInvoice.created_at}
+                {tanggal}
               </Text>
             </VStack>
           </HStack>
@@ -174,6 +206,7 @@ const DetailTagihan = () => {
             type="single"
             isCollapsible={true}
             isDisabled={false}
+            defaultIsOpen={true}
           >
             <AccordionItem
               value="a"
@@ -209,8 +242,7 @@ const DetailTagihan = () => {
                               fontSize={14}
                               fontWeight={"$semibold"}
                             >
-                              Tagihan{" "}
-                              {dataInvoice?.tagihan_users?.[0]?.no_tagihan}
+                              Tagihan {dataInvoice?.no_tagihan}
                             </Text>
                           </HStack>
                         </HStack>
@@ -256,7 +288,7 @@ const DetailTagihan = () => {
                         fontSize={14}
                         fontWeight={"$semibold"}
                       >
-                        {dataInvoice?.tagihan_users?.[0]?.master_tagihan?.nama}
+                        {dataInvoice.master_tagihan?.nama ?? "-"}
                       </Text>
                     </HStack>
 
@@ -274,15 +306,7 @@ const DetailTagihan = () => {
                         fontSize={14}
                         fontWeight={"$semibold"}
                       >
-                        {new Date(
-                          dataInvoice?.tagihan_users?.[0]?.updated_at?.split(
-                            " "
-                          )[0]
-                        ).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        })}
+                        {tanggal}
                       </Text>
                     </HStack>
 
@@ -300,9 +324,7 @@ const DetailTagihan = () => {
                         fontSize={14}
                         fontWeight={"$semibold"}
                       >
-                        {dataInvoice?.tagihan_users?.[0]?.updated_at
-                          ?.split(" ")[1]
-                          ?.slice(0, 5)}
+                        {waktu}
                       </Text>
                     </HStack>
 
@@ -320,10 +342,7 @@ const DetailTagihan = () => {
                         fontSize={14}
                         fontWeight={"$semibold"}
                       >
-                        Rp.{" "}
-                        {formatRupiah(
-                          dataInvoice?.tagihan_users?.[0]?.nominal ?? 0
-                        )}
+                        Rp. {formatRupiah(dataInvoice.nominal ?? 0)}
                       </Text>
                     </HStack>
                   </VStack>
@@ -334,7 +353,7 @@ const DetailTagihan = () => {
         </VStack>
       </ScrollView>
       <Divider bgColor={"transparent"} />
-      <VStack mt={10} mx={10} mb={20}>
+      <VStack mt={10} mx={10} mb={40}>
         <Button
           bgColor={colors.primary}
           borderRadius={10}

@@ -66,7 +66,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import CustomActionSheet from "@/components/CustomActionSheet";
 import { useTagihanStore } from "@/src/store/tagihanStore";
 
@@ -74,7 +74,7 @@ const BayarSaldo = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const [showModal, setShowModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef<any>(null);
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [password, setPassword] = useState("");
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
@@ -83,7 +83,7 @@ const BayarSaldo = () => {
   const toast = useToast();
   const { nominal, no_invoice, from, activeTab } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
   const [dataInvoice, setDataInvoice] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
   const [userBalance, setUserBalance] = useState<number>(0);
@@ -92,7 +92,7 @@ const BayarSaldo = () => {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState<"error" | "warning">("error");
-  const alertRef = useRef();
+  const alertRef = useRef<any>(null);
 
   const handleClose = () => setShowActionsheet(false);
   const rawAmount =
@@ -103,7 +103,7 @@ const BayarSaldo = () => {
   const textColor = mode === "dark" ? "white" : "black";
   const bgColor = mode === "dark" ? "black" : "white";
 
-  const token = useUserStore.getState().accessToken;
+  const token = useAuthStore.getState().accessToken;
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
@@ -248,7 +248,7 @@ const BayarSaldo = () => {
                     alignItems="center"
                     m={5}
                   >
-                    <HStack spacing={0} alignItems="center">
+                  <HStack space={"$0"} alignItems="center">
                       <Text fontFamily="Lato" fontSize="$md" color={textColor}>
                         Rp. {formatRupiah(Number(dataInvoice?.nominal) || 0)}
                       </Text>
@@ -575,7 +575,7 @@ const BayarSaldo = () => {
             >
               <AccordionHeader>
                 <AccordionTrigger>
-                  {({ isExpanded }) => (
+                  {({ isExpanded }: { isExpanded: boolean }) => (
                     <>
                       <HStack justifyContent="space-between" mx={2}>
                         <HStack space="md">

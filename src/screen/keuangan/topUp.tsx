@@ -18,21 +18,48 @@ import {
   Button,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, useColorScheme } from "react-native";
+import { useAuthStore } from "@/src/store/authStore";
+import apiService from "@/src/service/apiService";
 
 const topUp = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [amount, setAmount] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [userBalance, setUserBalance] = useState<number>(0);
+  const user = useAuthStore((state) => state.user);
 
   const borderColor = mode === "dark" ? colors.box : colors.gray.light[100];
   const textColor = mode === "dark" ? "white" : "black";
 
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await apiService.mySaldo();
+        const balance = typeof response.data === 'object' ? response.data.saldo : response.data;
+        setUserBalance(Number(balance ?? 0));
+      } catch (error) {
+        console.error("Failed to fetch balance:", error);
+      }
+    };
+    fetchBalance();
+  }, []);
+
+  const formatRupiah = (value: number) => {
+    return new Intl.NumberFormat("id-ID").format(value);
+  };
+
   const handleSubmit = () => {
     setIsSubmitted(true);
-    router.push("/metodeBayar");
+    router.push({
+      pathname: "/metodeBayar",
+      params: {
+        nominal: amount,
+        from: "topup"
+      }
+    });
   };
 
   return (
@@ -69,7 +96,7 @@ const topUp = () => {
                     Saldo
                   </Text>
                   <Text color="white" mx={10} fontFamily="Lato" fontSize={16}>
-                    Rp.104.389.000
+                    Rp. {formatRupiah(userBalance)}
                   </Text>
                 </HStack>
               </Center>
@@ -78,10 +105,10 @@ const topUp = () => {
 
           <Center>
             <Avatar bgColor={colors.primary} size="md" borderRadius="$full">
-              <AvatarFallbackText>Muhammad Robby</AvatarFallbackText>
+              <AvatarFallbackText>{user?.username || "U"}</AvatarFallbackText>
             </Avatar>
             <Text color={textColor} fontFamily="Lato" fontSize={16}>
-              Muhammad Robby
+              {user?.username || "User Account"}
             </Text>
             <Center flex={1} justifyContent="center" alignItems="center">
               <HStack width="70%" space="sm" alignItems="center" px={20}>

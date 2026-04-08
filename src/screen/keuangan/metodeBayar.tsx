@@ -31,7 +31,9 @@ const MetodeBayar = () => {
   const screenHeight = Dimensions.get("window").height;
   const mode = useColorScheme();
   const [selected, setSelected] = useState<string | null>(null);
-  const { invoice, from, activeTab } = useLocalSearchParams<{ invoice?: string }>();
+  const { invoice, from, activeTab } = useLocalSearchParams<{
+    invoice?: string;
+  }>();
   const { selectedTagihan } = useTagihanStore();
 
   const [saldoData, setSaldoData] = useState<number>(0);
@@ -42,20 +44,19 @@ const MetodeBayar = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log("tag",dataVa);
-  
+  console.log("tag", dataVa);
 
   const allowedCodes = ["bca", "bni", "bri", "bmi", "mandiri"];
   const vaItem = useMemo(
     () => dataVa.find((item: AnyObj) => item.code === "va"),
-    [dataVa]
+    [dataVa],
   );
   const vaChannels: any[] = useMemo(
     () =>
       vaItem?.channels?.filter((channel: AnyObj) =>
-        allowedCodes.includes((channel.code || "").toLowerCase())
+        allowedCodes.includes((channel.code || "").toLowerCase()),
       ) || [],
-    [vaItem]
+    [vaItem],
   );
 
   const textColor = mode === "dark" ? "white" : "black";
@@ -63,11 +64,38 @@ const MetodeBayar = () => {
 
   const totalNominal = (selectedTagihan || []).reduce(
     (total: number, item: AnyObj) => total + parseInt(item.nominal || 0),
-    0
+    0,
   );
 
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID").format(value);
+
+  const getBankLogo = (namaBank: string) => {
+    const bankName = (namaBank || "").toLowerCase();
+    if (bankName.includes("mandiri")) {
+      return require("@/assets/images/bank/mandiri.png");
+    }
+    if (bankName.includes("bca")) {
+      return require("@/assets/images/bank/bca.png");
+    }
+    if (bankName.includes("bni")) {
+      return require("@/assets/images/bank/bni.png");
+    }
+    if (bankName.includes("bri")) {
+      return require("@/assets/images/bank/bri.png");
+    }
+    if (bankName.includes("bmi")) {
+      return require("@/assets/images/bank/bmi.png");
+    }
+    if (bankName.includes("jago")) {
+      return require("@/assets/images/bank/jago.png");
+    }
+    return null;
+  };
+
+  const isBankKnown = (namaBank: string) => {
+    return getBankLogo(namaBank) !== null;
+  };
 
   const handleRadioClick = (value: string, rekening?: any) => {
     setSelected((prev) => (prev === value ? null : value));
@@ -81,7 +109,7 @@ const MetodeBayar = () => {
   // --- Redirect helper: arahkan sesuai metode jika pembayaran sudah ada ---
   const resolveVaFee = (bankCode: string) => {
     const ch = vaChannels.find(
-      (c) => (c.code || "").toLowerCase() === bankCode.toLowerCase()
+      (c) => (c.code || "").toLowerCase() === bankCode.toLowerCase(),
     );
     return ch?.transaction_fee?.actual_fee ?? 0;
   };
@@ -172,15 +200,15 @@ const MetodeBayar = () => {
     }
   };
 
-  const fetchVa = async () => {
-    try {
-      const response = await apiService.virtualAccount();
-      setDataVa(response.data.payment_methods || []);
-    } catch (error) {
-      setDataVa([]);
-      console.error("Failed to fetch virtual account:", error);
-    }
-  };
+  // const fetchVa = async () => {
+  //   try {
+  //     const response = await apiService.virtualAccount();
+  //     setDataVa(response.data.payment_methods || []);
+  //   } catch (error) {
+  //     setDataVa([]);
+  //     console.error("Failed to fetch virtual account:", error);
+  //   }
+  // };
 
   useEffect(() => {
     const init = async () => {
@@ -188,7 +216,7 @@ const MetodeBayar = () => {
       await Promise.allSettled([
         fetchSaldo(),
         fetchRekening(),
-        fetchVa(),
+        // fetchVa(),
         fetchDetail(),
       ]);
       setLoading(false);
@@ -218,14 +246,14 @@ const MetodeBayar = () => {
 
       try {
         // const response = await apiService.payment(params);
-       
-          router.push({
-            pathname: "/bayarSaldo",
-            params: {
-              nominal: totalNominal || dataInvoice?.nominal || 0,
-              no_invoice: dataInvoice.no_invoice,
-            },
-          });
+
+        router.push({
+          pathname: "/bayarSaldo",
+          params: {
+            nominal: totalNominal || dataInvoice?.nominal || 0,
+            no_invoice: dataInvoice.no_invoice,
+          },
+        });
       } catch (error) {
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);
@@ -240,7 +268,6 @@ const MetodeBayar = () => {
       const vaChannel = vaChannels.find((ch) => ch.code === selectedBank);
 
       console.log("va channel", vaChannel);
-      
 
       if (!vaChannel) {
         alert("Virtual Account tidak ditemukan.");
@@ -254,13 +281,12 @@ const MetodeBayar = () => {
         invoiceId: dataInvoice.id,
       };
 
-      console.log("param va",paramsVa);
-      
+      console.log("param va", paramsVa);
 
       try {
         const response = await apiService.paymentVa(paramsVa);
-        console.log("response",response);
-        
+        console.log("response", response);
+
         const vaNumber = response?.data?.pembayaran_tagihan || {};
 
         router.push({
@@ -288,7 +314,7 @@ const MetodeBayar = () => {
     if (selected.startsWith("transfer-")) {
       const selectedBank = selected.replace("transfer-", "").toUpperCase();
       const rekeningDipilih = dataRekening.find(
-        (rek) => (rek.nama_bank || "").toUpperCase() === selectedBank
+        (rek) => (rek.nama_bank || "").toUpperCase() === selectedBank,
       );
 
       if (!rekeningDipilih) {
@@ -324,8 +350,14 @@ const MetodeBayar = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        backgroundColor={mode === "dark" ? "black" : "white"}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          backgroundColor={mode === "dark" ? "black" : "white"}
+        >
           <Header data="Pilih Metode Bayar" />
           <VStack flex={1} px={16} py={20}>
             <VStack alignItems="center" mt={10}>
@@ -369,7 +401,10 @@ const MetodeBayar = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      backgroundColor={mode === "dark" ? "black" : "white"}
+    >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         backgroundColor={mode === "dark" ? "black" : "white"}
@@ -420,7 +455,7 @@ const MetodeBayar = () => {
                 <Text color={textColor} fontFamily="Lato">
                   Rp.{" "}
                   {Number(
-                    totalNominal || dataInvoice?.nominal || 0
+                    totalNominal || dataInvoice?.nominal || 0,
                   ).toLocaleString("id-ID")}
                 </Text>
               </HStack>
@@ -489,17 +524,17 @@ const MetodeBayar = () => {
               <VStack space="md" m={10} mt={20}>
                 <HStack justifyContent="space-between" alignItems="center">
                   <HStack space="md" alignItems="center">
-                    <Image
-                      size="xs"
-                      source={
-                        rek.nama_bank === "MANDIRI"
-                          ? require("@/assets/images/bank/mandiri.png")
-                          : require("@/assets/images/bank/bca.png")
-                      }
-                      alt={rek.nama_bank}
-                      borderRadius={10}
-                      mt={"-5%"}
-                    />
+                    {isBankKnown(rek.nama_bank) ? (
+                      <Image
+                        size="xs"
+                        source={getBankLogo(rek.nama_bank)!}
+                        alt={rek.nama_bank}
+                        borderRadius={10}
+                        mt={"-5%"}
+                      />
+                    ) : (
+                      <Entypo name="wallet" size={20} color={colors.primary} />
+                    )}
                     <Text color={textColor} fontFamily="Lato">
                       Transfer {rek.nama_bank}
                     </Text>
@@ -515,7 +550,7 @@ const MetodeBayar = () => {
                       onPress={() =>
                         handleRadioClick(
                           `transfer-${(rek.nama_bank || "").toLowerCase()}`,
-                          rek
+                          rek,
                         )
                       }
                     >
@@ -534,8 +569,8 @@ const MetodeBayar = () => {
             </Box>
           ))}
 
-          {/* Metode VA */}
-          {vaChannels.map((channelItem: AnyObj, index: number) => (
+          {/* Metode VA - Commented sementara karena API error 500 */}
+          {/* {vaChannels.map((channelItem: AnyObj, index: number) => (
             <Box
               key={index}
               borderRadius={10}
@@ -548,7 +583,6 @@ const MetodeBayar = () => {
             >
               <VStack space="md" px={10} py={20}>
                 <HStack justifyContent="space-between" alignItems="center">
-                  {/* Bank logo + Bank name */}
                   <HStack alignItems="center" space="md">
                     <Image
                       size="xs"
@@ -556,12 +590,12 @@ const MetodeBayar = () => {
                         channelItem.code === "bca"
                           ? require("@/assets/images/bank/bca.png")
                           : channelItem.code === "bni"
-                          ? require("@/assets/images/bank/bni.png")
-                          : channelItem.code === "bri"
-                          ? require("@/assets/images/bank/bri.png")
-                          : channelItem.code === "bmi"
-                          ? require("@/assets/images/bank/bmi.png")
-                          : require("@/assets/images/bank/mandiri.png")
+                            ? require("@/assets/images/bank/bni.png")
+                            : channelItem.code === "bri"
+                              ? require("@/assets/images/bank/bri.png")
+                              : channelItem.code === "bmi"
+                                ? require("@/assets/images/bank/bmi.png")
+                                : require("@/assets/images/bank/mandiri.png")
                       }
                       alt={channelItem.code}
                       borderRadius={10}
@@ -571,12 +605,11 @@ const MetodeBayar = () => {
                     </Text>
                   </HStack>
 
-                  {/* Fee + Radio Button */}
                   <HStack alignItems="center" space="md">
                     <Text color={textColor} fontFamily="Lato" fontSize={12}>
                       +VA fee Rp.{" "}
                       {channelItem.transaction_fee?.actual_fee?.toLocaleString(
-                        "id-ID"
+                        "id-ID",
                       ) || "0"}
                     </Text>
 
@@ -598,7 +631,7 @@ const MetodeBayar = () => {
                 </HStack>
               </VStack>
             </Box>
-          ))}
+          ))} */}
         </VStack>
 
         {/* Footer */}
@@ -616,27 +649,35 @@ const MetodeBayar = () => {
       )}
 
       <Divider />
-      <HStack justifyContent="space-between" m={20} alignItems="center">
-        <VStack>
-          <Text fontFamily="Lato">Total Transfer</Text>
-          <Text color={textColor} fontWeight="$semibold" fontFamily="Lato">
-            Rp.{" "}
-            {Number(totalNominal || dataInvoice?.nominal || 0).toLocaleString(
-              "id-ID"
-            )}
-          </Text>
-        </VStack>
-        <Button
-          bgColor={colors.primary}
-          borderRadius={10}
-          mt={4}
-          onPress={handleNext}
-        >
-          <Text color="white" fontFamily="Lato">
-            Selanjutnya
-          </Text>
-        </Button>
-      </HStack>
+      <Box
+        style={{ backgroundColor: mode === "dark" ? "black" : "white" }}
+        py={10}
+        pb={55}
+        width="100%"
+      >
+        <HStack justifyContent="space-between" mx={20} alignItems="center">
+          <VStack>
+            <Text fontFamily="Lato" color={mode === "dark" ? "white" : "black"}>
+              Total Transfer
+            </Text>
+            <Text color={textColor} fontWeight="$semibold" fontFamily="Lato">
+              Rp.{" "}
+              {Number(totalNominal || dataInvoice?.nominal || 0).toLocaleString(
+                "id-ID",
+              )}
+            </Text>
+          </VStack>
+          <Button
+            bgColor={colors.primary}
+            borderRadius={10}
+            onPress={handleNext}
+          >
+            <Text color="white" fontFamily="Lato">
+              Selanjutnya
+            </Text>
+          </Button>
+        </HStack>
+      </Box>
     </SafeAreaView>
   );
 };

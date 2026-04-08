@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import { useAuthStore } from "@/src/store/authStore";
-import { useUserStore } from "@/src/store/userStore";
 import {
   Entypo,
   FontAwesome5,
@@ -27,13 +26,12 @@ const pengaturanAkun = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
 
-  const clearAuth = useUserStore((state) => state.clearAuth);
+  const { clearAuth, logout: authLogout } = useAuthStore();
 
   const logout = async () => {
-    await AsyncStorage.clear();
-    clearAuth();
-    useAuthStore.getState().logout();
-    router.replace("/login");
+    // Clear everything and go to login
+    authLogout();
+    router.replace("/(auth)/login");
   };
 
   return (

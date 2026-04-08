@@ -21,7 +21,7 @@ import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import MenuHome from "@/components/MenuHome";
 import HomeCard from "@/components/HomeCard";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import apiService from "@/src/service/apiService";
 import TagihanCard from "@/components/TagihanCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -32,27 +32,34 @@ const Home = () => {
   const insets = useSafeAreaInsets();
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
-  const [saldoData, setSaldoData] = useState(0);
-  const [dataTagihan, setDataTagihan] = useState({});
+  const [saldoData, setSaldoData] = useState<{ id: number; saldo: string }>({ id: 0, saldo: "0" });
+  const [dataTagihan, setDataTagihan] = useState<any[]>([]);
 
   console.log("Render Home with saldoData:", saldoData);
   
 
-  const user = useUserStore((state) => state.user);
+  const [showPasswordBanner, setShowPasswordBanner] = useState(true);
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Selamat Pagi,";
+    if (hour < 15) return "Selamat Siang,";
+    if (hour < 18) return "Selamat Sore,";
+    return "Selamat Malam,";
+  };
+
+  const user = useAuthStore((state) => state.user);
 
   const fetchSaldo = async () => {
     try {
       const response = await apiService.mySaldo();
-      setSaldoData(response.data);
-    } catch (error) {
-      setSaldoData(0);
+      // If response.data is just the number, wrap it. 
+      // Based on HomeCard props, it needs {id, saldo}.
+      const balance = typeof response.data === 'object' ? response.data.saldo : response.data;
+      setSaldoData({ id: 1, saldo: String(balance ?? 0) });
+    } catch (error: any) {
+      setSaldoData({ id: 0, saldo: "0" });
       console.error("Failed to fetch saldo:", error);
-
-      const status = error?.response?.status;
-      if (status === 401 || status === 403) {
-        useUserStore.getState().clearAuth();
-        router.replace("/login");
-      }
     }
   };
 
@@ -63,9 +70,9 @@ const Home = () => {
       const raw = response.data;
 
       const transformed = [
-        { id: 1, label: "Tagihan Belum Lunas", saldo: raw.tagihan_belum_lunas },
-        { id: 2, label: "Tagihan Lunas", saldo: raw.tagihan_lunas },
-        { id: 3, label: "Total Tagihan", saldo: raw.tagihan_total },
+        { id: 1, label: "Tagihan Belum Lunas", saldo: String(raw.tagihan_belum_lunas ?? 0) },
+        { id: 2, label: "Tagihan Lunas", saldo: String(raw.tagihan_lunas ?? 0) },
+        { id: 3, label: "Total Tagihan", saldo: String(raw.tagihan_total ?? 0) },
       ];
 
       setDataTagihan(transformed);
@@ -101,7 +108,7 @@ const Home = () => {
               fontSize={14}
               color={mode === "dark" ? "white" : colors.gray.light[400]}
             >
-              Good Morning,
+              {getGreeting()}
             </Text>
             <Text
               fontSize={18}
@@ -119,60 +126,64 @@ const Home = () => {
 
           <MenuHome />
 
-          <Box
-            borderRadius={10}
-            mt={20}
-            mx={10}
-            my={5}
-            backgroundColor={mode === "dark" ? "black" : "white"}
-          >
-            <VStack space="md" m={20}>
-              <HStack justifyContent="space-between">
-                <Box
-                  borderRadius={"$full"}
-                  bgColor={colors.primary}
-                  width={30}
-                  height={30}
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <MaterialCommunityIcons name="lock" size={20} color="white" />
-                </Box>
-
-                <MaterialCommunityIcons name="close" size={30} />
-              </HStack>
-
-              <HStack justifyContent="space-between" width={"auto"}>
-                <VStack width={"70%"}>
-                  <Text
-                    fontFamily="Lato-Bold"
-                    fontSize={20}
-                    color={mode === "dark" ? "white" : "black"}
+          {showPasswordBanner && (
+            <Box
+              borderRadius={10}
+              mt={20}
+              mx={10}
+              my={5}
+              backgroundColor={mode === "dark" ? "black" : "white"}
+            >
+              <VStack space="md" m={20}>
+                <HStack justifyContent="space-between" alignItems="center">
+                  <Box
+                    borderRadius={"$full"}
+                    bgColor={colors.primary}
+                    width={30}
+                    height={30}
+                    justifyContent="center"
+                    alignItems="center"
                   >
-                    Ganti Kata Sandi Anda!
-                  </Text>
-                  <Text
-                    fontSize={14}
-                    fontFamily="Lato"
-                    color={mode === "dark" ? "white" : "black"}
-                    mt={2}
-                  >
-                    Untuk keamanan akun anda, kami sarankan untuk mengganti kata
-                    sandi secara berkala, minimal 4 bulan sekali.
-                  </Text>
-                </VStack>
-                <Box>
-                  <Image
-                    size="xl"
-                    source={require("@/assets/images/lock.png")}
-                    alt="artikel"
-                    borderRadius={10}
-                    mt={"-10%"}
-                  />
-                </Box>
-              </HStack>
-            </VStack>
-          </Box>
+                    <MaterialCommunityIcons name="lock" size={20} color="white" />
+                  </Box>
+
+                  <TouchableOpacity onPress={() => setShowPasswordBanner(false)}>
+                    <MaterialCommunityIcons name="close" size={28} color={mode === "dark" ? "white" : "black"} />
+                  </TouchableOpacity>
+                </HStack>
+
+                <HStack justifyContent="space-between" width={"auto"}>
+                  <VStack width={"70%"}>
+                    <Text
+                      fontFamily="Lato-Bold"
+                      fontSize={20}
+                      color={mode === "dark" ? "white" : "black"}
+                    >
+                      Ganti Kata Sandi Anda!
+                    </Text>
+                    <Text
+                      fontSize={14}
+                      fontFamily="Lato"
+                      color={mode === "dark" ? "white" : "black"}
+                      mt={2}
+                    >
+                      Untuk keamanan akun anda, kami sarankan untuk mengganti kata
+                      sandi secara berkala, minimal 4 bulan sekali.
+                    </Text>
+                  </VStack>
+                  <Box>
+                    <Image
+                      size="xl"
+                      source={require("@/assets/images/lock.png")}
+                      alt="artikel"
+                      borderRadius={10}
+                      mt={"-10%"}
+                    />
+                  </Box>
+                </HStack>
+              </VStack>
+            </Box>
+          )}
 
           <HStack mt={20} mx={20} justifyContent="space-between">
             <Text

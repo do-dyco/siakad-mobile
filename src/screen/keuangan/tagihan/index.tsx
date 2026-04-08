@@ -4,7 +4,7 @@ import Proses from "@/components/Proses";
 import SearchFilter, { FilterOption } from "@/components/SearchFilter"; // Import komponen baru
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   Box,
@@ -35,16 +35,18 @@ type ItemType = {
   expire_at: string;
   nominal: number;
   status?: "UNPAID" | "IN_PROGRESS" | "PAID" | string;
+  created_at?: string;
+  updated_at?: string;
   master_tagihan?: { nama?: string };
 };
 
-const LIMIT = 50;
+const LIMIT = 10;
 
 const Tagihan = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
   const layout = useWindowDimensions();
-  
+
   // Get active tab from params (untuk back navigation)
   const { activeTab } = useLocalSearchParams();
 
@@ -53,13 +55,12 @@ const Tagihan = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tahun, setTahun] = useState("");
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // console.log("tab",activeTab);
-  
 
   // Data
   const [ongoingData, setOngoingData] = useState<ItemType[]>([]);
@@ -72,15 +73,15 @@ const Tagihan = () => {
   });
 
   console.log("Render Tagihan:", { activeTab, index });
-  
-useFocusEffect(
-  useCallback(() => {
-    if (activeTab !== undefined) {
-      console.log("activeTab di Tagihan:", activeTab);
-      setIndex(activeTab === "1" ? 1 : 0);
-    }
-  }, [activeTab])
-);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (activeTab !== undefined) {
+        console.log("activeTab di Tagihan:", activeTab);
+        setIndex(activeTab === "1" ? 1 : 0);
+      }
+    }, [activeTab]),
+  );
 
   const params = useMemo(
     () => ({
@@ -92,47 +93,117 @@ useFocusEffect(
       start: 1,
       userId: Number(user?.id),
     }),
-    [search, startDate, endDate, tahun, user?.id]
+    [search, startDate, endDate, tahun, user?.id],
   );
 
-  const fetchData = async () => {
+  // Fetch data untuk tab "Sedang Berlangsung" (UNPAID)
+  const fetchOngoingData = async () => {
     try {
-      setIsLoading(true);
-
-      const fetchParams = {
+      const response = await apiService.myTagihanList({
         search: search,
-        start: 1,
-        length: LIMIT,
-        userId: user?.id,
-        orderBy: [
-          { column: 0, asc: false },
-          { column: 0, asc: false },
-        ],
-        startDate,
-        endDate,
-        tahun,
-      };
+        limit: LIMIT,
+        status: "UNPAID",
+      });
 
-      console.log("Requesting:", fetchParams);
+      console.log("=== ONGOING API RESPONSE ===");
+      console.log("Full response:", response);
+      console.log("Response data:", response?.data);
+      console.log("Response data type:", Array.isArray(response?.data) ? "array" : typeof response?.data);
 
-      const response = await apiService.myListTagihan(fetchParams);
+      // Handle berbagai kemungkinan struktur response
+      let rawItems: any[] = [];
 
-      const allData: ItemType[] = (response?.data?.tagihan_users ?? []).map(
-        (item: any) => ({
-          ...item,
-          status: item.status?.toUpperCase(),
-        })
-      );
+      if (Array.isArray(response?.data)) {
+        rawItems = response.data;
+      } else if (Array.isArray(response?.data?.data)) {
+        rawItems = response.data.data;
+      } else if (Array.isArray(response?.data?.tagihan_users)) {
+        rawItems = response.data.tagihan_users;
+      } else if (Array.isArray(response?.data?.tagihan)) {
+        rawItems = response.data.tagihan;
+      }
 
-      console.log("API response status list:", allData.map((d) => d.status));
+      console.log("Raw items count:", rawItems.length);
+      console.log("First item:", rawItems[0]);
 
-      const unpaid = allData.filter((d) => d.status === "UNPAID");
-      const inProgress = allData.filter((d) => d.status === "IN_PROGRESS");
+      const data: ItemType[] = rawItems.map((item: any) => ({
+        id: item.id?.toString() || "",
+        no_tagihan: item.no_tagihan || item.no_tagihan || "",
+        no_invoice: item.no_invoice || "",
+        tagihan_name: item.tagihan_name || item.nama_tagihan || "",
+        total: item.total?.toString() || "",
+        expire_at: item.expire_at || item.expired_at || "",
+        nominal: Number(item.nominal) || 0,
+        status: item.status?.toUpperCase() ?? "UNPAID",
+        created_at: item.created_at || "",
+        updated_at: item.updated_at || "",
+        master_tagihan: item.master_tagihan || { nama: item.nama_tagihan || "-" },
+      }));
 
-      setOngoingData(unpaid);
-      setProsesData(inProgress);
+      console.log("Mapped ongoing data:", data);
+      setOngoingData(data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching ongoing data:", error);
+      setOngoingData([]);
+    }
+  };
+
+  // Fetch data untuk tab "Dalam Proses" (invoice-tagihan)
+  const fetchProsesData = async () => {
+    try {
+      const response = await apiService.myInvoiceTagihanList({
+        search: search,
+        status: "",
+        limit: LIMIT,
+      });
+
+      console.log("=== PROSES API RESPONSE ===");
+      console.log("Full response:", response);
+      console.log("Response data:", response?.data);
+      console.log("Response data type:", Array.isArray(response?.data) ? "array" : typeof response?.data);
+
+      // Handle berbagai kemungkinan struktur response untuk invoice-tagihan
+      let rawItems: any[] = [];
+
+      if (Array.isArray(response?.data)) {
+        rawItems = response.data;
+      } else if (Array.isArray(response?.data?.data)) {
+        rawItems = response.data.data;
+      } else if (Array.isArray(response?.data?.invoice_tagihans)) {
+        rawItems = response.data.invoice_tagihans;
+      } else if (Array.isArray(response?.data?.invoices)) {
+        rawItems = response.data.invoices;
+      }
+
+      console.log("Raw items count:", rawItems.length);
+      console.log("First item:", rawItems[0]);
+
+      const data: ItemType[] = rawItems.map((item: any) => ({
+        id: item.id?.toString() || "",
+        no_tagihan: item.no_tagihan || item.tagihan_no || "",
+        no_invoice: item.no_invoice || item.invoice_no || item.no_invoice || "",
+        tagihan_name: item.tagihan_name || item.nama_tagihan || item.description || "",
+        total: item.total?.toString() || "",
+        expire_at: item.expire_at || item.expired_at || item.tanggal_exp || "",
+        nominal: Number(item.nominal) || Number(item.total_nominal) || 0,
+        status: item.status?.toUpperCase() ?? "IN_PROGRESS",
+        created_at: item.created_at || item.tanggal || "",
+        updated_at: item.updated_at || "",
+        master_tagihan: item.master_tagihan || { nama: item.nama_tagihan || item.nama || "-" },
+      }));
+
+      console.log("Mapped proses data:", data);
+      setProsesData(data);
+    } catch (error) {
+      console.error("Error fetching proses data:", error);
+      setProsesData([]);
+    }
+  };
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      await Promise.all([fetchOngoingData(), fetchProsesData()]);
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +213,7 @@ useFocusEffect(
     if (isRefreshing) return;
     setIsRefreshing(true);
     try {
-      await fetchData();
+      await Promise.all([fetchOngoingData(), fetchProsesData()]);
     } finally {
       setIsRefreshing(false);
     }
@@ -178,11 +249,11 @@ useFocusEffect(
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
-        
-        setStartDate(startOfWeek.toISOString().split('T')[0]);
-        setEndDate(endOfWeek.toISOString().split('T')[0]);
+
+        setStartDate(startOfWeek.toISOString().split("T")[0]);
+        setEndDate(endOfWeek.toISOString().split("T")[0]);
         setTahun("");
-      }
+      },
     },
     {
       label: "Bulan Ini",
@@ -192,11 +263,11 @@ useFocusEffect(
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        
-        setStartDate(startOfMonth.toISOString().split('T')[0]);
-        setEndDate(endOfMonth.toISOString().split('T')[0]);
+
+        setStartDate(startOfMonth.toISOString().split("T")[0]);
+        setEndDate(endOfMonth.toISOString().split("T")[0]);
         setTahun("");
-      }
+      },
     },
     {
       label: "Tahun Ini",
@@ -207,7 +278,7 @@ useFocusEffect(
         setTahun(currentYear);
         setStartDate("");
         setEndDate("");
-      }
+      },
     },
     {
       label: "3 Bulan Terakhir",
@@ -215,12 +286,16 @@ useFocusEffect(
       onPress: () => {
         console.log("Filter: 3 Bulan Terakhir");
         const now = new Date();
-        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-        
-        setStartDate(threeMonthsAgo.toISOString().split('T')[0]);
-        setEndDate(now.toISOString().split('T')[0]);
+        const threeMonthsAgo = new Date(
+          now.getFullYear(),
+          now.getMonth() - 3,
+          1,
+        );
+
+        setStartDate(threeMonthsAgo.toISOString().split("T")[0]);
+        setEndDate(now.toISOString().split("T")[0]);
         setTahun("");
-      }
+      },
     },
   ];
 
@@ -236,18 +311,18 @@ useFocusEffect(
   const routes = useMemo(
     () => [
       { key: "first", title: "Sedang Berlangsung" },
-      { key: "second", title: "Dalam Proses" }, 
+      { key: "second", title: "Dalam Proses" },
     ],
-    []
+    [],
   );
 
   return (
     <SafeAreaView
-     style={{
-          flex: 1,
-          backgroundColor: mode === "dark" ? "black" : "white",
-        }}
-        edges={["top", "bottom"]}
+      style={{
+        flex: 1,
+        backgroundColor: mode === "dark" ? "black" : "white",
+      }}
+      edges={["top", "bottom"]}
     >
       {/* Header */}
       <Box backgroundColor={mode === "dark" ? "black" : "white"} mt={30}>

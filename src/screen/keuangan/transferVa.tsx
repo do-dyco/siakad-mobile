@@ -2,7 +2,7 @@ import CustomBadge from "@/components/CustomBadge";
 import DashedDivider from "@/components/dashedDivider";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import {
   SafeAreaView,
   ScrollView,
@@ -40,7 +40,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 
 const TransferVa = () => {
   const mode = useColorScheme();
@@ -51,7 +51,7 @@ const TransferVa = () => {
   const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice } =
     useLocalSearchParams();
   const [loading, setLoading] = useState(false);
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
   const [dataInvoice, setDataInvoice] = useState<any>({});
 
   const handleClose = () => setShowActionsheet(false);
@@ -67,6 +67,33 @@ const TransferVa = () => {
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
+  };
+
+  const getBankLogo = (namaBank: string) => {
+    const bankName = (namaBank || "").toLowerCase();
+    if (bankName.includes("mandiri")) {
+      return require("@/assets/images/bank/mandiri.png");
+    }
+    if (bankName.includes("bca")) {
+      return require("@/assets/images/bank/bca.png");
+    }
+    if (bankName.includes("bni")) {
+      return require("@/assets/images/bank/bni.png");
+    }
+    if (bankName.includes("bri")) {
+      return require("@/assets/images/bank/bri.png");
+    }
+    if (bankName.includes("bmi")) {
+      return require("@/assets/images/bank/bmi.png");
+    }
+    if (bankName.includes("jago")) {
+      return require("@/assets/images/bank/jago.png");
+    }
+    return null;
+  };
+
+  const isBankKnown = (namaBank: string) => {
+    return getBankLogo(namaBank) !== null;
   };
 
   const fetchDetail = async () => {
@@ -189,16 +216,16 @@ const TransferVa = () => {
                 <DashedDivider />
 
                 <HStack space="md">
-                  <Image
-                    size="xs"
-                    source={
-                      nama_bank === "MANDIRI"
-                        ? require("@/assets/images/bank/mandiri.png")
-                        : require("@/assets/images/bank/bca.png")
-                    }
-                    alt="bank"
-                    borderRadius={10}
-                  />
+                  {isBankKnown(nama_bank) ? (
+                    <Image
+                      size="xs"
+                      source={getBankLogo(nama_bank)!}
+                      alt="bank"
+                      borderRadius={10}
+                    />
+                  ) : (
+                    <Entypo name="wallet" size={20} color={colors.primary} />
+                  )}
                   <VStack>
                     <Text fontFamily="Lato" color={textColor}>
                       Bank {nama_bank} VA

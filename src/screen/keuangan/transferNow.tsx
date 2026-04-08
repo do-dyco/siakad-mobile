@@ -6,6 +6,7 @@ import {
   EvilIcons,
   Ionicons,
   MaterialCommunityIcons,
+  Entypo,
 } from "@expo/vector-icons";
 import {
   SafeAreaView,
@@ -52,7 +53,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 
 const TransferNow = () => {
   const mode = useColorScheme();
@@ -62,10 +63,17 @@ const TransferNow = () => {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const toast = useToast();
-  const { nama_bank, no_rekening, nama_rekening, nominal, no_invoice, activeTab, from } =
-    useLocalSearchParams();
+  const {
+    nama_bank,
+    no_rekening,
+    nama_rekening,
+    nominal,
+    no_invoice,
+    activeTab,
+    from,
+  } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
   const [dataInvoice, setDataInvoice] = useState<any>({});
 
   const handleClose = () => setShowActionsheet(false);
@@ -84,6 +92,33 @@ const TransferNow = () => {
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID").format(value);
+  };
+
+  const getBankLogo = (namaBank: string) => {
+    const bankName = (namaBank || "").toLowerCase();
+    if (bankName.includes("mandiri")) {
+      return require("@/assets/images/bank/mandiri.png");
+    }
+    if (bankName.includes("bca")) {
+      return require("@/assets/images/bank/bca.png");
+    }
+    if (bankName.includes("bni")) {
+      return require("@/assets/images/bank/bni.png");
+    }
+    if (bankName.includes("bri")) {
+      return require("@/assets/images/bank/bri.png");
+    }
+    if (bankName.includes("bmi")) {
+      return require("@/assets/images/bank/bmi.png");
+    }
+    if (bankName.includes("jago")) {
+      return require("@/assets/images/bank/jago.png");
+    }
+    return null;
+  };
+
+  const isBankKnown = (namaBank: string) => {
+    return getBankLogo(namaBank) !== null;
   };
 
   const fetchDetail = async () => {
@@ -201,8 +236,7 @@ const TransferNow = () => {
         params: { activeTab: activeTab },
       });
       return;
-    } else{
-
+    } else {
       router.push("/invoice");
     }
   };
@@ -246,11 +280,18 @@ const TransferNow = () => {
         edges={["top", "bottom"]}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, backgroundColor: mode === "dark" ? "black" : "white" }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            backgroundColor: mode === "dark" ? "black" : "white",
+          }}
           backgroundColor={mode === "dark" ? "black" : "white"}
           height={screenHeight}
         >
-          <Header data={"Transfer Sekarang"} backTo={from} activeTab={activeTab}/>
+          <Header
+            data={"Transfer Sekarang"}
+            backTo={from}
+            activeTab={activeTab}
+          />
           <VStack space="md" flex={1} m={10}>
             <Text fontFamily="Lato" color={textColor} size="lg">
               Transfer Bank
@@ -279,19 +320,19 @@ const TransferNow = () => {
                 <DashedDivider />
 
                 <HStack space="md">
-                  <Image
-                    size="xs"
-                    source={
-                      nama_bank === "MANDIRI"
-                        ? require("@/assets/images/bank/mandiri.png")
-                        : require("@/assets/images/bank/bca.png")
-                    }
-                    alt="bank"
-                    borderRadius={10}
-                  />
+                  {isBankKnown(nama_bank) ? (
+                    <Image
+                      size="xs"
+                      source={getBankLogo(nama_bank)!}
+                      alt="bank"
+                      borderRadius={10}
+                    />
+                  ) : (
+                    <Entypo name="wallet" size={20} color={colors.primary} />
+                  )}
                   <VStack>
                     <Text fontFamily="Lato" color={textColor}>
-                      Bank {nama_bank}
+                      {nama_bank}
                     </Text>
                     <Text fontFamily="Lato" color={textColor}>
                       {nama_rekening}
@@ -353,7 +394,7 @@ const TransferNow = () => {
                       onPress={() =>
                         copyToClipboard(
                           `Rp.${formatRupiah(mainPart)}.${lastThree}`,
-                          "Jumlah transfer"
+                          "Jumlah transfer",
                         )
                       }
                     >
@@ -506,7 +547,13 @@ const TransferNow = () => {
           </VStack>
         </ScrollView>
 
-        <Box bgColor={mode === "dark" ? "black" : "white"} position="absolute" bottom={0} width="100%" pb={20}>
+        <Box
+          bgColor={mode === "dark" ? "black" : "white"}
+          position="absolute"
+          bottom={0}
+          width="100%"
+          pb={20}
+        >
           <VStack space="md" m={10}>
             <Center>
               <TouchableOpacity onPress={() => setShowModal(true)}>
@@ -544,10 +591,9 @@ const TransferNow = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         finalFocusRef={ref}
-       
       >
         <ModalBackdrop />
-        <ModalContent  bgColor={mode === "dark" ? "black" : "white"}>
+        <ModalContent bgColor={mode === "dark" ? "black" : "white"}>
           <ModalHeader>
             <Heading size="lg" color={textColor} fontFamily="Lato">
               Batalkan Transaksi?

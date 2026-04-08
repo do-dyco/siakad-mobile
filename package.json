@@ -6,6 +6,8 @@
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
+    "android:emulator": "emulator -avd Pixel_9_Pro_API_37 && npm run android",
+    "emulator": "emulator -avd Pixel_9_Pro_API_37",
     "android:build": "eas build --platform android --profile preview",
     "android:build:local": "eas build --platform android --profile preview --local",
     "android:build:local:clean": "eas build --platform android --profile preview --local --clear-cache",
@@ -67,6 +69,7 @@
     "react-native-view-shot": "4.0.3",
     "react-native-web": "^0.21.0",
     "react-native-worklets": "0.5.1",
+    "tslib": "^2.8.1",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

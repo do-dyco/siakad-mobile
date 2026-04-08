@@ -21,7 +21,7 @@ import SkeletonList from "@/components/SkeletonList";
 import { useEffect, useState } from "react";
 import CustomBadge from "@/components/CustomBadge";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 
 export default function Keuangan() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function Keuangan() {
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
   const [length, setLength] = useState(10);
-  const user = useUserStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
 
   const data = [
     { value: 45, color: "#10B981" },

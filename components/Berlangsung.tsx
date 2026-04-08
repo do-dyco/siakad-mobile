@@ -42,6 +42,9 @@ type ItemType = {
   total: string;
   expire_at: string;
   nominal: number;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
   master_tagihan?: { nama?: string };
 };
 

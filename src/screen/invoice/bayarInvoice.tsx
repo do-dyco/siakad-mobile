@@ -2,7 +2,7 @@ import DashedDivider from "@/components/dashedDivider";
 import Header from "@/components/Header";
 import colors from "@/src/config/colors";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Feather,
@@ -65,7 +65,7 @@ const BayarInvoice = () => {
   const { invoice, from, activeTab, nominal, no_invoice, metode } =
     useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState([]);
-  const { user } = useUserStore();
+  const { user } = useAuthStore();
   const [showActionsheet, setShowActionsheet] = useState(false);
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
   const insets = useSafeAreaInsets();
@@ -77,6 +77,8 @@ const BayarInvoice = () => {
     title: "",
     message: "",
   });
+
+  console.log("data invoice:", dataInvoice);
 
   const handleOpenShareSheet = async () => {
     try {
@@ -108,7 +110,7 @@ const BayarInvoice = () => {
           message: `📄 Invoice Pembayaran Anda\n\nInvoice: ${
             dataInvoice?.no_invoice || no_invoice || "-"
           }\nTotal: Rp. ${Number(
-            dataInvoice?.pembayaran?.nominal || nominal || 0
+            dataInvoice?.pembayaran?.nominal || nominal || 0,
           ).toLocaleString("id-ID")}`,
           url: uri, // hasil ViewShot (file://...)
         };
@@ -278,7 +280,7 @@ const BayarInvoice = () => {
                     >
                       Rp.{" "}
                       {formatRupiah(
-                        dataInvoice?.pembayaran?.nominal || nominal
+                        dataInvoice?.pembayaran?.nominal || nominal,
                       ) || "0"}
                     </Text>
                   </Center>

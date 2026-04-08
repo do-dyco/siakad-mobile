@@ -1,8 +1,8 @@
-import axios, { AxiosRequestConfig, AxiosError } from "axios";
+import axios, { InternalAxiosRequestConfig, AxiosError } from "axios";
 import ENV from "./env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { useUserStore } from "../store/userStore";
+import { useAuthStore } from "../store/authStore";
 
 const axiosInstance = axios.create({
   baseURL: ENV.API_DEV, // ✅ tetap pakai ENV.API_DEV
@@ -16,14 +16,11 @@ const axiosInstance = axios.create({
 
 // ----- Request: sisipkan Bearer token dari store -----
 axiosInstance.interceptors.request.use(
-  async (config: AxiosRequestConfig) => {
-    const token = useUserStore.getState().accessToken;
+  async (config: InternalAxiosRequestConfig) => {
+    const token = useAuthStore.getState().accessToken;
     
-    if (token) {
-      config.headers = {
-        ...(config.headers || {}),
-        Authorization: `Bearer ${token}`,
-      };
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -40,16 +37,12 @@ axiosInstance.interceptors.response.use(
 
     if (status === 401 && !isRedirecting) {
       isRedirecting = true;
-      // try {
-      //   useUserStore.getState().clearAuth?.();
-      //   await AsyncStorage.removeItem("auth-storage");
-      //   setTimeout(() => {
-      //     // router.replace("/(auth)/login");
-      //     isRedirecting = false;
-      //   }, 0);
-      // } catch {
-      //   isRedirecting = false;
-      // }
+      try {
+        useAuthStore.getState().logout();
+        // The _layout.tsx should handle the redirection based on isLoggedIn state
+      } finally {
+        isRedirecting = false;
+      }
     }
 
     return Promise.reject(error);

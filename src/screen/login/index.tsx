@@ -10,6 +10,14 @@ import {
   ScrollView,
   SafeAreaView,
   Pressable,
+  HStack,
+  Checkbox,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  CheckIcon,
+  Box,
+  Spinner,
 } from "@gluestack-ui/themed";
 import colors from "@/src/config/colors";
 import { useRouter } from "expo-router";
@@ -18,12 +26,12 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { Dimensions, TouchableOpacity, useColorScheme } from "react-native";
+import { Dimensions, TouchableOpacity, useColorScheme, KeyboardAvoidingView, Platform } from "react-native";
 import { useEffect, useState } from "react";
 import AlertCustom from "@/components/Alert";
 import apiService from "@/src/service/apiService";
-import { useUserStore } from "@/src/store/userStore";
 import { useAuthStore } from "@/src/store/authStore";
+import { MotiView } from "moti";
 
 export default function Login() {
   const router = useRouter();
@@ -35,23 +43,27 @@ export default function Login() {
   const [kodeUnik, setKodeUnik] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isHydrating, setIsHydrating] = useState(true);
 
-  const { isLoggedIn, login: authLogin } = useAuthStore();
-  const setAuth = useUserStore((state) => state.setAuth);
-  const accessToken = useUserStore((state) => state.accessToken);
+  const { isLoggedIn, setAuth, hasHydrated } = useAuthStore();
+
+  useEffect(() => {
+    if (hasHydrated && isLoggedIn) {
+      router.replace("/(tabs)");
+    }
+  }, [hasHydrated, isLoggedIn]);
 
   const handleLogin = async () => {
-    setLoading(true);
-    setShowAlert(false);
-
     if (!login.trim() || !password.trim() || !kodeUnik.trim()) {
+      setAlertMessage("Silakan isi email, kode instansi, dan kata sandi sebelum melanjutkan.");
       setShowAlert(true);
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
+    setShowAlert(false);
 
     const param = {
       login: login.trim(),
@@ -63,8 +75,6 @@ export default function Login() {
     try {
       console.log("Mengirim request login dengan param:", param);
       const res = await apiService.login(param);
-
-      console.log("Login response:", res);
 
       if (res?.meta?.status_code === 200) {
         setAuth({
@@ -78,216 +88,206 @@ export default function Login() {
           accessToken: res.data.access_token,
           refreshToken: res.data.refresh_token,
         });
-        authLogin();
-        router.replace("/(tabs)");
+        // Navigation will be handled by useEffect or RootLayout
       } else {
+        setAlertMessage(res?.meta?.message || "Login gagal. Silakan periksa kembali data Anda.");
         setShowAlert(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      setAlertMessage(error?.response?.data?.meta?.message || "Terjadi kesalahan pada server. Silakan coba lagi nanti.");
       setShowAlert(true);
     } finally {
       setLoading(false);
     }
   };
 
-  // Hidrasi kedua store sebelum render UI
-  useEffect(() => {
-    let mounted = true;
-    let authUnsub: any;
-    let userUnsub: any;
-
-    const hydrateStores = async () => {
-      try {
-        const authPromise = new Promise<void>((resolve) => {
-          if (useAuthStore.persist.hasHydrated()) {
-            resolve();
-          } else {
-            authUnsub = useAuthStore.persist.onFinishHydration(() => resolve());
-          }
-        });
-
-        const userPromise = new Promise<void>((resolve) => {
-          if (useUserStore.persist.hasHydrated()) {
-            resolve();
-          } else {
-            userUnsub = useUserStore.persist.onFinishHydration(() => resolve());
-          }
-        });
-
-        await Promise.all([authPromise, userPromise]);
-
-        if (!mounted) return;
-
-        const token = (useUserStore.getState() as { accessToken: string })
-          .accessToken;
-        const loggedIn = (useAuthStore.getState() as { isLoggedIn: boolean })
-          .isLoggedIn;
-
-        setIsHydrating(false);
-
-        if (token && loggedIn) {
-          router.replace("/(tabs)");
-        }
-      } catch (err) {
-        console.error("Store hydration error:", err);
-        setIsHydrating(false);
-      }
-    };
-
-    hydrateStores();
-
-    return () => {
-      mounted = false;
-      if (authUnsub) authUnsub();
-      if (userUnsub) userUnsub();
-    };
-  }, [router]);
-
-  if (isHydrating) {
+  if (!hasHydrated) {
     return (
-      <SafeAreaView
-        backgroundColor={mode === "dark" ? "black" : "white"}
-        height={screenHeight}
-      >
+      <SafeAreaView backgroundColor={mode === "dark" ? "black" : "white"} height="100%">
         <Center flex={1}>
-          <Image
-            style={{ width: 80, height: 80, marginBottom: 20 }}
-            source={require("@/assets/images/LOGO.png")}
-            alt="logo"
-          />
-          <Text
-            fontSize={16}
-            fontFamily="Lato"
-            color={mode === "dark" ? "white" : colors.gray.light[900]}
-          >
-            Loading...
-          </Text>
+          <Spinner size="large" color={colors.brand[500]} />
         </Center>
       </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView>
-      <SafeAreaView
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1 }}
         backgroundColor={mode === "dark" ? "black" : "white"}
-        height={screenHeight}
+        showsVerticalScrollIndicator={false}
       >
-        <Image
-          style={{ width: 50, height: 50, margin: 30 }}
-          source={require("@/assets/images/LOGO.png")}
-          alt="logo"
-          mt="20%"
-        />
-        <Center mt={30} mx={20}>
-          <VStack space="md">
-            <Text
-              fontWeight="$extrabold"
-              fontFamily="Lato"
-              fontSize={24}
-              color={mode === "dark" ? "white" : colors.gray.light[900]}
-            >
-              Selamat datang
-            </Text>
-            <Text
-              fontSize={14}
-              mb={30}
-              fontFamily="Lato"
-              color={mode === "dark" ? "white" : colors.gray.light[400]}
-            >
-              Masukkan email, kode instansi dan kata sandi Anda untuk masuk ke
-              dalam aplikasi.
-            </Text>
-
-            <Input borderRadius={12}>
-              <InputSlot mx={10}>
-                <MaterialCommunityIcons
-                  name="email-outline"
-                  size={25}
-                  color={"#535862"}
-                />
-              </InputSlot>
-              <InputField
-                placeholder="Masukkan username / email Anda"
-                value={login}
-                onChangeText={setLogin}
-                color={mode === "dark" ? "white" : "black"}
-                placeholderTextColor={mode === "dark" ? "white" : "#888"}
+        <SafeAreaView flex={1}>
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 500 }}
+            style={{ flex: 1 }}
+          >
+            <Box px={24} pt={60} pb={24}>
+              <Image
+                style={{ width: 60, height: 60 }}
+                source={require("@/assets/images/LOGO.png")}
+                alt="logo"
+                resizeMode="contain"
               />
-            </Input>
-
-            <Input borderRadius={12}>
-              <InputSlot mx={10}>
-                <FontAwesome name="id-card-o" size={20} color={"#535862"} />
-              </InputSlot>
-              <InputField
-                placeholder="Masukkan kode instansi"
-                value={kodeUnik}
-                onChangeText={setKodeUnik}
-                color={mode === "dark" ? "white" : "black"}
-                placeholderTextColor={mode === "dark" ? "white" : "#888"}
-              />
-            </Input>
-
-            <Input borderRadius={12}>
-              <InputField
-                placeholder="Kata sandi"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChangeText={setPassword}
-                color={mode === "dark" ? "white" : "black"}
-                placeholderTextColor={mode === "dark" ? "white" : "#888"}
-              />
-              <InputSlot mx={10}>
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
-                  <Entypo
-                    name={showPassword ? "eye" : "eye-with-line"}
-                    size={25}
-                    color="#535862"
-                  />
-                </Pressable>
-              </InputSlot>
-            </Input>
-
-            <Button
-              size="md"
-              variant="solid"
-              bgColor={colors.brand[500]}
-              mt={20}
-              borderRadius={12}
-              onPress={handleLogin}
-              isDisabled={loading}
-            >
-              <Text color="#ffffff" fontFamily="Lato">
-                {loading ? "Loading..." : "Masuk"}
-              </Text>
-            </Button>
-
-            <Center mt={20}>
-              <TouchableOpacity onPress={() => router.push("/forgetPassword")}>
+              
+              <VStack mt={40} space="xs">
                 <Text
-                  fontFamily="Lato"
+                  fontWeight="$extrabold"
+                  fontFamily="Lato-Bold"
+                  fontSize={28}
                   color={mode === "dark" ? "white" : colors.gray.light[900]}
                 >
-                  Lupa Kata Sandi ?
+                  Selamat datang
                 </Text>
-              </TouchableOpacity>
-            </Center>
-          </VStack>
-        </Center>
+                <Text
+                  fontSize={15}
+                  fontFamily="Lato"
+                  color={mode === "dark" ? colors.gray.dark[400] : colors.gray.light[500]}
+                  lineHeight={22}
+                >
+                  Silakan masuk dengan akun Anda untuk mengakses dashboard akademik.
+                </Text>
+              </VStack>
 
-        {showAlert && (
-          <VStack mx={20} mt={20}>
-            <AlertCustom
-              boxBgColor={colors.error[500]}
-              iconColor="white"
-              title="Input Tidak Lengkap"
-              message="Silakan isi email, kode instansi, dan kata sandi sebelum melanjutkan."
-            />
-          </VStack>
-        )}
-      </SafeAreaView>
-    </ScrollView>
+              <VStack mt={32} space="lg">
+                <VStack space="xs">
+                  <Text size="sm" fontWeight="$medium" color={mode === "dark" ? "white" : colors.gray.light[700]}>
+                    Email atau Username
+                  </Text>
+                  <Input borderRadius={12} height={50} variant="outline" size="md">
+                    <InputSlot pl={12}>
+                      <MaterialCommunityIcons
+                        name="email-outline"
+                        size={20}
+                        color={colors.gray.light[500]}
+                      />
+                    </InputSlot>
+                    <InputField
+                      placeholder="Contoh: user@email.com"
+                      value={login}
+                      onChangeText={setLogin}
+                      color={mode === "dark" ? "white" : "black"}
+                    />
+                  </Input>
+                </VStack>
+
+                <VStack space="xs">
+                  <Text size="sm" fontWeight="$medium" color={mode === "dark" ? "white" : colors.gray.light[700]}>
+                    Kode Instansi
+                  </Text>
+                  <Input borderRadius={12} height={50} variant="outline" size="md">
+                    <InputSlot pl={12}>
+                      <FontAwesome name="id-card-o" size={18} color={colors.gray.light[500]} />
+                    </InputSlot>
+                    <InputField
+                      placeholder="Masukkan kode instansi"
+                      value={kodeUnik}
+                      onChangeText={setKodeUnik}
+                      color={mode === "dark" ? "white" : "black"}
+                    />
+                  </Input>
+                </VStack>
+
+                <VStack space="xs">
+                  <Text size="sm" fontWeight="$medium" color={mode === "dark" ? "white" : colors.gray.light[700]}>
+                    Kata Sandi
+                  </Text>
+                  <Input borderRadius={12} height={50} variant="outline" size="md">
+                    <InputSlot pl={12}>
+                      <MaterialCommunityIcons name="lock-outline" size={20} color={colors.gray.light[500]} />
+                    </InputSlot>
+                    <InputField
+                      placeholder="••••••••"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChangeText={setPassword}
+                      color={mode === "dark" ? "white" : "black"}
+                    />
+                    <InputSlot pr={12}>
+                      <Pressable onPress={() => setShowPassword(!showPassword)}>
+                        <Entypo
+                          name={showPassword ? "eye" : "eye-with-line"}
+                          size={20}
+                          color={colors.gray.light[500]}
+                        />
+                      </Pressable>
+                    </InputSlot>
+                  </Input>
+                </VStack>
+
+                <HStack justifyContent="space-between" alignItems="center">
+                  <Checkbox
+                    size="md"
+                    isInvalid={false}
+                    isDisabled={false}
+                    value="remember"
+                    isChecked={rememberMe}
+                    onChange={(val) => setRememberMe(val)}
+                    aria-label="Remember me"
+                  >
+                    <CheckboxIndicator mr="$2">
+                      <CheckboxIcon as={CheckIcon} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel fontFamily="Lato" size="sm">Ingat saya</CheckboxLabel>
+                  </Checkbox>
+
+                  <TouchableOpacity onPress={() => router.push("/forgetPassword")}>
+                    <Text
+                      fontFamily="Lato-Bold"
+                      fontSize={14}
+                      color={colors.brand[500]}
+                    >
+                      Lupa Kata Sandi?
+                    </Text>
+                  </TouchableOpacity>
+                </HStack>
+
+                <Button
+                  size="lg"
+                  variant="solid"
+                  action="primary"
+                  bg={colors.brand[500]}
+                  h={50}
+                  mt={8}
+                  borderRadius={12}
+                  onPress={handleLogin}
+                  isDisabled={loading}
+                >
+                  {loading ? (
+                    <Spinner color="white" />
+                  ) : (
+                    <Text color="white" fontWeight="$bold" fontFamily="Lato-Bold">
+                      Masuk Ke Akun
+                    </Text>
+                  )}
+                </Button>
+              </VStack>
+
+              {showAlert && (
+                <MotiView
+                  from={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  style={{ marginTop: 24 }}
+                >
+                  <AlertCustom
+                    boxBgColor={colors.error[500]}
+                    iconColor="white"
+                    title="Oops!"
+                    message={alertMessage}
+                  />
+                </MotiView>
+              )}
+            </Box>
+          </MotiView>
+        </SafeAreaView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

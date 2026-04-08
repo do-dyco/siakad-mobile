@@ -4,7 +4,37 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="589658b5-1d4c-4a08-9310-5764c2946ff8" name="Changes" comment="" />
+    <list default="true" id="589658b5-1d4c-4a08-9310-5764c2946ff8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/keuangan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/keuangan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Berlangsung.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Berlangsung.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Proses.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Proses.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/instance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/instance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/account/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/account/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/account/pengaturanAkun.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/account/pengaturanAkun.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/home/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/home/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/invoice/bayarInvoice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/invoice/bayarInvoice.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/invoice/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/invoice/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/bayarSaldo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/bayarSaldo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/detailTransaksi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/detailTransaksi.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/metodeBayar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/metodeBayar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/statusTransaksi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/statusTransaksi.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/tagihan/detailTagihan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/tagihan/detailTagihan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/tagihan/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/tagihan/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/topUp.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/topUp.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/transferNow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/transferNow.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/transferVa.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/transferVa.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screen/login/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/login/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/apiService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/apiService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/authStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/authStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/tagihanStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/tagihanStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/userStore.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,26 +46,27 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="31GyujgzNrLJigeF4VPYlG18L7t" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "dody-new",
-    "last_opened_file_path": "D:/project/siakad-mobile/android"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dody-dev&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/project/siakad-mobile&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
