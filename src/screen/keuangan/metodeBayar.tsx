@@ -129,6 +129,8 @@ const MetodeBayar = () => {
         params: {
           nominal,
           no_invoice: inv?.no_invoice,
+          from: from,
+          activeTab: activeTab,
         },
       });
       return;
@@ -144,6 +146,8 @@ const MetodeBayar = () => {
           no_invoice: inv?.no_invoice,
           va_fee: resolveVaFee(bankCode),
           no_rekening: pay.no_rekening,
+          from: from,
+          activeTab: activeTab,
         },
       });
       return;
@@ -252,6 +256,8 @@ const MetodeBayar = () => {
           params: {
             nominal: totalNominal || dataInvoice?.nominal || 0,
             no_invoice: dataInvoice.no_invoice,
+            from: from,
+            activeTab: activeTab,
           },
         });
       } catch (error) {
@@ -299,6 +305,8 @@ const MetodeBayar = () => {
             no_invoice: dataInvoice.no_invoice,
             va_fee: vaChannel.transaction_fee?.actual_fee || 0,
             no_rekening: vaNumber.no_rekening,
+            from: from,
+            activeTab: activeTab,
           },
         });
         return response;
@@ -343,6 +351,8 @@ const MetodeBayar = () => {
           nama_rekening: rekeningDipilih.nama_rekening,
           nominal: totalNominal || dataInvoice?.nominal || 0,
           no_invoice: dataInvoice.no_invoice,
+          from: from,
+          activeTab: activeTab,
         },
       });
     }
@@ -358,7 +368,11 @@ const MetodeBayar = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           backgroundColor={mode === "dark" ? "black" : "white"}
         >
-          <Header data="Pilih Metode Bayar" />
+          <Header
+            data="Pilih Metode Bayar"
+            backTo={from}
+            activeTab={activeTab}
+          />
           <VStack flex={1} px={16} py={20}>
             <VStack alignItems="center" mt={10}>
               <Spinner size="large" color={colors.primary} />
@@ -410,7 +424,11 @@ const MetodeBayar = () => {
         backgroundColor={mode === "dark" ? "black" : "white"}
         height={screenHeight}
       >
-        <Header data="Pilih Metode Bayar" />
+        <Header
+          data="Pilih Metode Bayar"
+          backTo={from}
+          activeTab={activeTab}
+        />
 
         <VStack space="md" m={10} flex={1}>
           {/* Invoice Box */}

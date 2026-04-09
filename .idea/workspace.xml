@@ -5,35 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="589658b5-1d4c-4a08-9310-5764c2946ff8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/keuangan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/keuangan.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Berlangsung.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Berlangsung.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/Proses.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Proses.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config/instance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/instance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/account/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/account/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/account/pengaturanAkun.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/account/pengaturanAkun.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/home/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/home/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/invoice/bayarInvoice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/invoice/bayarInvoice.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/invoice/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/invoice/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/bayarSaldo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/bayarSaldo.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/detailTransaksi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/detailTransaksi.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screen/keuangan/metodeBayar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/metodeBayar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screen/keuangan/statusTransaksi.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/statusTransaksi.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screen/keuangan/tagihan/detailTagihan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/tagihan/detailTagihan.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screen/keuangan/tagihan/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/tagihan/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/topUp.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/topUp.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/keuangan/transferNow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/transferNow.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screen/keuangan/transferVa.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/keuangan/transferVa.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/login/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/login/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/apiService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/apiService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/authStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/authStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/tagihanStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/tagihanStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/userStore.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

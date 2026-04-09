@@ -18,12 +18,14 @@ import {
   Center,
   HStack,
 } from "@gluestack-ui/themed";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Dimensions, useColorScheme } from "react-native";
 
 const DetailTransaksi = () => {
   const mode = useColorScheme();
   const screenHeight = Dimensions.get("window").height;
+  const { from, activeTab } = useLocalSearchParams();
 
   return (
     <SafeAreaView
@@ -31,7 +33,11 @@ const DetailTransaksi = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Transaksi"} />
+        <Header
+          data={"Detail Transaksi"}
+          backTo={from}
+          activeTab={activeTab}
+        />
 
         <VStack m={20} mt={20} space={"md"}>
           <Box

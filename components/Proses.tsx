@@ -82,6 +82,8 @@ const Proses = ({
     return filtered;
   }, [data]);
 
+  console.log("data", uniqueData);
+
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await Clipboard.setStringAsync(text);
@@ -295,7 +297,7 @@ const Proses = ({
                   Nama Tagihan
                 </Text>
                 <Text fontSize={14} fontFamily="Lato" fontWeight="$semibold">
-                  {item.master_tagihan?.nama ?? "-"}
+                  {item.tagihan_users?.[0]?.master_tagihan?.nama ?? "-"}
                 </Text>
               </VStack>
               <CustomBadge variant="warning" label="Dalam Proses" />

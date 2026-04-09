@@ -126,22 +126,8 @@ const Tagihan = () => {
       console.log("Raw items count:", rawItems.length);
       console.log("First item:", rawItems[0]);
 
-      const data: ItemType[] = rawItems.map((item: any) => ({
-        id: item.id?.toString() || "",
-        no_tagihan: item.no_tagihan || item.no_tagihan || "",
-        no_invoice: item.no_invoice || "",
-        tagihan_name: item.tagihan_name || item.nama_tagihan || "",
-        total: item.total?.toString() || "",
-        expire_at: item.expire_at || item.expired_at || "",
-        nominal: Number(item.nominal) || 0,
-        status: item.status?.toUpperCase() ?? "UNPAID",
-        created_at: item.created_at || "",
-        updated_at: item.updated_at || "",
-        master_tagihan: item.master_tagihan || { nama: item.nama_tagihan || "-" },
-      }));
-
-      console.log("Mapped ongoing data:", data);
-      setOngoingData(data);
+      // Simpan raw items agar semua data terbawa untuk detail
+      setOngoingData(rawItems as ItemType[]);
     } catch (error) {
       console.error("Error fetching ongoing data:", error);
       setOngoingData([]);
@@ -178,22 +164,8 @@ const Tagihan = () => {
       console.log("Raw items count:", rawItems.length);
       console.log("First item:", rawItems[0]);
 
-      const data: ItemType[] = rawItems.map((item: any) => ({
-        id: item.id?.toString() || "",
-        no_tagihan: item.no_tagihan || item.tagihan_no || "",
-        no_invoice: item.no_invoice || item.invoice_no || item.no_invoice || "",
-        tagihan_name: item.tagihan_name || item.nama_tagihan || item.description || "",
-        total: item.total?.toString() || "",
-        expire_at: item.expire_at || item.expired_at || item.tanggal_exp || "",
-        nominal: Number(item.nominal) || Number(item.total_nominal) || 0,
-        status: item.status?.toUpperCase() ?? "IN_PROGRESS",
-        created_at: item.created_at || item.tanggal || "",
-        updated_at: item.updated_at || "",
-        master_tagihan: item.master_tagihan || { nama: item.nama_tagihan || item.nama || "-" },
-      }));
-
-      console.log("Mapped proses data:", data);
-      setProsesData(data);
+      // Simpan raw items agar semua data terbawa untuk detail
+      setProsesData(rawItems as ItemType[]);
     } catch (error) {
       console.error("Error fetching proses data:", error);
       setProsesData([]);

@@ -109,8 +109,12 @@ const DetailTagihan = () => {
     );
   }
 
-  // Parse expire_at untuk tanggal dan waktu
-  const [tanggal, waktu] = dataInvoice.expire_at?.split(" ") ?? ["-", "-"];
+  // Parse expire_at untuk tanggal dan waktu (prioritas: pembayaran.expire_at > tagihan_users[0].expire_at > expire_at)
+  const expireAt = dataInvoice?.pembayaran?.expire_at
+    ?? dataInvoice?.tagihan_users?.[0]?.expire_at
+    ?? dataInvoice?.expire_at
+    ?? "";
+  const [tanggal, waktu] = expireAt?.split(" ") ?? ["-", "-"];
 
   return (
     <SafeAreaView
@@ -149,7 +153,7 @@ const DetailTagihan = () => {
               fontFamily="Lato"
               color={mode == "dark" ? "white" : "black"}
             >
-              Rp. {formatRupiah(dataInvoice.nominal)}
+              Rp. {formatRupiah(Number(dataInvoice.nominal) || 0)}
             </Text>
             <Text
               fontWeight={"$bold"}
@@ -242,7 +246,7 @@ const DetailTagihan = () => {
                               fontSize={14}
                               fontWeight={"$semibold"}
                             >
-                              Tagihan {dataInvoice?.no_tagihan}
+                              Tagihan {dataInvoice?.tagihan_users?.[0]?.no_tagihan ?? dataInvoice?.no_tagihan ?? "-"}
                             </Text>
                           </HStack>
                         </HStack>
@@ -288,7 +292,9 @@ const DetailTagihan = () => {
                         fontSize={14}
                         fontWeight={"$semibold"}
                       >
-                        {dataInvoice.master_tagihan?.nama ?? "-"}
+                        {dataInvoice?.tagihan_users?.[0]?.master_tagihan?.nama
+                          ?? dataInvoice?.master_tagihan?.nama
+                          ?? "-"}
                       </Text>
                     </HStack>
 

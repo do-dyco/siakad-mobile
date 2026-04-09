@@ -54,7 +54,7 @@ const StatusTransaksi = () => {
   const toggleActionsheet = () => setShowActionsheet(!showActionsheet);
   const textColor = isDark ? "white" : "black";
   const bgColor = isDark ? "black" : "white";
-  const { nama_bank, nama_rekening, nominal, no_invoice } =
+  const { nama_bank, nama_rekening, nominal, no_invoice, from, activeTab } =
     useLocalSearchParams();
   const [dataInvoice, setDataInvoice] = useState<any>({});
   const toast = useToast();
@@ -158,7 +158,11 @@ const StatusTransaksi = () => {
         backgroundColor={bgColor}
         height={screenHeight}
       >
-        <Header data="Status Transaksi" />
+        <Header
+          data="Status Transaksi"
+          backTo={from}
+          activeTab={activeTab}
+        />
 
         <VStack space="md" flex={1} m={10}>
           {/* Status Box */}

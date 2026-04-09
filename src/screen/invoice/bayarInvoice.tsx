@@ -219,7 +219,7 @@ const BayarInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Invoice"} from={from} activeTab={activeTab} />
+        <Header data={"Detail Invoice"} backTo={from} activeTab={activeTab} />
 
         <VStack m={20} mt={20} space={"md"}>
           <ViewShot

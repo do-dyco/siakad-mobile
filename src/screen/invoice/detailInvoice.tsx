@@ -85,7 +85,11 @@ const DetailInvoice = () => {
       height={screenHeight}
     >
       <ScrollView>
-        <Header data={"Detail Transaksi"} />
+        <Header
+          data={"Detail Transaksi"}
+          backTo={from}
+          activeTab={activeTab}
+        />
         <VStack space="md" mx={10}>
           <HStack justifyContent="space-between">
             <Text
